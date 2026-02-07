@@ -950,3 +950,9 @@ Mostrá un resumen con:
 
 ### Output token limit
 - Si el output excede 32K tokens, NO es un error. Simplemente continuá el trabajo en el siguiente bloque sin explicar qué pasó.
+
+### Post-ejecución obligatoria
+Después de completar cada fase de GSD (antes de merge a main):
+1. Invocar `/project:review` sobre el diff de la rama actual vs main
+2. Si el review reporta problemas, corregirlos ANTES de merge
+3. Solo hacer merge si el review pasa limpio
