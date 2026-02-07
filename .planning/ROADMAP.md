@@ -52,11 +52,12 @@ Plans:
   3. System successfully calls siRecepDE SOAP endpoint with mutual TLS
   4. System parses SIFEN response and maps codes (0260=aprobado, 0300+=rechazado)
   5. System can query DE status by CDC using siConsDE
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — IXmlGenerator port + SifenDataMapper + XmlGeneratorSifen adapter (TDD)
+- [ ] 02-02-PLAN.md — FirmaDigitalSifen + SifenGatewayImpl adapters (TDD)
+- [ ] 02-03-PLAN.md — Wire adapters into EnviarDE + SincronizarPendientes use cases
 
 ### Phase 3: Sync & Queue
 **Goal**: Implement offline sync engine with FIFO queue processing and exponential backoff
