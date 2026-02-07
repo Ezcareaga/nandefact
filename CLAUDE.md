@@ -922,3 +922,31 @@ SIFEN_PROD_URL=https://sifen.set.gov.py/de/ws/
 WHATSAPP_API_TOKEN=<meta-api-token>
 WHATSAPP_PHONE_ID=<phone-number-id>
 ```
+
+---
+
+## Reglas del Agente
+
+### Comunicación
+- Sé conciso. No expliques lo que vas a hacer, solo hacelo.
+- No repitas código en la explicación que ya escribiste en archivos.
+- No pidas confirmación. Ejecutá directamente.
+- No muestres outputs intermedios a menos que haya un error.
+- No hagas tablas decorativas ni árboles ASCII durante el trabajo.
+
+### Al terminar cada tarea
+Mostrá un resumen con:
+1. Commits realizados (hash corto + mensaje)
+2. Archivos creados/modificados (solo nombres, no contenido)
+3. Tests: cantidad total, pasados, fallidos
+4. Errores encontrados y cómo se resolvieron
+5. Tiempo total
+
+### Principios de código
+- DRY: si algo se usa 2+ veces, extraer a función/clase/módulo compartido.
+- SOLID: responsabilidad única, abierto/cerrado, inversión de dependencias.
+- No duplicar lógica entre archivos. Reutilizar siempre.
+- Preferir composición sobre herencia.
+
+### Output token limit
+- Si el output excede 32K tokens, NO es un error. Simplemente continuá el trabajo en el siguiente bloque sin explicar qué pasó.
