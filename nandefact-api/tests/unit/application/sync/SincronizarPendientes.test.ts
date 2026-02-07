@@ -23,7 +23,10 @@ describe('SincronizarPendientes', () => {
    * Helper: Crea una factura en estado pendiente con items y CDC generado.
    */
   function crearFacturaPendiente(id: string, fecha: Date): Factura {
-    const numeroFactura = new NumeroFactura('001', '003', `000${id.slice(-4)}`);
+    // Generar número de 7 dígitos basado en el ID
+    const hashCode = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const numero = String(hashCode % 10000000).padStart(7, '0');
+    const numeroFactura = new NumeroFactura('001', '003', numero);
     const factura = new Factura({
       id,
       comercioId,
