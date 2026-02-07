@@ -35,11 +35,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. SincronizarPendientes use case can process queue of pending facturas in FIFO order
   4. AnularFactura use case can send cancelation event for approved DTE
   5. Unit tests validate use case behavior with mocked ports
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — CrearFactura use case + application errors + IComercioRepository port (TDD)
+- [ ] 01-02-PLAN.md — EnviarDE + AnularFactura use cases (TDD)
+- [ ] 01-03-PLAN.md — SincronizarPendientes use case (TDD)
 
 ### Phase 2: SIFEN Integration
 **Goal**: Implement SIFEN gateway adapter with XML generation, signature, and SOAP communication
