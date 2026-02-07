@@ -43,7 +43,10 @@ export class AnularFactura {
     }
 
     // 3. Obtener CDC (una factura aprobada siempre tiene CDC)
-    const cdc = factura.cdc!.value;
+    if (!factura.cdc) {
+      throw new Error(`Factura ${input.facturaId} aprobada sin CDC`);
+    }
+    const cdc = factura.cdc.value;
 
     // 4. Enviar evento de cancelación a SIFEN
     const response = await this.deps.sifenGateway.anularDE(cdc, input.motivo);

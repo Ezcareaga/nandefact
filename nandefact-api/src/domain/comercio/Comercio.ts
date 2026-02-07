@@ -1,6 +1,6 @@
 import type { TipoContribuyente } from '../shared/types.js';
-import { RUC } from './RUC.js';
-import { Timbrado } from './Timbrado.js';
+import type { RUC } from './RUC.js';
+import type { Timbrado } from './Timbrado.js';
 
 export interface ComercioProps {
   id: string;

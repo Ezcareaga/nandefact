@@ -43,7 +43,10 @@ export class EnviarDE {
     factura.marcarEnviada();
 
     // 3. Generar XML placeholder (será reemplazado en Phase 2)
-    const xmlPlaceholder = this.generarXmlPlaceholder(factura.cdc!.value);
+    if (!factura.cdc) {
+      throw new Error(`Factura ${input.facturaId} no tiene CDC generado`);
+    }
+    const xmlPlaceholder = this.generarXmlPlaceholder(factura.cdc.value);
 
     // 4. Firmar XML con certificado CCFE
     const xmlFirmado = await this.deps.firmaDigital.firmar(xmlPlaceholder);

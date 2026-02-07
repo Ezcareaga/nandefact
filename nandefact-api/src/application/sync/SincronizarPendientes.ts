@@ -69,9 +69,12 @@ export class SincronizarPendientes {
         await this.procesarFactura(factura);
 
         // Registrar resultado exitoso
+        if (!factura.cdc) {
+          throw new Error(`Factura ${factura.id} procesada sin CDC`);
+        }
         resultados.push({
           facturaId: factura.id,
-          cdc: factura.cdc!.value,
+          cdc: factura.cdc.value,
           exito: true,
         });
         exitosas++;
@@ -80,7 +83,7 @@ export class SincronizarPendientes {
         const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
         resultados.push({
           facturaId: factura.id,
-          cdc: factura.cdc!.value,
+          cdc: factura.cdc?.value ?? '',
           exito: false,
           error: errorMessage,
         });
@@ -118,7 +121,10 @@ export class SincronizarPendientes {
     factura.marcarEnviada();
 
     // 2. Generar XML placeholder (será reemplazado en Phase 2)
-    const xmlPlaceholder = this.generarXmlPlaceholder(factura.cdc!.value);
+    if (!factura.cdc) {
+      throw new Error(`Factura ${factura.id} no tiene CDC generado`);
+    }
+    const xmlPlaceholder = this.generarXmlPlaceholder(factura.cdc.value);
 
     // 3. Firmar XML con certificado CCFE
     const xmlFirmado = await this.deps.firmaDigital.firmar(xmlPlaceholder);

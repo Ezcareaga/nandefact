@@ -6,10 +6,10 @@ import type {
   EstadoSifen,
 } from '../shared/types.js';
 import { CDC } from './CDC.js';
-import { ItemFactura } from './ItemFactura.js';
-import { NumeroFactura } from './NumeroFactura.js';
-import { Timbrado } from '../comercio/Timbrado.js';
-import { RUC } from '../comercio/RUC.js';
+import type { ItemFactura } from './ItemFactura.js';
+import type { NumeroFactura } from './NumeroFactura.js';
+import type { Timbrado } from '../comercio/Timbrado.js';
+import type { RUC } from '../comercio/RUC.js';
 import { FacturaSinItemsError } from '../errors/FacturaSinItemsError.js';
 
 export interface FacturaProps {
