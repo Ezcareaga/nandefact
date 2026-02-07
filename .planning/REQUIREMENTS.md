@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Facturación
 
-- [ ] **FACT-01**: Sistema puede crear factura con CDC, items, IVA calculado, y guardarla con estado pendiente
+- [x] **FACT-01**: Sistema puede crear factura con CDC, items, IVA calculado, y guardarla con estado pendiente
 - [ ] **FACT-02**: Sistema puede firmar XML con CCFE y enviar DE a SIFEN (siRecepDE)
 - [ ] **FACT-03**: Sistema procesa cola de facturas pendientes en orden FIFO con backoff exponencial
 - [ ] **FACT-04**: Sistema puede anular DTE aprobado via evento cancelación SIFEN
@@ -96,7 +96,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FACT-01 | Phase 1 - Application Layer | Pending |
+| FACT-01 | Phase 1 - Application Layer | Complete |
 | FACT-02 | Phase 2 - SIFEN Integration | Pending |
 | FACT-03 | Phase 3 - Sync & Queue | Pending |
 | FACT-04 | Phase 4 - Events & KuDE | Pending |
@@ -130,4 +130,4 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-07 after roadmap creation*
+*Last updated: 2026-02-07 after Phase 1 completion*

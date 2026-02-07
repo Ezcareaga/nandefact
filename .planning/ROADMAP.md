@@ -12,7 +12,7 @@ Build production-ready backend (Application Layer → Infrastructure → API) an
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Application Layer** - Core use cases (CrearFactura, EnviarDE, etc.)
+- [x] **Phase 1: Application Layer** - Core use cases (CrearFactura, EnviarDE, etc.)
 - [ ] **Phase 2: SIFEN Integration** - XML generation, signature, SOAP communication
 - [ ] **Phase 3: Sync & Queue** - Offline processing with backoff, FIFO queue
 - [ ] **Phase 4: Events & KuDE** - Cancelation, inutilization, PDF generation
@@ -38,9 +38,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — CrearFactura use case + application errors + IComercioRepository port (TDD)
-- [ ] 01-02-PLAN.md — EnviarDE + AnularFactura use cases (TDD)
-- [ ] 01-03-PLAN.md — SincronizarPendientes use case (TDD)
+- [x] 01-01-PLAN.md — CrearFactura use case + application errors + IComercioRepository port (TDD)
+- [x] 01-02-PLAN.md — EnviarDE + AnularFactura use cases (TDD)
+- [x] 01-03-PLAN.md — SincronizarPendientes use case (TDD)
 
 ### Phase 2: SIFEN Integration
 **Goal**: Implement SIFEN gateway adapter with XML generation, signature, and SOAP communication
@@ -197,7 +197,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Application Layer | 0/TBD | Not started | - |
+| 1. Application Layer | 3/3 | Complete | 2026-02-07 |
 | 2. SIFEN Integration | 0/TBD | Not started | - |
 | 3. Sync & Queue | 0/TBD | Not started | - |
 | 4. Events & KuDE | 0/TBD | Not started | - |
