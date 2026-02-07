@@ -96,32 +96,32 @@ Requirements for initial release. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FACT-01 | Phase 1 | Pending |
-| FACT-02 | Phase 1 | Pending |
-| FACT-03 | Phase 1 | Pending |
-| FACT-04 | Phase 1 | Pending |
-| FACT-05 | Phase 1 | Pending |
-| FACT-06 | Phase 1 | Pending |
-| KUDE-01 | Phase 1 | Pending |
-| KUDE-02 | Phase 1 | Pending |
-| PROD-01 | Phase 2 | Pending |
-| PROD-02 | Phase 2 | Pending |
-| PROD-03 | Phase 2 | Pending |
-| CLIE-01 | Phase 2 | Pending |
-| CLIE-02 | Phase 2 | Pending |
-| CLIE-03 | Phase 2 | Pending |
-| COME-01 | Phase 2 | Pending |
-| COME-02 | Phase 2 | Pending |
-| COME-03 | Phase 2 | Pending |
-| AUTH-01 | Phase 3 | Pending |
-| AUTH-02 | Phase 3 | Pending |
-| INFR-01 | Phase 4 | Pending |
-| INFR-02 | Phase 4 | Pending |
-| INFR-03 | Phase 4 | Pending |
-| APP-01 | Phase 5 | Pending |
-| APP-02 | Phase 5 | Pending |
-| APP-03 | Phase 5 | Pending |
-| APP-04 | Phase 5 | Pending |
+| FACT-01 | Phase 1 - Application Layer | Pending |
+| FACT-02 | Phase 2 - SIFEN Integration | Pending |
+| FACT-03 | Phase 3 - Sync & Queue | Pending |
+| FACT-04 | Phase 4 - Events & KuDE | Pending |
+| FACT-05 | Phase 4 - Events & KuDE | Pending |
+| FACT-06 | Phase 2 - SIFEN Integration | Pending |
+| KUDE-01 | Phase 4 - Events & KuDE | Pending |
+| KUDE-02 | Phase 4 - Events & KuDE | Pending |
+| PROD-01 | Phase 5 - Productos & Clientes | Pending |
+| PROD-02 | Phase 5 - Productos & Clientes | Pending |
+| PROD-03 | Phase 5 - Productos & Clientes | Pending |
+| CLIE-01 | Phase 5 - Productos & Clientes | Pending |
+| CLIE-02 | Phase 5 - Productos & Clientes | Pending |
+| CLIE-03 | Phase 5 - Productos & Clientes | Pending |
+| COME-01 | Phase 6 - Comercio & Auth | Pending |
+| COME-02 | Phase 6 - Comercio & Auth | Pending |
+| COME-03 | Phase 6 - Comercio & Auth | Pending |
+| AUTH-01 | Phase 6 - Comercio & Auth | Pending |
+| AUTH-02 | Phase 6 - Comercio & Auth | Pending |
+| INFR-01 | Phase 8 - Infrastructure Testing | Pending |
+| INFR-02 | Phase 8 - Infrastructure Testing | Pending |
+| INFR-03 | Phase 8 - Infrastructure Testing | Pending |
+| APP-01 | Phase 10 - Android UI | Pending |
+| APP-02 | Phase 10 - Android UI | Pending |
+| APP-03 | Phase 10 - Android UI | Pending |
+| APP-04 | Phase 9 - Android Shared KMP | Pending |
 
 **Coverage:**
 - v1 requirements: 26 total
@@ -130,4 +130,4 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-07 after initial definition*
+*Last updated: 2026-02-07 after roadmap creation*
