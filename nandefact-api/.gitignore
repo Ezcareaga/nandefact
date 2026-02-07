@@ -1,0 +1,33 @@
+# Dependencias
+node_modules/
+
+# Build
+dist/
+
+# Entorno
+.env
+.env.local
+.env.*.local
+
+# Cobertura y tests
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Certificados (NUNCA commitear)
+*.p12
+*.pfx
+*.pem
+*.key
