@@ -5,6 +5,8 @@ import type { IFirmaDigital } from './IFirmaDigital.js';
 import type { ISifenGateway, SifenResponse } from './ISifenGateway.js';
 import type { IComercioRepository } from '../comercio/IComercioRepository.js';
 import type { IClienteRepository } from '../cliente/IClienteRepository.js';
+import { CDCSinGenerarError } from '../errors/CDCSinGenerarError.js';
+import { DomainError } from '../errors/DomainError.js';
 
 export interface EnviarFacturaResult {
   esAprobado: boolean;
@@ -32,13 +34,13 @@ export class EnviarFacturaASifen {
     // 1. Cargar comercio
     const comercio = await this.deps.comercioRepository.findById(factura.comercioId);
     if (!comercio) {
-      throw new Error(`Comercio no encontrado: ${factura.comercioId}`);
+      throw new DomainError(`Comercio no encontrado: ${factura.comercioId}`);
     }
 
     // 2. Cargar cliente
     const cliente = await this.deps.clienteRepository.findById(factura.clienteId);
     if (!cliente) {
-      throw new Error(`Cliente no encontrado: ${factura.clienteId}`);
+      throw new DomainError(`Cliente no encontrado: ${factura.clienteId}`);
     }
 
     // 3. Marcar como enviada
@@ -46,7 +48,7 @@ export class EnviarFacturaASifen {
 
     // 4. Validar CDC
     if (!factura.cdc) {
-      throw new Error(`Factura ${factura.id} no tiene CDC generado`);
+      throw new CDCSinGenerarError(factura.id);
     }
 
     // 5. Generar XML

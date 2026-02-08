@@ -1,6 +1,7 @@
 import type { TipoContribuyente } from '../shared/types.js';
 import type { RUC } from './RUC.js';
 import type { Timbrado } from './Timbrado.js';
+import { ComercioInvalidoError } from '../errors/ComercioInvalidoError.js';
 import { DomainError } from '../errors/DomainError.js';
 
 export interface ComercioProps {
@@ -64,16 +65,16 @@ export class Comercio {
 
   constructor(props: ComercioProps) {
     if (props.razonSocial.trim().length === 0) {
-      throw new Error('La razón social no puede estar vacía');
+      throw new ComercioInvalidoError('la razón social no puede estar vacía');
     }
 
     if (!/^\d{3}$/.test(props.establecimiento)) {
-      throw new Error(`Establecimiento inválido: "${props.establecimiento}", debe ser 3 dígitos`);
+      throw new ComercioInvalidoError(`establecimiento "${props.establecimiento}" debe ser 3 dígitos`);
     }
 
     if (!/^\d{3}$/.test(props.puntoExpedicion)) {
-      throw new Error(
-        `Punto de expedición inválido: "${props.puntoExpedicion}", debe ser 3 dígitos`,
+      throw new ComercioInvalidoError(
+        `punto de expedición "${props.puntoExpedicion}" debe ser 3 dígitos`,
       );
     }
 
