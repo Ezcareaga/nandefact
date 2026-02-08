@@ -7,6 +7,7 @@ import { ItemFactura } from '../../../../src/domain/factura/ItemFactura.js';
 import { NumeroFactura } from '../../../../src/domain/factura/NumeroFactura.js';
 import { Timbrado } from '../../../../src/domain/comercio/Timbrado.js';
 import { RUC } from '../../../../src/domain/comercio/RUC.js';
+import { FacturaNoEncontradaError } from '../../../../src/application/errors/FacturaNoEncontradaError.js';
 
 describe('EncolarFactura', () => {
   const timbrado = new Timbrado('12558946', new Date('2024-01-01'), new Date('2026-12-31'));
@@ -99,6 +100,9 @@ describe('EncolarFactura', () => {
     vi.mocked(facturaRepository.findById).mockResolvedValue(null);
 
     // Act & Assert
+    await expect(encolarFactura.execute({ facturaId })).rejects.toThrow(
+      FacturaNoEncontradaError,
+    );
     await expect(encolarFactura.execute({ facturaId })).rejects.toThrow(
       'Factura no encontrada',
     );
