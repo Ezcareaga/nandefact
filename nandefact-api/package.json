@@ -40,5 +40,10 @@
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.18.0",
     "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "facturacionelectronicapy-setapi": "^1.0.34",
+    "facturacionelectronicapy-xmlgen": "^1.0.277",
+    "facturacionelectronicapy-xmlsign": "^1.0.28"
   }
 }
