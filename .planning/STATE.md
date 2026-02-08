@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 ## Current Position
 
 Phase: 3 of 10 (Sync & Queue) — IN PROGRESS
-Plan: 1 of 3 complete
-Last activity: 2026-02-08 — Completed 03-01-PLAN.md (Queue domain layer)
+Plan: 2 of 3 complete
+Last activity: 2026-02-08 — Completed 03-02-PLAN.md (BullMQ adapter)
 
-Progress: [███░░░░░░░] 23%
+Progress: [███░░░░░░░] 27%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 14.0 min
-- Total execution time: 1.63 hours
+- Total plans completed: 8
+- Average duration: 12.0 min
+- Total execution time: 1.69 hours
 
 **By Phase:**
 
@@ -28,14 +28,14 @@ Progress: [███░░░░░░░] 23%
 |-------|-------|-------|----------|--------|
 | 01-application-layer | 3/3 | 8 min | 2.7 min | Complete |
 | 02-sifen-integration | 3/3 | 84 min | 28.0 min | Complete |
-| 03-sync-queue | 1/3 | 6 min | 6.0 min | In Progress |
+| 03-sync-queue | 2/3 | 10 min | 5.0 min | In Progress |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (2min), 02-01 (72min), 02-02 (6min), 02-03 (6min), 03-01 (6min)
-- Trend: Velocity stable at 6min for well-scoped plans, xmlgen was outlier
+- Last 5 plans: 02-01 (72min), 02-02 (6min), 02-03 (6min), 03-01 (6min), 03-02 (4min)
+- Trend: Velocity improving (6min → 4min), infrastructure tasks faster than expected
 
 **Test Coverage:**
-- Total tests: 151 (59 domain + 33 application + 59 sifen)
+- Total tests: 172 (59 domain + 33 application + 59 sifen + 21 queue/logging)
 - All passing, zero regressions
 
 *Updated after each plan completion*
@@ -71,6 +71,10 @@ Recent decisions affecting current work:
 - 03-01: 72-hour check at processing time (Good) — Expiration checked when job dequeued, not when enqueued
 - 03-01: Max 5 retry attempts (Good) — Prevents infinite loops while allowing transient failures to resolve
 - 03-01: Single-job processing (Good) — One job at a time simplifies error handling, BullMQ manages concurrency
+- 03-02: Concurrency=1 for strict FIFO (Good) — Ensures facturas are processed in exact order enqueued
+- 03-02: Rate limiting 10 jobs/min (Good) — Prevents overwhelming SIFEN API with burst traffic
+- 03-02: Exponential backoff in adapter (Good) — Domain remains pure, retry delays calculated in infrastructure
+- 03-02: Mock BullMQ in tests (Good) — Unit tests don't require running Redis instance
 
 ### Pending Todos
 
@@ -85,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-08 00:43:39Z
-Stopped at: Completed 03-01-PLAN.md (Queue domain and use cases)
+Last session: 2026-02-08 03:51:20Z
+Stopped at: Completed 03-02-PLAN.md (BullMQ adapter implementation)
 Resume file: None
