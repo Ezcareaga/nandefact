@@ -12,14 +12,14 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **FACT-01**: Sistema puede crear factura con CDC, items, IVA calculado, y guardarla con estado pendiente
 - [x] **FACT-02**: Sistema puede firmar XML con CCFE y enviar DE a SIFEN (siRecepDE)
 - [x] **FACT-03**: Sistema procesa cola de facturas pendientes en orden FIFO con backoff exponencial
-- [ ] **FACT-04**: Sistema puede anular DTE aprobado via evento cancelación SIFEN
-- [ ] **FACT-05**: Sistema puede inutilizar rangos de numeración salteados
+- [x] **FACT-04**: Sistema puede anular DTE aprobado via evento cancelación SIFEN
+- [x] **FACT-05**: Sistema puede inutilizar rangos de numeración salteados
 - [x] **FACT-06**: Sistema puede consultar estado de DE por CDC (siConsDE)
 
 ### KuDE
 
-- [ ] **KUDE-01**: Sistema genera PDF KuDE con datos factura, totales IVA, QR code
-- [ ] **KUDE-02**: Puerto INotificador implementado (interfaz lista para WhatsApp, sin Meta API)
+- [x] **KUDE-01**: Sistema genera PDF KuDE con datos factura, totales IVA, QR code
+- [x] **KUDE-02**: Puerto INotificador implementado (interfaz lista para WhatsApp, sin Meta API)
 
 ### Productos
 
@@ -99,11 +99,11 @@ Requirements for initial release. Each maps to roadmap phases.
 | FACT-01 | Phase 1 - Application Layer | Complete |
 | FACT-02 | Phase 2 - SIFEN Integration | Complete |
 | FACT-03 | Phase 3 - Sync & Queue | Complete |
-| FACT-04 | Phase 4 - Events & KuDE | Pending |
-| FACT-05 | Phase 4 - Events & KuDE | Pending |
+| FACT-04 | Phase 4 - Events & KuDE | Complete |
+| FACT-05 | Phase 4 - Events & KuDE | Complete |
 | FACT-06 | Phase 2 - SIFEN Integration | Complete |
-| KUDE-01 | Phase 4 - Events & KuDE | Pending |
-| KUDE-02 | Phase 4 - Events & KuDE | Pending |
+| KUDE-01 | Phase 4 - Events & KuDE | Complete |
+| KUDE-02 | Phase 4 - Events & KuDE | Complete |
 | PROD-01 | Phase 5 - Productos & Clientes | Pending |
 | PROD-02 | Phase 5 - Productos & Clientes | Pending |
 | PROD-03 | Phase 5 - Productos & Clientes | Pending |
@@ -130,4 +130,4 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-08 after Phase 2 completion*
+*Last updated: 2026-02-08 after Phase 4 completion*

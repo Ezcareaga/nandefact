@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Application Layer** - Core use cases (CrearFactura, EnviarDE, etc.)
 - [x] **Phase 2: SIFEN Integration** - XML generation, signature, SOAP communication
 - [x] **Phase 3: Sync & Queue** - Offline processing with backoff, FIFO queue
-- [ ] **Phase 4: Events & KuDE** - Cancelation, inutilization, PDF generation
+- [x] **Phase 4: Events & KuDE** - Cancelation, inutilization, PDF generation
 - [ ] **Phase 5: Productos & Clientes** - CRUD use cases, validation, search
 - [ ] **Phase 6: Comercio & Auth** - Setup, certificate management, JWT + PIN
 - [ ] **Phase 7: API REST** - Express routes, Zod validation, endpoints
@@ -88,8 +88,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — SIFEN events: fix cancelation state mutation + proper XML, add inutilization use case
-- [ ] 04-02-PLAN.md — KuDE PDF generation with QR code + EnviarKuDE use case + NotificadorStub
+- [x] 04-01-PLAN.md — SIFEN events: fix cancelation state mutation + proper XML, add inutilization use case
+- [x] 04-02-PLAN.md — KuDE PDF generation with QR code + EnviarKuDE use case + NotificadorStub
 
 ### Phase 5: Productos & Clientes
 **Goal**: Implement CRUD use cases for products and clients with validation
@@ -201,7 +201,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Application Layer | 3/3 | Complete | 2026-02-07 |
 | 2. SIFEN Integration | 3/3 | Complete | 2026-02-08 |
 | 3. Sync & Queue | 2/2 | Complete | 2026-02-08 |
-| 4. Events & KuDE | 0/2 | Not started | - |
+| 4. Events & KuDE | 2/2 | Complete | 2026-02-08 |
 | 5. Productos & Clientes | 0/TBD | Not started | - |
 | 6. Comercio & Auth | 0/TBD | Not started | - |
 | 7. API REST | 0/TBD | Not started | - |
