@@ -18,3 +18,6 @@ export type CondicionPago = 'contado' | 'credito';
 
 /** Tipo de documento de identidad del receptor */
 export type TipoDocumentoIdentidad = 'RUC' | 'CI' | 'pasaporte' | 'innominado';
+
+/** Rol del usuario en el comercio */
+export type RolUsuario = 'dueño' | 'empleado';
