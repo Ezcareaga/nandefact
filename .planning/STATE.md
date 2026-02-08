@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 ## Current Position
 
 Phase: 8 of 10 (Infrastructure Testing) — IN PROGRESS
-Plan: 1 of 4 (plan 08-01 complete)
-Last activity: 2026-02-08 — Completed 08-01-PLAN.md (Prisma ORM + Docker)
+Plan: 2 of 4 (plan 08-02 complete)
+Last activity: 2026-02-08 — Completed 08-02-PLAN.md (PostgreSQL Repositories + JWT Auth)
 
-Progress: [████████░░] 75%
+Progress: [████████░░] 76.5%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
-- Average duration: 9.4 min
-- Total execution time: 3.20 hours
+- Total plans completed: 21
+- Average duration: 9.5 min
+- Total execution time: 3.37 hours
 
 **By Phase:**
 
@@ -33,17 +33,18 @@ Progress: [████████░░] 75%
 | 05-productos-clientes | 2/2 | 14 min | 7.0 min | Complete |
 | 06-comercio-auth | 2/2 | 28 min | 14.0 min | Complete |
 | 07-api-rest | 4/4 | 23 min | 5.8 min | Complete ✅ |
-| 08-infrastructure-testing | 1/4 | 6 min | 6.0 min | In Progress |
+| 08-infrastructure-testing | 2/4 | 17 min | 8.5 min | In Progress |
 
 **Recent Trend:**
-- Last 5 plans: 07-02 (4min), 07-03 (7min), 07-04 (9min), 08-01 (6min)
-- Trend: Infrastructure setup faster than expected - Prisma schema straightforward
+- Last 5 plans: 07-03 (7min), 07-04 (9min), 08-01 (6min), 08-02 (11min)
+- Trend: Repository adapters slower than DB setup — reflection pattern + enum mapping + BigInt conversion required careful implementation
 
 **Test Coverage:**
 - Total tests: 371 (139 domain + 123 application + 75 sifen + 34 queue/logging/kude/http)
 - All passing, zero regressions
 - Phase 7 added 12 HTTP route tests
 - Phase 8-01: No new tests (infrastructure setup only)
+- Phase 8-02: No new tests (adapters integrate existing tests)
 
 *Updated after each plan completion*
 
@@ -116,6 +117,12 @@ Recent decisions affecting current work:
 - 08-01: Cascade delete on Comercio (Good) — All entities belong to Comercio, delete together
 - 08-01: Restrict delete on Cliente (Good) — Cannot delete cliente if facturas exist (audit trail)
 - 08-01: Multi-stage Docker build (Good) — Smaller production image, faster builds with layer caching
+- 08-02: Reflection pattern for Factura reconstruction (Good) — Private fields (_items, _cdc, _estado) can't be set via constructor, reflection bypasses validation
+- 08-02: Enum mapping dueño → dueno (Good) — PostgreSQL enums can't have tildes, mapper handles conversion
+- 08-02: AES-256-GCM over AES-256-CBC (Good) — Authenticated encryption prevents tampering, modern standard
+- 08-02: bcrypt salt rounds = 10 (Good) — Balances security vs performance (~100ms hash time)
+- 08-02: JWT HS256 over RS256 (Good) — Symmetric key sufficient for our use case, simpler key management
+- 08-02: Graceful shutdown handlers (Good) — Disconnect Prisma on SIGTERM/SIGINT prevents orphaned connections
 
 ### Pending Todos
 
@@ -132,6 +139,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 08-01-PLAN.md (Prisma ORM + Docker infrastructure)
+Stopped at: Completed 08-02-PLAN.md (PostgreSQL Repositories + JWT Auth + Dependency Wiring)
 Resume file: None
-Next: 08-02 (Repository implementations with Prisma)
+Next: 08-03 (Integration tests or HTTP API tests)

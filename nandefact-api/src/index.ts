@@ -1,18 +1,29 @@
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 /**
  * Punto de entrada de la aplicación ÑandeFact API.
  *
  * Este archivo:
  * 1. Instancia todas las dependencias (use cases, repos, servicios)
  * 2. Inicia el servidor HTTP
- *
- * NOTA: En esta fase (07-04), las dependencias son stubs que lanzan errores "Not implemented".
- * La Fase 8 (infrastructure) implementará los adaptadores reales (PostgreSQL, SIFEN, etc.).
+ * 3. Maneja graceful shutdown
  */
 
 import { startServer } from './interfaces/http/server.js';
 import type { AppDependencies } from './interfaces/http/app.js';
+
+// Prisma Client singleton
+import { prisma } from './infrastructure/persistence/prismaClient.js';
+
+// Repositorios PostgreSQL
+import { ComercioRepositoryPg } from './infrastructure/persistence/ComercioRepositoryPg.js';
+import { UsuarioRepositoryPg } from './infrastructure/persistence/UsuarioRepositoryPg.js';
+import { ProductoRepositoryPg } from './infrastructure/persistence/ProductoRepositoryPg.js';
+import { ClienteRepositoryPg } from './infrastructure/persistence/ClienteRepositoryPg.js';
+import { FacturaRepositoryPg } from './infrastructure/persistence/FacturaRepositoryPg.js';
+import { CertificadoStorePg } from './infrastructure/persistence/CertificadoStorePg.js';
+
+// Servicios de autenticación
+import { AuthServiceJWT } from './infrastructure/auth/AuthServiceJWT.js';
+import { HashServiceBcrypt } from './infrastructure/auth/HashServiceBcrypt.js';
 
 // Casos de uso
 import { AutenticarUsuario } from './application/auth/AutenticarUsuario.js';
@@ -35,209 +46,135 @@ import { InutilizarNumeracion } from './application/facturacion/InutilizarNumera
 import { EncolarFactura } from './application/sync/EncolarFactura.js';
 import { SincronizarPendientes } from './application/sync/SincronizarPendientes.js';
 
-// Puertos (interfaces)
-import type { IAuthService } from './domain/auth/IAuthService.js';
-import type { IFacturaRepository } from './domain/factura/IFacturaRepository.js';
-import type { IComercioRepository } from './domain/comercio/IComercioRepository.js';
-import type { IClienteRepository } from './domain/cliente/IClienteRepository.js';
-import type { IProductoRepository } from './domain/producto/IProductoRepository.js';
+// Puertos (interfaces) - para stubs temporales
 import type { ISifenGateway } from './domain/factura/ISifenGateway.js';
 import type { IKudeGenerator } from './domain/factura/IKudeGenerator.js';
 import type { INotificador } from './domain/factura/INotificador.js';
 import type { ISyncQueue } from './domain/sync/ISyncQueue.js';
 
 /**
- * Stub de IAuthService - Lanza "Not implemented"
- * La implementación real estará en Phase 8 (JWT + bcrypt)
+ * Stubs temporales para servicios externos aún no implementados.
+ * Phase 9 implementará SIFEN, KuDE, WhatsApp, etc.
  */
-// @ts-ignore - Stub incompleto, Phase 8 implementará todos los métodos
-class StubAuthService implements IAuthService {
-  async autenticar(): Promise<never> {
-    throw new Error('IAuthService.autenticar not implemented');
-  }
-  async verificarAccessToken(): Promise<never> {
-    throw new Error('IAuthService.verificarAccessToken not implemented');
-  }
-  async verificarRefreshToken(): Promise<never> {
-    throw new Error('IAuthService.verificarRefreshToken not implemented');
-  }
-  async generarTokens(): Promise<never> {
-    throw new Error('IAuthService.generarTokens not implemented');
-  }
-}
 
-/**
- * Stub de IFacturaRepository - Lanza "Not implemented"
- * La implementación real estará en Phase 8 (PostgreSQL + Prisma)
- */
-// @ts-ignore - Stub incompleto, Phase 8 implementará todos los métodos
-class StubFacturaRepository implements IFacturaRepository {
-  async save(): Promise<never> {
-    throw new Error('IFacturaRepository.save not implemented');
-  }
-  async findById(): Promise<never> {
-    throw new Error('IFacturaRepository.findById not implemented');
-  }
-  async findByComercio(): Promise<never> {
-    throw new Error('IFacturaRepository.findByComercio not implemented');
-  }
-  async findPendientes(): Promise<never> {
-    throw new Error('IFacturaRepository.findPendientes not implemented');
-  }
-}
-
-/**
- * Stub de IComercioRepository - Lanza "Not implemented"
- */
-// @ts-ignore - Stub incompleto, Phase 8 implementará todos los métodos
-class StubComercioRepository implements IComercioRepository {
-  async save(): Promise<never> {
-    throw new Error('IComercioRepository.save not implemented');
-  }
-  async findById(): Promise<never> {
-    throw new Error('IComercioRepository.findById not implemented');
-  }
-  async findByRuc(): Promise<never> {
-    throw new Error('IComercioRepository.findByRuc not implemented');
-  }
-}
-
-/**
- * Stub de IClienteRepository - Lanza "Not implemented"
- */
-class StubClienteRepository implements IClienteRepository {
-  async save(): Promise<never> {
-    throw new Error('IClienteRepository.save not implemented');
-  }
-  async findById(): Promise<never> {
-    throw new Error('IClienteRepository.findById not implemented');
-  }
-  async findByComercio(): Promise<never> {
-    throw new Error('IClienteRepository.findByComercio not implemented');
-  }
-  async buscar(): Promise<never> {
-    throw new Error('IClienteRepository.buscar not implemented');
-  }
-}
-
-/**
- * Stub de IProductoRepository - Lanza "Not implemented"
- */
-class StubProductoRepository implements IProductoRepository {
-  async save(): Promise<never> {
-    throw new Error('IProductoRepository.save not implemented');
-  }
-  async findById(): Promise<never> {
-    throw new Error('IProductoRepository.findById not implemented');
-  }
-  async findByComercio(): Promise<never> {
-    throw new Error('IProductoRepository.findByComercio not implemented');
-  }
-}
-
-/**
- * Stub de ISifenGateway - Lanza "Not implemented"
- */
-// @ts-ignore - Stub incompleto, Phase 8 implementará todos los métodos
 class StubSifenGateway implements ISifenGateway {
+  // eslint-disable-next-line @typescript-eslint/require-await
   async enviarDE(): Promise<never> {
     throw new Error('ISifenGateway.enviarDE not implemented');
   }
+  // eslint-disable-next-line @typescript-eslint/require-await
   async consultarEstado(): Promise<never> {
     throw new Error('ISifenGateway.consultarEstado not implemented');
   }
+  // eslint-disable-next-line @typescript-eslint/require-await
   async anularDE(): Promise<never> {
     throw new Error('ISifenGateway.anularDE not implemented');
   }
+  // eslint-disable-next-line @typescript-eslint/require-await
   async inutilizarNumeracion(): Promise<never> {
     throw new Error('ISifenGateway.inutilizarNumeracion not implemented');
   }
+  // eslint-disable-next-line @typescript-eslint/require-await
   async consultarRUC(): Promise<never> {
     throw new Error('ISifenGateway.consultarRUC not implemented');
   }
 }
 
-/**
- * Stub de IKudeGenerator - Lanza "Not implemented"
- */
 class StubKudeGenerator implements IKudeGenerator {
+  // eslint-disable-next-line @typescript-eslint/require-await
   async generar(): Promise<never> {
     throw new Error('IKudeGenerator.generar not implemented');
   }
 }
 
-/**
- * Stub de INotificador - Lanza "Not implemented"
- */
 class StubNotificador implements INotificador {
+  // eslint-disable-next-line @typescript-eslint/require-await
   async enviarKuDE(): Promise<never> {
     throw new Error('INotificador.enviarKuDE not implemented');
   }
 }
 
-/**
- * Stub de ISyncQueue - Lanza "Not implemented"
- */
-// @ts-ignore - Stub incompleto, Phase 8 implementará todos los métodos
 class StubSyncQueue implements ISyncQueue {
+  // eslint-disable-next-line @typescript-eslint/require-await
   async encolar(): Promise<never> {
     throw new Error('ISyncQueue.encolar not implemented');
   }
+  // eslint-disable-next-line @typescript-eslint/require-await
   async desencolar(): Promise<never> {
     throw new Error('ISyncQueue.desencolar not implemented');
   }
+  // eslint-disable-next-line @typescript-eslint/require-await
   async completar(): Promise<never> {
     throw new Error('ISyncQueue.completar not implemented');
   }
+  // eslint-disable-next-line @typescript-eslint/require-await
   async fallar(): Promise<never> {
     throw new Error('ISyncQueue.fallar not implemented');
   }
+  // eslint-disable-next-line @typescript-eslint/require-await
   async contarPendientes(): Promise<never> {
     throw new Error('ISyncQueue.contarPendientes not implemented');
   }
+  // eslint-disable-next-line @typescript-eslint/require-await
   async obtenerPendientes(): Promise<never> {
     throw new Error('ISyncQueue.obtenerPendientes not implemented');
   }
 }
 
-
 /**
- * Construir dependencias con stubs.
- * Phase 8 reemplazará estos stubs con implementaciones reales.
+ * Construir dependencias con implementaciones reales de persistencia y auth.
  */
 function buildDependencies(): AppDependencies {
-  // Stubs de infraestructura
-  const authService = new StubAuthService();
-  const facturaRepository = new StubFacturaRepository();
-  const comercioRepository = new StubComercioRepository();
-  const clienteRepository = new StubClienteRepository();
-  const productoRepository = new StubProductoRepository();
+  // Repositorios PostgreSQL
+  const comercioRepository = new ComercioRepositoryPg(prisma);
+  const usuarioRepository = new UsuarioRepositoryPg(prisma);
+  const productoRepository = new ProductoRepositoryPg(prisma);
+  const clienteRepository = new ClienteRepositoryPg(prisma);
+  const facturaRepository = new FacturaRepositoryPg(prisma);
+  const certificadoStore = new CertificadoStorePg(prisma);
+
+  // Servicios de autenticación
+  const authService = new AuthServiceJWT();
+  const hashService = new HashServiceBcrypt();
+
+  // Stubs de servicios externos (Phase 9)
   const sifenGateway = new StubSifenGateway();
   const kudeGenerator = new StubKudeGenerator();
   const notificador = new StubNotificador();
   const syncQueue = new StubSyncQueue();
 
-  // Instanciar casos de uso con stubs
-  // @ts-expect-error - Dependencias stub, Phase 8 tendrá implementaciones reales
-  const autenticarUsuario = new AutenticarUsuario({ authService });
-  // @ts-expect-error - Dependencias stub, Phase 8 tendrá implementaciones reales
-  const refrescarToken = new RefrescarToken({ authService });
+  // Instanciar casos de uso con dependencias reales
+  const autenticarUsuario = new AutenticarUsuario({
+    usuarioRepository,
+    hashService,
+    authService,
+  });
+  const refrescarToken = new RefrescarToken({ authService, usuarioRepository });
   const registrarComercio = new RegistrarComercio({ comercioRepository });
-  // @ts-ignore - Stub incompleto, Phase 8 implementará todos los métodos
-  const cargarCertificado = new CargarCertificado({ comercioRepository, certificadoStore: {} });
+  const cargarCertificado = new CargarCertificado({ comercioRepository, certificadoStore });
   const configurarTimbrado = new ConfigurarTimbrado({ comercioRepository });
-  // @ts-expect-error - Dependencias stub, Phase 8 tendrá implementaciones reales
-  const crearProducto = new CrearProducto({ productoRepository });
+  const crearProducto = new CrearProducto({ productoRepository, comercioRepository });
   const editarProducto = new EditarProducto({ productoRepository });
   const listarProductos = new ListarProductos({ productoRepository });
-  // @ts-expect-error - Dependencias stub, Phase 8 tendrá implementaciones reales
-  const crearCliente = new CrearCliente({ clienteRepository });
+  const crearCliente = new CrearCliente({ clienteRepository, comercioRepository });
   const editarCliente = new EditarCliente({ clienteRepository });
   const buscarClientes = new BuscarClientes({ clienteRepository });
   const consultarRUC = new ConsultarRUC({ sifenGateway });
   const crearFactura = new CrearFactura({ facturaRepository, comercioRepository });
-  // @ts-ignore - Stub incompleto, Phase 8 implementará todos los métodos
-  const enviarDE = new EnviarDE({ facturaRepository, comercioRepository, sifenGateway, xmlGenerator: { generarXml: async () => '' }, firmaDigital: { firmar: async () => '' } });
+  // @ts-expect-error - Stub incompleto, Phase 9 implementará xmlGenerator y firmaDigital
+  const enviarDE = new EnviarDE({
+    facturaRepository,
+    comercioRepository,
+    sifenGateway,
+    xmlGenerator: {
+      // eslint-disable-next-line @typescript-eslint/require-await
+      generarXml: async () => '',
+    },
+    firmaDigital: {
+      // eslint-disable-next-line @typescript-eslint/require-await
+      firmar: async () => '',
+    },
+  });
   const anularFactura = new AnularFactura({ facturaRepository, comercioRepository, sifenGateway });
   const enviarKuDE = new EnviarKuDE({
     facturaRepository,
@@ -248,13 +185,19 @@ function buildDependencies(): AppDependencies {
   });
   const inutilizarNumeracion = new InutilizarNumeracion({ comercioRepository, sifenGateway });
   const encolarFactura = new EncolarFactura({ facturaRepository, syncQueue });
-  // @ts-ignore - Stub incompleto, Phase 8 implementará todos los métodos
+  // @ts-expect-error - Stub incompleto, Phase 9 implementará xmlGenerator y firmaDigital
   const sincronizarPendientes = new SincronizarPendientes({
     facturaRepository,
     comercioRepository,
     sifenGateway,
-    xmlGenerator: { generarXml: async () => '' },
-    firmaDigital: { firmar: async () => '' },
+    xmlGenerator: {
+      // eslint-disable-next-line @typescript-eslint/require-await
+      generarXml: async () => '',
+    },
+    firmaDigital: {
+      // eslint-disable-next-line @typescript-eslint/require-await
+      firmar: async () => '',
+    },
   });
 
   return {
@@ -292,11 +235,30 @@ function buildDependencies(): AppDependencies {
 }
 
 /**
+ * Graceful shutdown handler.
+ * Desconecta Prisma limpiamente al recibir SIGTERM/SIGINT.
+ */
+async function gracefulShutdown(signal: string): Promise<void> {
+  console.log(`\nRecibida señal ${signal}. Cerrando conexiones...`);
+  await prisma.$disconnect();
+  console.log('Prisma desconectado. Saliendo.');
+  process.exit(0);
+}
+
+/**
  * Main - Iniciar servidor
  */
 function main(): void {
-  const port = parseInt(process.env.PORT || '3000', 10);
+  const port = parseInt(process.env.PORT ?? '3000', 10);
   const deps = buildDependencies();
+
+  // Registrar handlers de shutdown
+  process.on('SIGTERM', () => {
+    void gracefulShutdown('SIGTERM');
+  });
+  process.on('SIGINT', () => {
+    void gracefulShutdown('SIGINT');
+  });
 
   startServer(deps, port);
 }

@@ -31,3 +31,5 @@ npm-debug.log*
 *.pfx
 *.pem
 *.key
+
+/src/generated/prisma
