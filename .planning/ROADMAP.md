@@ -69,11 +69,11 @@ Plans:
   3. System continues processing queue even if one factura fails
   4. System respects SIFEN 72-hour transmission window
   5. Queue worker logs all attempts with comercioId and CDC for debugging
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md — ISyncQueue port + SyncJob value object + EncolarFactura + ProcesarColaSifen use cases (TDD)
+- [ ] 03-02-PLAN.md — BullMQ adapter + exponential backoff + SyncWorker + ConsoleLogger
 
 ### Phase 4: Events & KuDE
 **Goal**: Implement SIFEN events (cancelation, inutilization) and KuDE PDF generation
