@@ -7,6 +7,13 @@ export interface SifenResponse {
   cdc: string;
 }
 
+/** Respuesta de consulta RUC */
+export interface ConsultaRUCResponse {
+  encontrado: boolean;
+  razonSocial: string | null;
+  ruc: string;
+}
+
 /** Puerto — Comunicación con Web Services SIFEN (SOAP) */
 export interface ISifenGateway {
   enviarDE(xmlFirmado: string): Promise<SifenResponse>;
@@ -20,4 +27,5 @@ export interface ISifenGateway {
     hasta: number,
     motivo: string
   ): Promise<SifenResponse>;
+  consultarRUC(ruc: string): Promise<ConsultaRUCResponse>;
 }

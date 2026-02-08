@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Doña María puede facturar electrónicamente desde su puesto en el mercado en menos de 30 segundos, con o sin internet, cumpliendo todas las reglas SIFEN/DNIT.
-**Current focus:** Phase 4 - Events & KuDE
+**Current focus:** Phase 5 - Productos & Clientes CRUD
 
 ## Current Position
 
-Phase: 4 of 10 (Events & KuDE) — COMPLETE
-Next: Phase 5 (HTTP REST API)
-Last activity: 2026-02-08 — Completed 04-02-PLAN.md (KuDE PDF generation)
+Phase: 5 of 10 (Productos & Clientes) — COMPLETE
+Plan: 2 of 2 (all plans complete)
+Last activity: 2026-02-08 — Completed 05-02-PLAN.md (Cliente CRUD)
 
-Progress: [████░░░░░░] 40%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 12.0 min
-- Total execution time: 2.00 hours
+- Total plans completed: 12
+- Average duration: 10.8 min
+- Total execution time: 2.15 hours
 
 **By Phase:**
 
@@ -30,14 +30,15 @@ Progress: [████░░░░░░] 40%
 | 02-sifen-integration | 3/3 | 84 min | 28.0 min | Complete |
 | 03-sync-queue | 2/2 | 10 min | 5.0 min | Complete |
 | 04-events-kude | 2/2 | 23 min | 11.5 min | Complete |
+| 05-productos-clientes | 2/2 | 14 min | 7.0 min | Complete |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (6min), 03-01 (6min), 03-02 (4min), 04-01 (10min), 04-02 (13min)
-- Trend: Stable velocity 4-13min per plan, infrastructure tasks trending higher
+- Last 5 plans: 03-02 (4min), 04-01 (10min), 04-02 (13min), 05-01 (7min), 05-02 (7min)
+- Trend: Stable velocity 4-13min per plan, consistent performance
 
 **Test Coverage:**
-- Total tests: 213 (63 domain + 49 application + 75 sifen + 26 queue/logging/kude)
-- All passing, zero regressions (27 tests added in 04-02)
+- Total tests: 282 (90 domain + 91 application + 75 sifen + 26 queue/logging/kude)
+- All passing, zero regressions (23 tests added in 05-02)
 
 *Updated after each plan completion*
 
@@ -84,6 +85,10 @@ Recent decisions affecting current work:
 - 04-02: PDFKit over TIPS-SA kude (Good) — Avoids Java dependency, lightweight, sufficient for KuDE spec
 - 04-02: IKudeGenerator signature updated (Good) — Accepts comercio + cliente for complete KuDE data
 - 04-02: NotificadorStub pattern (Good) — INotificador port defined with stub implementation until WhatsApp integration
+- 05-01: Immutable update methods over mutable setters (Good) — desactivar/actualizar return new instances, prevents mutation, easier to test
+- 05-01: Optional properties via conditional assignment (Good) — exactOptionalPropertyTypes prevents undefined in optional props, assign only when defined
+- 05-01: Paginated findByComercio with options object (Good) — Flexible, extensible API with { page, pageSize, soloActivos }
+- 05-01: TasaIVA validation in entity constructor (Good) — Only 10/5/0 allowed per Paraguay tax law, domain enforces business rule
 
 ### Pending Todos
 
@@ -99,5 +104,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 04-02-PLAN.md (KuDE PDF Generation) — Phase 4 complete
+Stopped at: Completed 05-02-PLAN.md (Cliente CRUD) — Phase 5 complete
 Resume file: None

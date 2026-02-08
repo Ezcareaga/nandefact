@@ -49,4 +49,24 @@ export class Cliente {
     this.frecuente = props.frecuente ?? false;
     this.enviarWhatsApp = props.enviarWhatsApp ?? true;
   }
+
+  /**
+   * Actualizar campos del cliente.
+   * Retorna nuevo Cliente con cambios aplicados (inmutabilidad).
+   * Re-valida los datos.
+   */
+  actualizar(cambios: Partial<Omit<ClienteProps, 'id' | 'comercioId'>>): Cliente {
+    return new Cliente({
+      id: this.id,
+      comercioId: this.comercioId,
+      nombre: cambios.nombre ?? this.nombre,
+      rucCi: cambios.rucCi ?? this.rucCi,
+      tipoDocumento: cambios.tipoDocumento ?? this.tipoDocumento,
+      telefono: cambios.telefono !== undefined ? cambios.telefono : this.telefono ?? undefined,
+      email: cambios.email !== undefined ? cambios.email : this.email ?? undefined,
+      direccion: cambios.direccion !== undefined ? cambios.direccion : this.direccion ?? undefined,
+      frecuente: cambios.frecuente !== undefined ? cambios.frecuente : this.frecuente,
+      enviarWhatsApp: cambios.enviarWhatsApp !== undefined ? cambios.enviarWhatsApp : this.enviarWhatsApp
+    });
+  }
 }

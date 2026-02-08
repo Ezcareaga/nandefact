@@ -94,6 +94,12 @@ export class SifenGatewayImpl implements ISifenGateway {
     return this.parseEventoResponse(response);
   }
 
+  consultarRUC(_ruc: string): Promise<never> {
+    // Stub implementation - real integration pending
+    // TIPS-SA library may expose siConsRUC, but for now we throw
+    throw new Error('consultarRUC no implementado - pendiente integración real SIFEN siConsRUC');
+  }
+
   /** Parsea respuesta de envío/consulta/evento */
   private parseSifenResponse(response: string | SifenResponseObject): SifenResponse {
     if (typeof response === 'string') {

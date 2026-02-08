@@ -12,7 +12,7 @@ import { Comercio } from '../../../../src/domain/comercio/Comercio.js';
 import { RUC } from '../../../../src/domain/comercio/RUC.js';
 import { Timbrado } from '../../../../src/domain/comercio/Timbrado.js';
 import { Cliente } from '../../../../src/domain/cliente/Cliente.js';
-import { FacturaNoEncontradaError } from '../../../../src/domain/errors/FacturaNoEncontradaError.js';
+import { FacturaNoEncontradaError } from '../../../../src/application/errors/FacturaNoEncontradaError.js';
 
 describe('EnviarKuDE', () => {
   let useCase: EnviarKuDE;
@@ -50,13 +50,13 @@ describe('EnviarKuDE', () => {
       enviarKuDE: vi.fn()
     } as any;
 
-    useCase = new EnviarKuDE(
-      mockFacturaRepo,
-      mockComercioRepo,
-      mockClienteRepo,
-      mockKudeGenerator,
-      mockNotificador
-    );
+    useCase = new EnviarKuDE({
+      facturaRepository: mockFacturaRepo,
+      comercioRepository: mockComercioRepo,
+      clienteRepository: mockClienteRepo,
+      kudeGenerator: mockKudeGenerator,
+      notificador: mockNotificador
+    });
 
     // Setup test data
     const ruc = new RUC('80069563-1');
@@ -111,7 +111,7 @@ describe('EnviarKuDE', () => {
 
   describe('happy path', () => {
     it('debe generar PDF y enviar notificación cuando cliente tiene telefono + enviarWhatsApp=true', async () => {
-      const result = await useCase.ejecutar({ facturaId: 'factura-1' });
+      const result = await useCase.execute({ facturaId: 'factura-1' });
 
       expect(result.pdfGenerado).toBe(true);
       expect(result.notificacionEnviada).toBe(true);
@@ -132,7 +132,7 @@ describe('EnviarKuDE', () => {
       });
       vi.mocked(mockClienteRepo.findById).mockResolvedValue(clienteSinTelefono);
 
-      const result = await useCase.ejecutar({ facturaId: 'factura-1' });
+      const result = await useCase.execute({ facturaId: 'factura-1' });
 
       expect(result.pdfGenerado).toBe(true);
       expect(result.notificacionEnviada).toBe(false);
@@ -154,7 +154,7 @@ describe('EnviarKuDE', () => {
       });
       vi.mocked(mockClienteRepo.findById).mockResolvedValue(clienteNoEnviar);
 
-      const result = await useCase.ejecutar({ facturaId: 'factura-1' });
+      const result = await useCase.execute({ facturaId: 'factura-1' });
 
       expect(result.pdfGenerado).toBe(true);
       expect(result.notificacionEnviada).toBe(false);
@@ -168,7 +168,7 @@ describe('EnviarKuDE', () => {
       factura.marcarCancelada();
       vi.mocked(mockFacturaRepo.findById).mockResolvedValue(factura);
 
-      const result = await useCase.ejecutar({ facturaId: 'factura-1' });
+      const result = await useCase.execute({ facturaId: 'factura-1' });
 
       expect(result.pdfGenerado).toBe(true);
       expect(mockKudeGenerator.generar).toHaveBeenCalled();
@@ -179,7 +179,7 @@ describe('EnviarKuDE', () => {
     it('debe lanzar FacturaNoEncontradaError si factura no existe', async () => {
       vi.mocked(mockFacturaRepo.findById).mockResolvedValue(null);
 
-      await expect(useCase.ejecutar({ facturaId: 'inexistente' }))
+      await expect(useCase.execute({ facturaId: 'inexistente' }))
         .rejects.toThrow(FacturaNoEncontradaError);
     });
 
@@ -202,7 +202,7 @@ describe('EnviarKuDE', () => {
 
       vi.mocked(mockFacturaRepo.findById).mockResolvedValue(facturaPendiente);
 
-      await expect(useCase.ejecutar({ facturaId: 'factura-2' }))
+      await expect(useCase.execute({ facturaId: 'factura-2' }))
         .rejects.toThrow('No se puede generar KuDE para factura en estado "pendiente"');
     });
 
@@ -225,21 +225,21 @@ describe('EnviarKuDE', () => {
 
       vi.mocked(mockFacturaRepo.findById).mockResolvedValue(facturaSinCdc);
 
-      await expect(useCase.ejecutar({ facturaId: 'factura-3' }))
+      await expect(useCase.execute({ facturaId: 'factura-3' }))
         .rejects.toThrow('No se puede generar KuDE sin CDC');
     });
 
     it('debe lanzar error si comercio no encontrado', async () => {
       vi.mocked(mockComercioRepo.findById).mockResolvedValue(null);
 
-      await expect(useCase.ejecutar({ facturaId: 'factura-1' }))
+      await expect(useCase.execute({ facturaId: 'factura-1' }))
         .rejects.toThrow('Comercio no encontrado');
     });
 
     it('debe lanzar error si cliente no encontrado', async () => {
       vi.mocked(mockClienteRepo.findById).mockResolvedValue(null);
 
-      await expect(useCase.ejecutar({ facturaId: 'factura-1' }))
+      await expect(useCase.execute({ facturaId: 'factura-1' }))
         .rejects.toThrow('Cliente no encontrado');
     });
   });

@@ -3,7 +3,7 @@ import type { IComercioRepository } from '../../domain/comercio/IComercioReposit
 import type { IClienteRepository } from '../../domain/cliente/IClienteRepository.js';
 import type { IKudeGenerator } from '../../domain/factura/IKudeGenerator.js';
 import type { INotificador } from '../../domain/factura/INotificador.js';
-import { FacturaNoEncontradaError } from '../../domain/errors/FacturaNoEncontradaError.js';
+import { FacturaNoEncontradaError } from '../errors/FacturaNoEncontradaError.js';
 
 export interface EnviarKuDEInput {
   facturaId: string;
@@ -27,16 +27,18 @@ export interface EnviarKuDEOutput {
  */
 export class EnviarKuDE {
   constructor(
-    private facturaRepository: IFacturaRepository,
-    private comercioRepository: IComercioRepository,
-    private clienteRepository: IClienteRepository,
-    private kudeGenerator: IKudeGenerator,
-    private notificador: INotificador
+    private readonly deps: {
+      facturaRepository: IFacturaRepository;
+      comercioRepository: IComercioRepository;
+      clienteRepository: IClienteRepository;
+      kudeGenerator: IKudeGenerator;
+      notificador: INotificador;
+    }
   ) {}
 
-  async ejecutar(input: EnviarKuDEInput): Promise<EnviarKuDEOutput> {
+  async execute(input: EnviarKuDEInput): Promise<EnviarKuDEOutput> {
     // 1. Cargar factura
-    const factura = await this.facturaRepository.findById(input.facturaId);
+    const factura = await this.deps.facturaRepository.findById(input.facturaId);
     if (!factura) {
       throw new FacturaNoEncontradaError(input.facturaId);
     }
@@ -54,24 +56,24 @@ export class EnviarKuDE {
     }
 
     // 4. Cargar comercio
-    const comercio = await this.comercioRepository.findById(factura.comercioId);
+    const comercio = await this.deps.comercioRepository.findById(factura.comercioId);
     if (!comercio) {
       throw new Error(`Comercio no encontrado: ${factura.comercioId}`);
     }
 
     // 5. Cargar cliente
-    const cliente = await this.clienteRepository.findById(factura.clienteId);
+    const cliente = await this.deps.clienteRepository.findById(factura.clienteId);
     if (!cliente) {
       throw new Error(`Cliente no encontrado: ${factura.clienteId}`);
     }
 
     // 6. Generar PDF
-    const pdfBuffer = await this.kudeGenerator.generar(factura, comercio, cliente);
+    const pdfBuffer = await this.deps.kudeGenerator.generar(factura, comercio, cliente);
 
     // 7. Enviar notificación si cliente tiene telefono y flag activado
     let notificacionEnviada = false;
     if (cliente.telefono && cliente.enviarWhatsApp) {
-      await this.notificador.enviarKuDE(cliente.telefono, pdfBuffer);
+      await this.deps.notificador.enviarKuDE(cliente.telefono, pdfBuffer);
       notificacionEnviada = true;
     }
 
