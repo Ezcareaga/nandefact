@@ -97,9 +97,9 @@ describe('SifenDataMapper', () => {
       expect(params.version).toBe(150);
     });
 
-    it('debe mapear RUC sin guion ni DV', () => {
+    it('debe mapear RUC completo con DV', () => {
       const params = SifenDataMapper.mapComercioToParams(comercioMock);
-      expect(params.ruc).toBe('80069563');
+      expect(params.ruc).toBe('80069563-1');
     });
 
     it('debe mapear razonSocial', () => {
@@ -291,11 +291,13 @@ describe('SifenDataMapper', () => {
       expect(items[1]?.cantidad).toBe(2);
     });
 
-    it('debe mapear precioUnitario', () => {
+    it('debe mapear precioUnitario como base sin IVA', () => {
       const factura = crearFacturaMock();
       const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
-      expect(items[0]?.precioUnitario).toBe(5000);
-      expect(items[1]?.precioUnitario).toBe(8000);
+      // Mandioca: 15000 total / 1.05 = 14286 base, / 3 unidades = 4762 por unidad
+      expect(items[0]?.precioUnitario).toBe(4762);
+      // Tomate: 16000 total / 1.10 = 14545 base, / 2 unidades = 7273 por unidad (rounded)
+      expect(items[1]?.precioUnitario).toBe(7273);
     });
 
     it('debe mapear ivaTipo=1 para IVA 10%', () => {
@@ -336,27 +338,18 @@ describe('SifenDataMapper', () => {
       expect(items[0]?.ivaTipo).toBe(3); // Exenta
     });
 
-    it('debe mapear ivaTasa (10 o 5 o 0)', () => {
+    it('debe mapear iva (tasa IVA: 10, 5, 0)', () => {
       const factura = crearFacturaMock();
       const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
-      expect(items[0]?.ivaTasa).toBe(5);
-      expect(items[1]?.ivaTasa).toBe(10);
+      expect(items[0]?.iva).toBe(5);
+      expect(items[1]?.iva).toBe(10);
     });
 
-    it('debe mapear ivaBase=100 (proporcion 100%)', () => {
+    it('debe mapear ivaProporcion=100 (proporcion 100%)', () => {
       const factura = crearFacturaMock();
       const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
-      expect(items[0]?.ivaBase).toBe(100);
-      expect(items[1]?.ivaBase).toBe(100);
-    });
-
-    it('debe mapear iva (monto IVA calculado)', () => {
-      const factura = crearFacturaMock();
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
-      // Mandioca: 3 * 5000 = 15000 → base = 14286, iva = 714
-      expect(items[0]?.iva).toBe(714);
-      // Tomate: 2 * 8000 = 16000 → base = 14545, iva = 1455
-      expect(items[1]?.iva).toBe(1455);
+      expect(items[0]?.ivaProporcion).toBe(100);
+      expect(items[1]?.ivaProporcion).toBe(100);
     });
   });
 });
