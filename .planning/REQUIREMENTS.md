@@ -10,11 +10,11 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Facturación
 
 - [x] **FACT-01**: Sistema puede crear factura con CDC, items, IVA calculado, y guardarla con estado pendiente
-- [ ] **FACT-02**: Sistema puede firmar XML con CCFE y enviar DE a SIFEN (siRecepDE)
+- [x] **FACT-02**: Sistema puede firmar XML con CCFE y enviar DE a SIFEN (siRecepDE)
 - [ ] **FACT-03**: Sistema procesa cola de facturas pendientes en orden FIFO con backoff exponencial
 - [ ] **FACT-04**: Sistema puede anular DTE aprobado via evento cancelación SIFEN
 - [ ] **FACT-05**: Sistema puede inutilizar rangos de numeración salteados
-- [ ] **FACT-06**: Sistema puede consultar estado de DE por CDC (siConsDE)
+- [x] **FACT-06**: Sistema puede consultar estado de DE por CDC (siConsDE)
 
 ### KuDE
 
@@ -97,11 +97,11 @@ Requirements for initial release. Each maps to roadmap phases.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FACT-01 | Phase 1 - Application Layer | Complete |
-| FACT-02 | Phase 2 - SIFEN Integration | Pending |
+| FACT-02 | Phase 2 - SIFEN Integration | Complete |
 | FACT-03 | Phase 3 - Sync & Queue | Pending |
 | FACT-04 | Phase 4 - Events & KuDE | Pending |
 | FACT-05 | Phase 4 - Events & KuDE | Pending |
-| FACT-06 | Phase 2 - SIFEN Integration | Pending |
+| FACT-06 | Phase 2 - SIFEN Integration | Complete |
 | KUDE-01 | Phase 4 - Events & KuDE | Pending |
 | KUDE-02 | Phase 4 - Events & KuDE | Pending |
 | PROD-01 | Phase 5 - Productos & Clientes | Pending |
@@ -130,4 +130,4 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-07 after Phase 1 completion*
+*Last updated: 2026-02-08 after Phase 2 completion*
