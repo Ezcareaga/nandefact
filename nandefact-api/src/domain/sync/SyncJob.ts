@@ -1,3 +1,5 @@
+import { DomainError } from '../errors/DomainError.js';
+
 export interface SyncJobProps {
   id: string;
   comercioId: string;
@@ -29,6 +31,22 @@ export class SyncJob {
   readonly creadoEn: Date;
 
   constructor(props: SyncJobProps) {
+    if (!props.id || props.id.trim().length === 0) {
+      throw new DomainError('SyncJob: id no puede estar vacío');
+    }
+    if (!props.comercioId || props.comercioId.trim().length === 0) {
+      throw new DomainError('SyncJob: comercioId no puede estar vacío');
+    }
+    if (!props.facturaId || props.facturaId.trim().length === 0) {
+      throw new DomainError('SyncJob: facturaId no puede estar vacío');
+    }
+    if (props.intentos < 0) {
+      throw new DomainError('SyncJob: intentos no puede ser negativo');
+    }
+    if (props.maxIntentos <= 0) {
+      throw new DomainError('SyncJob: maxIntentos debe ser mayor a 0');
+    }
+
     this.id = props.id;
     this.comercioId = props.comercioId;
     this.facturaId = props.facturaId;
