@@ -1,3 +1,11 @@
+/** Error cuando el XML no contiene el campo QR esperado */
+class QrCodeNoEncontradoError extends Error {
+  constructor() {
+    super('No se encontró el campo dQRCode (AA002) en el XML');
+    this.name = this.constructor.name;
+  }
+}
+
 /**
  * Adaptador — Genera código QR para SIFEN siguiendo spec e-Kuatia.
  * Usa facturacionelectronicapy-qrgen (TIPS-SA) para generar el QR con hash CDC+CSC.
@@ -41,7 +49,7 @@ export class QrGeneratorSifen {
     // El campo AA002 contiene la URL completa del QR
     const match = xmlConQr.match(/<dQRCode>(.*?)<\/dQRCode>/);
     if (!match || !match[1]) {
-      throw new Error('No se encontró el campo dQRCode (AA002) en el XML');
+      throw new QrCodeNoEncontradoError();
     }
     return match[1];
   }

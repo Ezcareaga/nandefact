@@ -88,7 +88,7 @@ describe('XmlGeneratorSifen', () => {
     const generator = new XmlGeneratorSifen();
 
     await expect(generator.generarXml(factura, comercioMock, clienteMock)).rejects.toThrow(
-      'No se puede generar XML sin CDC',
+      'no tiene CDC generado',
     );
   });
 

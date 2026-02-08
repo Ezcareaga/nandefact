@@ -3,8 +3,9 @@ import type { Comercio } from '../../domain/comercio/Comercio.js';
 import type { SifenConfig } from './SifenConfig.js';
 import type { SifenResponseObject } from 'facturacionelectronicapy-setapi';
 import { XmlGeneratorSifen } from './XmlGeneratorSifen.js';
+import { SifenNoImplementadoError } from './SifenNoImplementadoError.js';
 import setApi from 'facturacionelectronicapy-setapi';
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 
 /** Implementación gateway SIFEN usando TIPS-SA setapi */
 export class SifenGatewayImpl implements ISifenGateway {
@@ -97,7 +98,7 @@ export class SifenGatewayImpl implements ISifenGateway {
   consultarRUC(_ruc: string): Promise<never> {
     // Stub implementation - real integration pending
     // TIPS-SA library may expose siConsRUC, but for now we throw
-    throw new Error('consultarRUC no implementado - pendiente integración real SIFEN siConsRUC');
+    throw new SifenNoImplementadoError('consultarRUC (siConsRUC)');
   }
 
   /** Parsea respuesta de envío/consulta/evento */

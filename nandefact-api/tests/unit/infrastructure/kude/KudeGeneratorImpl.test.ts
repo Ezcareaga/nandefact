@@ -142,7 +142,7 @@ describe('KudeGeneratorImpl', () => {
       );
 
       await expect(generator.generar(facturaSinCdc, comercio, cliente))
-        .rejects.toThrow('No se puede generar KuDE sin CDC');
+        .rejects.toThrow('no tiene CDC generado');
     });
 
     it('debe incluir datos del comercio en el PDF (RUC, razón social, timbrado)', async () => {

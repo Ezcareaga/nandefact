@@ -9,6 +9,8 @@ export interface SifenConfigProps {
   privateKeyPath?: string;
 }
 
+import { SifenConfigError } from './SifenConfigError.js';
+
 /** Configuración SIFEN centralizada */
 export class SifenConfig {
   private readonly environment: SifenEnvironment;
@@ -18,10 +20,10 @@ export class SifenConfig {
 
   constructor(props: SifenConfigProps) {
     if (!props.certificatePath) {
-      throw new Error('certificatePath es requerido');
+      throw new SifenConfigError('certificatePath es requerido');
     }
     if (!props.certificatePassword) {
-      throw new Error('certificatePassword es requerido');
+      throw new SifenConfigError('certificatePassword es requerido');
     }
 
     this.environment = props.environment;

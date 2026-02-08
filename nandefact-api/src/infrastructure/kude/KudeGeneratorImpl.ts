@@ -4,6 +4,7 @@ import type { Factura } from '../../domain/factura/Factura.js';
 import type { Comercio } from '../../domain/comercio/Comercio.js';
 import type { Cliente } from '../../domain/cliente/Cliente.js';
 import type { QrGeneratorSifen } from './QrGeneratorSifen.js';
+import { CDCSinGenerarError } from '../../domain/errors/CDCSinGenerarError.js';
 
 /**
  * Adaptador — Genera KuDE (PDF) con campos obligatorios SIFEN.
@@ -38,7 +39,7 @@ export class KudeGeneratorImpl implements IKudeGenerator {
 
   async generar(factura: Factura, comercio: Comercio, cliente: Cliente): Promise<Buffer> {
     if (!factura.cdc) {
-      throw new Error('No se puede generar KuDE sin CDC. La factura debe estar aprobada.');
+      throw new CDCSinGenerarError(factura.id);
     }
 
     // Generar QR usando xmlgen + qrgen
