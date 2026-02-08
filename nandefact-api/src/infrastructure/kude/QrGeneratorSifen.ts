@@ -19,10 +19,10 @@ export class QrGeneratorSifen {
     environment: 'test' | 'production';
   }): Promise<string> {
     // qrgen toma el XML firmado y genera el campo AA002 (QR) para insertarlo en el XML
-     
-    const qrgenModule = await import('facturacionelectronicapy-qrgen');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+    const qrgenModule = await import('facturacionelectronicapy-qrgen') as any;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const xmlConQr = await qrgenModule.default.generateQR(
       params.xmlFirmado,
       params.cscId,
@@ -40,7 +40,7 @@ export class QrGeneratorSifen {
   extractQrUrl(xmlConQr: string): string {
     // El campo AA002 contiene la URL completa del QR
     const match = xmlConQr.match(/<dQRCode>(.*?)<\/dQRCode>/);
-    if (!match) {
+    if (!match || !match[1]) {
       throw new Error('No se encontró el campo dQRCode (AA002) en el XML');
     }
     return match[1];

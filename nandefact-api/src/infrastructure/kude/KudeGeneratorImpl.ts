@@ -44,7 +44,7 @@ export class KudeGeneratorImpl implements IKudeGenerator {
     // Generar QR usando xmlgen + qrgen
     // NOTE: En producción real, el XML firmado debería venir de un repositorio o ser pasado como parámetro.
     // Por ahora, generamos un XML mínimo solo para obtener el QR.
-    const xmlFirmado = await this.generarXmlMinimo(factura, comercio, cliente);
+    const xmlFirmado = this.generarXmlMinimo(factura, comercio, cliente);
     const xmlConQr = await this.qrGenerator.generarQr({
       xmlFirmado,
       cscId: this.cscId,
@@ -149,7 +149,7 @@ export class KudeGeneratorImpl implements IKudeGenerator {
     doc.fontSize(7).text(qrUrl, { align: 'center', link: qrUrl });
 
     doc.moveDown(1);
-    doc.fontSize(7).text('Documento electrónico válido según Ley 6380/2019', { align: 'center', color: 'gray' });
+    doc.fontSize(7).text('Documento electrónico válido según Ley 6380/2019', { align: 'center' });
 
     // Finalizar PDF
     doc.end();
