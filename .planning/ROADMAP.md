@@ -125,7 +125,7 @@ Plans:
 - [x] 06-02-PLAN.md — Usuario entity + AutenticarUsuario, RefrescarToken use cases with rate limiting (TDD)
 
 ### Phase 7: API REST
-**Goal**: Implement Express/Fastify HTTP layer with routes, Zod validation, and middleware
+**Goal**: Implement Express HTTP layer with routes, Zod validation, middleware, and server wiring for all 25+ API endpoints
 **Depends on**: Phases 1-6
 **Requirements**: (no explicit requirement, but implied by all endpoints)
 **Success Criteria** (what must be TRUE):
@@ -135,11 +135,13 @@ Plans:
   4. API exposes POST /api/v1/auth/login and POST /api/v1/auth/refresh
   5. All protected routes validate JWT token in Authorization header
   6. API returns consistent error responses with status codes and messages
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [ ] 07-01-PLAN.md — Express setup + middleware (error handler, Zod validation, JWT auth)
+- [ ] 07-02-PLAN.md — Auth + Comercio routes with Zod schemas
+- [ ] 07-03-PLAN.md — Productos + Clientes routes with Zod schemas
+- [ ] 07-04-PLAN.md — Facturas + Sync routes, server.ts wiring, index.ts bootstrap
 
 ### Phase 8: Infrastructure Testing
 **Goal**: Implement Docker Compose setup and comprehensive integration/e2e tests
@@ -204,7 +206,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. Events & KuDE | 2/2 | Complete | 2026-02-08 |
 | 5. Productos & Clientes | 2/2 | Complete | 2026-02-08 |
 | 6. Comercio & Auth | 2/2 | Complete | 2026-02-08 |
-| 7. API REST | 0/TBD | Not started | - |
+| 7. API REST | 0/4 | Not started | - |
 | 8. Infrastructure Testing | 0/TBD | Not started | - |
 | 9. Android Shared KMP | 0/TBD | Not started | - |
 | 10. Android UI | 0/TBD | Not started | - |
