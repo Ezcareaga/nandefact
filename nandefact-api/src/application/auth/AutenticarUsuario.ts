@@ -4,6 +4,7 @@ import type { IAuthService } from '../../domain/auth/IAuthService.js';
 import type { RolUsuario } from '../../domain/shared/types.js';
 import { CredencialesInvalidasError } from '../errors/CredencialesInvalidasError.js';
 import { CuentaBloqueadaError } from '../errors/CuentaBloqueadaError.js';
+import { EstadoInconsistenteAppError } from '../errors/EstadoInconsistenteAppError.js';
 
 export interface AutenticarUsuarioInput {
   telefono: string;
@@ -49,7 +50,7 @@ export class AutenticarUsuario {
       const ahora = new Date();
       const bloqueadoHasta = usuario.bloqueadoHasta;
       if (bloqueadoHasta === null) {
-        throw new Error('Estado inconsistente: usuario bloqueado pero bloqueadoHasta es null');
+        throw new EstadoInconsistenteAppError('usuario bloqueado pero bloqueadoHasta es null');
       }
       const minutosRestantes = Math.ceil((bloqueadoHasta.getTime() - ahora.getTime()) / (60 * 1000));
       throw new CuentaBloqueadaError(minutosRestantes);

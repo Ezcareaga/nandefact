@@ -136,7 +136,7 @@ describe('EncolarFactura', () => {
 
     // Act & Assert
     await expect(encolarFactura.execute({ facturaId })).rejects.toThrow(
-      'Factura no tiene CDC generado',
+      'no tiene CDC generado',
     );
     expect(syncQueue.encolar).not.toHaveBeenCalled();
   });
@@ -151,7 +151,7 @@ describe('EncolarFactura', () => {
 
     // Act & Assert
     await expect(encolarFactura.execute({ facturaId })).rejects.toThrow(
-      'Solo se pueden encolar facturas en estado pendiente',
+      'solo se pueden encolar facturas en estado pendiente',
     );
     expect(syncQueue.encolar).not.toHaveBeenCalled();
   });

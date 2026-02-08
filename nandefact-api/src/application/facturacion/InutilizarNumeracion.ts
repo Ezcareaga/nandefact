@@ -1,5 +1,7 @@
 import type { ISifenGateway } from '../../domain/factura/ISifenGateway.js';
 import type { IComercioRepository } from '../../domain/comercio/IComercioRepository.js';
+import { ValidacionInputError } from '../errors/ValidacionInputError.js';
+import { ComercioNoEncontradoError } from '../errors/ComercioNoEncontradoError.js';
 
 export interface InutilizarNumeracionInput {
   comercioId: string;
@@ -34,25 +36,25 @@ export class InutilizarNumeracion {
   async execute(input: InutilizarNumeracionInput): Promise<InutilizarNumeracionOutput> {
     // 1. Validar input
     if (input.desde <= 0) {
-      throw new Error('El número inicial debe ser mayor a cero');
+      throw new ValidacionInputError('El número inicial debe ser mayor a cero');
     }
 
     if (input.hasta <= 0) {
-      throw new Error('El número final debe ser mayor a cero');
+      throw new ValidacionInputError('El número final debe ser mayor a cero');
     }
 
     if (input.desde > input.hasta) {
-      throw new Error('El número inicial no puede ser mayor al número final');
+      throw new ValidacionInputError('El número inicial no puede ser mayor al número final');
     }
 
     if (!input.motivo || input.motivo.trim().length === 0) {
-      throw new Error('El motivo de inutilización es obligatorio');
+      throw new ValidacionInputError('El motivo de inutilización es obligatorio');
     }
 
     // 2. Cargar comercio (necesario para generar XML del evento)
     const comercio = await this.deps.comercioRepository.findById(input.comercioId);
     if (!comercio) {
-      throw new Error(`Comercio ${input.comercioId} no encontrado`);
+      throw new ComercioNoEncontradoError(input.comercioId);
     }
 
     // 3. Enviar evento de inutilización a SIFEN

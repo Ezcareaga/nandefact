@@ -4,6 +4,10 @@ import type { IClienteRepository } from '../../domain/cliente/IClienteRepository
 import type { IKudeGenerator } from '../../domain/factura/IKudeGenerator.js';
 import type { INotificador } from '../../domain/factura/INotificador.js';
 import { FacturaNoEncontradaError } from '../errors/FacturaNoEncontradaError.js';
+import { KuDENoGenerableError } from '../errors/KuDENoGenerableError.js';
+import { ComercioNoEncontradoError } from '../errors/ComercioNoEncontradoError.js';
+import { ClienteNoEncontradoError } from '../errors/ClienteNoEncontradoError.js';
+import { CDCSinGenerarError } from '../../domain/errors/CDCSinGenerarError.js';
 
 export interface EnviarKuDEInput {
   facturaId: string;
@@ -45,26 +49,26 @@ export class EnviarKuDE {
 
     // 2. Validar estado (solo aprobada o cancelada puede generar KuDE)
     if (factura.estado !== 'aprobado' && factura.estado !== 'cancelado') {
-      throw new Error(
-        `No se puede generar KuDE para factura en estado "${factura.estado}". Debe estar aprobada o cancelada.`
+      throw new KuDENoGenerableError(
+        `factura en estado "${factura.estado}". Debe estar aprobada o cancelada.`,
       );
     }
 
     // 3. Validar CDC (requerido para QR)
     if (!factura.cdc) {
-      throw new Error('No se puede generar KuDE sin CDC. La factura debe tener CDC asignado.');
+      throw new CDCSinGenerarError(input.facturaId);
     }
 
     // 4. Cargar comercio
     const comercio = await this.deps.comercioRepository.findById(factura.comercioId);
     if (!comercio) {
-      throw new Error(`Comercio no encontrado: ${factura.comercioId}`);
+      throw new ComercioNoEncontradoError(factura.comercioId);
     }
 
     // 5. Cargar cliente
     const cliente = await this.deps.clienteRepository.findById(factura.clienteId);
     if (!cliente) {
-      throw new Error(`Cliente no encontrado: ${factura.clienteId}`);
+      throw new ClienteNoEncontradoError(factura.clienteId);
     }
 
     // 6. Generar PDF

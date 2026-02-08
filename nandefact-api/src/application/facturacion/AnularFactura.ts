@@ -3,6 +3,8 @@ import type { IComercioRepository } from '../../domain/comercio/IComercioReposit
 import type { ISifenGateway } from '../../domain/factura/ISifenGateway.js';
 import { FacturaNoEncontradaError } from '../errors/FacturaNoEncontradaError.js';
 import { FacturaNoAnulableError } from '../errors/FacturaNoAnulableError.js';
+import { ComercioNoEncontradoError } from '../errors/ComercioNoEncontradoError.js';
+import { CDCSinGenerarError } from '../../domain/errors/CDCSinGenerarError.js';
 
 export interface AnularFacturaInput {
   facturaId: string;
@@ -45,12 +47,12 @@ export class AnularFactura {
     // 3. Cargar comercio (necesario para generar XML del evento)
     const comercio = await this.deps.comercioRepository.findById(factura.comercioId);
     if (!comercio) {
-      throw new Error(`Comercio ${factura.comercioId} no encontrado`);
+      throw new ComercioNoEncontradoError(factura.comercioId);
     }
 
     // 4. Obtener CDC (una factura aprobada siempre tiene CDC)
     if (!factura.cdc) {
-      throw new Error(`Factura ${input.facturaId} aprobada sin CDC`);
+      throw new CDCSinGenerarError(input.facturaId);
     }
     const cdc = factura.cdc.value;
 

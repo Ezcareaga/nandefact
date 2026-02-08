@@ -6,6 +6,7 @@ import type { IComercioRepository } from '../../domain/comercio/IComercioReposit
 import type { IClienteRepository } from '../../domain/cliente/IClienteRepository.js';
 import type { Factura } from '../../domain/factura/Factura.js';
 import { EnviarFacturaASifen } from '../../domain/factura/EnviarFacturaASifen.js';
+import { CDCSinGenerarError } from '../../domain/errors/CDCSinGenerarError.js';
 
 export interface SincronizarPendientesInput {
   comercioId: string;
@@ -78,7 +79,7 @@ export class SincronizarPendientes {
 
         // Registrar resultado exitoso
         if (!factura.cdc) {
-          throw new Error(`Factura ${factura.id} procesada sin CDC`);
+          throw new CDCSinGenerarError(factura.id);
         }
         resultados.push({
           facturaId: factura.id,
