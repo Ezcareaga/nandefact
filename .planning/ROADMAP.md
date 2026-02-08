@@ -118,11 +118,11 @@ Plans:
   3. Admin can configure active timbrado with vigencia dates per punto de expedicion
   4. User can login with telefono + PIN (4-6 digits) and receive JWT access token (15min) + refresh token (7d)
   5. System enforces rate limiting: 5 failed PIN attempts triggers 30-minute lockout
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
+- [ ] 06-01-PLAN.md — Comercio entity extension + RegistrarComercio, CargarCertificado, ConfigurarTimbrado use cases (TDD)
+- [ ] 06-02-PLAN.md — Usuario entity + AutenticarUsuario, RefrescarToken use cases with rate limiting (TDD)
 
 ### Phase 7: API REST
 **Goal**: Implement Express/Fastify HTTP layer with routes, Zod validation, and middleware
