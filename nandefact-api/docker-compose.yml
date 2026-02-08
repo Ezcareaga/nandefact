@@ -16,6 +16,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - nandefact-network
 
   redis:
     image: redis:7-alpine
@@ -30,7 +32,70 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - nandefact-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nandefact-api
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgresql://nandefact:nandefact_dev@postgres:5432/nandefact
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev-secret-change-in-production-min-64-chars-long-random-string
+      JWT_REFRESH_SECRET: dev-refresh-secret-change-in-production-min-64-chars-long
+      CCFE_ENCRYPTION_KEY: dev-encryption-key-change-in-production-32-bytes-hex
+      SIFEN_ENVIRONMENT: test
+      SIFEN_TEST_URL: https://sifen-test.set.gov.py/de/ws/
+      SIFEN_PROD_URL: https://sifen.set.gov.py/de/ws/
+      WHATSAPP_API_TOKEN: your-meta-api-token-here
+      WHATSAPP_PHONE_ID: your-phone-number-id-here
+      NODE_ENV: development
+      PORT: 3000
+      LOG_LEVEL: debug
+    volumes:
+      # Mount prisma for development migrations (comentar en producción)
+      - ./prisma:/app/prisma
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+    networks:
+      - nandefact-network
+
+  # Servicio auxiliar para correr migrations en CI/CD
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: nandefact-migrate
+    environment:
+      DATABASE_URL: postgresql://nandefact:nandefact_dev@postgres:5432/nandefact
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npx prisma migrate deploy
+    networks:
+      - nandefact-network
+    profiles:
+      - tools
 
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  nandefact-network:
+    driver: bridge

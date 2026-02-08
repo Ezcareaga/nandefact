@@ -1,0 +1,274 @@
+// Prisma schema para ÑandeFact — Sistema de facturación electrónica SIFEN
+// Matching CLAUDE.md DB model exactly
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum RolUsuario {
+  dueno    // Dueño (mapeado sin tilde para Postgres)
+  empleado
+
+  @@map("rol_usuario")
+}
+
+enum TipoDocumentoIdentidad {
+  RUC
+  CI
+  pasaporte
+  innominado
+
+  @@map("tipo_documento_identidad")
+}
+
+enum TasaIVA {
+  IVA_10  // 10%
+  IVA_5   // 5%
+  EXENTA  // 0%
+
+  @@map("tasa_iva")
+}
+
+enum EstadoSifen {
+  pendiente
+  enviado
+  aprobado
+  rechazado
+  contingencia
+  cancelado
+
+  @@map("estado_sifen")
+}
+
+enum CondicionPago {
+  contado
+  credito
+
+  @@map("condicion_pago")
+}
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+model Comercio {
+  id        String   @id @default(uuid()) @db.Uuid
+  ruc       String   @unique @db.VarChar(20)
+  razonSocial String @map("razon_social") @db.VarChar(200)
+  nombreFantasia String @map("nombre_fantasia") @db.VarChar(200)
+
+  // Establecimiento y punto de expedición
+  establecimiento    String @db.VarChar(3)
+  puntoExpedicion    String @map("punto_expedicion") @db.VarChar(3)
+
+  // Timbrado
+  timbradoNumero       String   @map("timbrado_numero") @db.VarChar(15)
+  timbradoFechaInicio  DateTime @map("timbrado_fecha_inicio")
+  timbradoFechaFin     DateTime @map("timbrado_fecha_fin")
+
+  // Tipo contribuyente (1=PF, 2=PJ)
+  tipoContribuyente Int @map("tipo_contribuyente")
+
+  // Estado
+  activo Boolean @default(true)
+
+  // Dirección
+  direccion         String? @db.Text
+  numeroCasa        String? @map("numero_casa") @db.VarChar(10)
+  departamento      Int?
+  departamentoDesc  String? @map("departamento_desc") @db.VarChar(100)
+  distrito          Int?
+  distritoDesc      String? @map("distrito_desc") @db.VarChar(100)
+  ciudad            Int?
+  ciudadDesc        String? @map("ciudad_desc") @db.VarChar(100)
+
+  // Contacto
+  telefono String? @db.VarChar(20)
+  email    String? @db.VarChar(200)
+
+  // Actividad económica
+  rubro                     String? @db.VarChar(100)
+  actividadEconomicaCodigo  String? @map("actividad_economica_codigo") @db.VarChar(10)
+  actividadEconomicaDesc    String? @map("actividad_economica_desc") @db.VarChar(200)
+  tipoRegimen               Int?    @map("tipo_regimen")
+  zonamercado               String? @map("zona_mercado") @db.VarChar(50)
+
+  // Certificados y credenciales (encriptados)
+  ccfeCertificado Bytes? @map("ccfe_certificado")
+  ccfeClave       Bytes? @map("ccfe_clave")
+  csc             String? @db.VarChar(64)
+  cscId           String? @map("csc_id") @db.VarChar(10)
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  usuarios  Usuario[]
+  productos Producto[]
+  clientes  Cliente[]
+  facturas  Factura[]
+
+  @@map("comercio")
+}
+
+model Usuario {
+  id         String   @id @default(uuid()) @db.Uuid
+  comercioId String   @map("comercio_id") @db.Uuid
+  nombre     String   @db.VarChar(100)
+  telefono   String   @unique @db.VarChar(20)
+  pinHash    String   @map("pin_hash") @db.VarChar(256)
+  rol        RolUsuario
+  activo     Boolean  @default(true)
+
+  // Rate limiting
+  intentosFallidos Int       @default(0) @map("intentos_fallidos")
+  bloqueadoHasta   DateTime? @map("bloqueado_hasta")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  comercio Comercio @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+  facturas Factura[]
+
+  @@map("usuario")
+}
+
+model Producto {
+  id             String   @id @default(uuid()) @db.Uuid
+  comercioId     String   @map("comercio_id") @db.Uuid
+  nombre         String   @db.VarChar(200)
+  codigo         String?  @db.VarChar(50)
+  precioUnitario BigInt   @map("precio_unitario") // PYG sin decimales
+  unidadMedida   String   @map("unidad_medida") @db.VarChar(10)
+  tasaIVA        Int      @map("tasa_iva") // 10, 5, o 0
+  categoria      String?  @db.VarChar(100)
+  activo         Boolean  @default(true)
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  comercio Comercio @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+
+  @@map("producto")
+}
+
+model Cliente {
+  id              String                  @id @default(uuid()) @db.Uuid
+  comercioId      String                  @map("comercio_id") @db.Uuid
+  nombre          String                  @db.VarChar(200)
+  rucCi           String                  @map("ruc_ci") @db.VarChar(20)
+  tipoDocumento   TipoDocumentoIdentidad  @map("tipo_documento")
+  telefono        String?                 @db.VarChar(20)
+  email           String?                 @db.VarChar(200)
+  direccion       String?                 @db.Text
+  frecuente       Boolean                 @default(false)
+  enviarWhatsApp  Boolean                 @default(true) @map("enviar_whatsapp")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  comercio Comercio  @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+  facturas Factura[]
+
+  @@map("cliente")
+}
+
+model Factura {
+  id         String   @id @default(uuid()) @db.Uuid
+  comercioId String   @map("comercio_id") @db.Uuid
+  usuarioId  String?  @map("usuario_id") @db.Uuid
+  clienteId  String   @map("cliente_id") @db.Uuid
+
+  // Datos SIFEN
+  cdc               String? @unique @db.VarChar(44)
+  numero            BigInt
+  tipoDocumento     Int     @map("tipo_documento") // 1=FE, 5=NC, 6=ND, 7=NR
+  establecimiento   String  @db.VarChar(3)
+  puntoExpedicion   String  @map("punto_expedicion") @db.VarChar(3)
+  tipoEmision       Int     @map("tipo_emision") // 1=Normal, 2=Contingencia
+  condicionPago     CondicionPago @map("condicion_pago")
+  fechaEmision      DateTime @map("fecha_emision")
+
+  // Timbrado (snapshot al momento de emisión)
+  timbradoNumero      String   @map("timbrado_numero") @db.VarChar(15)
+  timbradoFechaInicio DateTime @map("timbrado_fecha_inicio")
+  timbradoFechaFin    DateTime @map("timbrado_fecha_fin")
+
+  // Montos (BigInt porque PYG sin decimales)
+  totalBruto  BigInt @map("total_bruto")
+  totalIVA10  BigInt @map("total_iva_10")
+  totalIVA5   BigInt @map("total_iva_5")
+  totalExenta BigInt @map("total_exenta")
+  totalIVA    BigInt @map("total_iva")
+
+  // Estado SIFEN
+  estadoSifen          EstadoSifen @default(pendiente) @map("estado_sifen")
+  sifenRespuesta       String?     @map("sifen_respuesta") @db.Text
+  sifenCodigoRespuesta String?     @map("sifen_codigo_respuesta") @db.VarChar(10)
+  sifenFechaEnvio      DateTime?   @map("sifen_fecha_envio")
+  sifenFechaAprobacion DateTime?   @map("sifen_fecha_aprobacion")
+
+  // Envío WhatsApp
+  whatsappEnviado Boolean   @default(false) @map("whatsapp_enviado")
+  whatsappFecha   DateTime? @map("whatsapp_fecha")
+
+  // KuDE PDF
+  kudePdfPath String? @map("kude_pdf_path") @db.VarChar(500)
+
+  // Sync offline
+  syncId         String?   @map("sync_id") @db.Uuid
+  createdOffline Boolean   @default(false) @map("created_offline")
+  syncedAt       DateTime? @map("synced_at")
+
+  // Nota de crédito/débito referencia
+  facturaReferenciaId String? @map("factura_referencia_id") @db.Uuid
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  comercio          Comercio           @relation(fields: [comercioId], references: [id], onDelete: Cascade)
+  usuario           Usuario?           @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  cliente           Cliente            @relation(fields: [clienteId], references: [id], onDelete: Restrict)
+  detalles          FacturaDetalle[]
+  facturaReferencia Factura?           @relation("NotaCreditoRef", fields: [facturaReferenciaId], references: [id])
+  notasCredito      Factura[]          @relation("NotaCreditoRef")
+
+  @@map("factura")
+}
+
+model FacturaDetalle {
+  id             String @id @default(uuid()) @db.Uuid
+  facturaId      String @map("factura_id") @db.Uuid
+  productoId     String? @map("producto_id") @db.Uuid // No FK — snapshot decoupling
+  descripcion    String @db.VarChar(200)
+  cantidad       BigInt // Entero
+  precioUnitario BigInt @map("precio_unitario") // PYG
+  subtotal       BigInt // cantidad × precioUnitario
+
+  // IVA según catálogo SIFEN
+  ivaTipo       Int @map("iva_tipo") // 1=Gravado, 2=Parcialmente exento, 3=Exento
+  ivaTasa       Int @map("iva_tasa") // 10, 5, o 0
+  ivaProporcion Int @default(100) @map("iva_proporcion") // % proporción gravada
+  ivaBase       BigInt @map("iva_base") // Base gravada calculada
+  ivaMonto      BigInt @map("iva_monto") // Monto IVA calculado
+
+  // Relations
+  factura Factura @relation(fields: [facturaId], references: [id], onDelete: Cascade)
+
+  @@map("factura_detalle")
+}
