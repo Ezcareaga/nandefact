@@ -9,18 +9,18 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 
 ## Current Position
 
-Phase: 2 of 10 (SIFEN Integration) — COMPLETE
-Next: Phase 3 (Sync & Queue)
-Last activity: 2026-02-08 — Phase 2 verified (5/5 must-haves passed)
+Phase: 3 of 10 (Sync & Queue) — IN PROGRESS
+Plan: 1 of 3 complete
+Last activity: 2026-02-08 — Completed 03-01-PLAN.md (Queue domain layer)
 
-Progress: [██░░░░░░░░] 20%
+Progress: [███░░░░░░░] 23%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 15.7 min
-- Total execution time: 1.57 hours
+- Total plans completed: 7
+- Average duration: 14.0 min
+- Total execution time: 1.63 hours
 
 **By Phase:**
 
@@ -28,13 +28,14 @@ Progress: [██░░░░░░░░] 20%
 |-------|-------|-------|----------|--------|
 | 01-application-layer | 3/3 | 8 min | 2.7 min | Complete |
 | 02-sifen-integration | 3/3 | 84 min | 28.0 min | Complete |
+| 03-sync-queue | 1/3 | 6 min | 6.0 min | In Progress |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (4min), 01-03 (2min), 02-01 (72min), 02-02 (6min), 02-03 (6min)
-- Trend: Initial spike for xmlgen integration, velocity returning to normal
+- Last 5 plans: 01-03 (2min), 02-01 (72min), 02-02 (6min), 02-03 (6min), 03-01 (6min)
+- Trend: Velocity stable at 6min for well-scoped plans, xmlgen was outlier
 
 **Test Coverage:**
-- Total tests: 140 (59 domain + 22 application + 59 sifen)
+- Total tests: 151 (59 domain + 33 application + 59 sifen)
 - All passing, zero regressions
 
 *Updated after each plan completion*
@@ -66,6 +67,10 @@ Recent decisions affecting current work:
 - 02-02: Mock fs in tests (Good) — Tests don't require real certificate files, faster execution
 - 02-03: Repository injection in use cases (Good) — Use cases load all required aggregates (factura, comercio, cliente) before calling infrastructure
 - 02-03: Error handling for missing entities (Good) — Throw explicit errors when comercio or cliente not found for debugging clarity
+- 03-01: SyncJob as immutable value object (Good) — conError() returns new instance, prevents race conditions in multi-worker scenarios
+- 03-01: 72-hour check at processing time (Good) — Expiration checked when job dequeued, not when enqueued
+- 03-01: Max 5 retry attempts (Good) — Prevents infinite loops while allowing transient failures to resolve
+- 03-01: Single-job processing (Good) — One job at a time simplifies error handling, BullMQ manages concurrency
 
 ### Pending Todos
 
@@ -80,6 +85,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-08
-Stopped at: Phase 2 SIFEN Integration complete, verified 5/5
+Last session: 2026-02-08 00:43:39Z
+Stopped at: Completed 03-01-PLAN.md (Queue domain and use cases)
 Resume file: None
