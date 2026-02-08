@@ -9,18 +9,18 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 
 ## Current Position
 
-Phase: 6 of 10 (Comercio & Auth) — COMPLETE
-Plan: 2 of 2 (all plans complete)
-Last activity: 2026-02-08 — Phase 6 complete (Comercio & Auth)
+Phase: 7 of 10 (API REST) — IN PROGRESS
+Plan: 1 of 4 (07-01 complete)
+Last activity: 2026-02-08 — Completed 07-01-PLAN.md (Express middleware foundation)
 
-Progress: [██████░░░░] 60%
+Progress: [██████░░░░] 62.5%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
-- Average duration: 11.1 min
-- Total execution time: 2.78 hours
+- Total plans completed: 16
+- Average duration: 10.6 min
+- Total execution time: 2.83 hours
 
 **By Phase:**
 
@@ -32,10 +32,11 @@ Progress: [██████░░░░] 60%
 | 04-events-kude | 2/2 | 23 min | 11.5 min | Complete |
 | 05-productos-clientes | 2/2 | 14 min | 7.0 min | Complete |
 | 06-comercio-auth | 2/2 | 28 min | 14.0 min | Complete |
+| 07-api-rest | 1/4 | 3 min | 3.0 min | In Progress |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (7min), 05-02 (7min), 06-01 (12min), 06-02 (16min)
-- Trend: Stable velocity 7-16min per plan, auth/comercio tasks slightly longer
+- Last 5 plans: 05-02 (7min), 06-01 (12min), 06-02 (16min), 07-01 (3min)
+- Trend: API foundation tasks very fast (3min), domain/business logic slower (12-16min)
 
 **Test Coverage:**
 - Total tests: 359 (139 domain + 123 application + 75 sifen + 22 queue/logging/kude)
@@ -95,6 +96,10 @@ Recent decisions affecting current work:
 - 06-02: Generic auth error messages (Good) — Prevents user enumeration attacks, same message for all auth failures
 - 06-02: Token rotation on refresh (Good) — Security best practice, old refresh token invalidated when new pair generated
 - 06-02: estaBloqueado accepts ahora parameter (Good) — Testability via dependency injection of time
+- 07-01: Express over Fastify (Good) — Ecosystem maturity, middleware availability, team familiarity sufficient for MVP
+- 07-01: Error handler checks specific before generic (Good) — CredencialesInvalidasError before ApplicationError ensures correct 401 code
+- 07-01: Consistent error response structure (Good) — { success: false, error: { code, message } } for predictable client handling
+- 07-01: Type assertions for validated params/query (Good) — Express built-in types strict, assertions safe after Zod parsing
 
 ### Pending Todos
 
@@ -115,5 +120,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Phase 6 complete, ready for Phase 7 (API REST)
+Stopped at: Completed 07-01 (Express middleware foundation), ready for 07-02 (Auth routes)
 Resume file: None
