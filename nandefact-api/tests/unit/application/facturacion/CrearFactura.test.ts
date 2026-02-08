@@ -209,6 +209,38 @@ describe('CrearFactura', () => {
     expect(facturaGuardada?.numeroFactura.numero).toBe('0000137');
   });
 
+  it('debería crear factura con condicionPago credito correctamente', async () => {
+    const input = {
+      comercioId: 'comercio-uuid',
+      clienteId: 'cliente-uuid',
+      tipoDocumento: 1 as const,
+      condicionPago: 'credito' as const,
+      fechaEmision: new Date('2024-06-15'),
+      numero: '0000200',
+      items: [
+        {
+          productoId: 'producto-1',
+          descripcion: 'Mandioca',
+          cantidad: 3,
+          precioUnitario: 5000,
+          tasaIVA: 10,
+        },
+      ],
+    };
+
+    const output = await crearFactura.execute(input);
+
+    expect(mockFacturaRepository.save).toHaveBeenCalledTimes(1);
+    expect(output.facturaId).toBeTruthy();
+    expect(output.cdc.length).toBe(44);
+    expect(output.estado).toBe('pendiente');
+    expect(output.totalBruto).toBe(15000);
+
+    // Verificar que la factura guardada tiene condicionPago='credito'
+    const facturaGuardada = vi.mocked(mockFacturaRepository.save).mock.calls[0]?.[0];
+    expect(facturaGuardada?.condicionPago).toBe('credito');
+  });
+
   it('debería lanzar FacturaSinItemsError si items array vacío', async () => {
     const input = {
       comercioId: 'comercio-uuid',

@@ -53,6 +53,11 @@ export interface SifenData {
       monto?: string;
       moneda?: string;
     }>;
+    credito?: {
+      tipo: number;
+      plazo: string;
+      cuotas?: number;
+    };
   };
   moneda: string;
   cliente: {
@@ -160,20 +165,30 @@ export function mapFacturaToData(factura: Factura, _comercio: Comercio, cliente:
   const f = factura.fechaEmision;
   const fecha = `${String(f.getUTCFullYear())}-${String(f.getUTCMonth() + 1).padStart(2, '0')}-${String(f.getUTCDate()).padStart(2, '0')}T${String(f.getUTCHours()).padStart(2, '0')}:${String(f.getUTCMinutes()).padStart(2, '0')}:${String(f.getUTCSeconds()).padStart(2, '0')}`;
 
-  // Mapear condicion pago: contado=1, credito=2
-  const condicionTipo = factura.condicionPago === 'contado' ? 1 : 2;
-
-  // Para condicion contado, agregar entregas con monto total
-  const entregas: Array<{ tipo: number; monto?: string; moneda?: string }> | undefined =
-    factura.condicionPago === 'contado'
-      ? [
-          {
-            tipo: 1, // Efectivo
-            monto: String(factura.totalBruto),
-            moneda: 'PYG',
-          },
-        ]
-      : undefined;
+  // Construir condicion de pago según tipo (Grupo F del XML SIFEN)
+  let condicionObj: SifenData['condicion'];
+  if (factura.condicionPago === 'contado') {
+    // Grupo F1: entrega contado con monto total
+    condicionObj = {
+      tipo: 1,
+      entregas: [
+        {
+          tipo: 1, // Efectivo
+          monto: String(factura.totalBruto),
+          moneda: 'PYG',
+        },
+      ],
+    };
+  } else {
+    // Grupo F2: crédito — plazo "A convenir" para venta fiado de mercado
+    condicionObj = {
+      tipo: 2,
+      credito: {
+        tipo: 1, // 1=Plazo
+        plazo: 'A convenir',
+      },
+    };
+  }
 
   // Mapear cliente segun tipo documento
   const clienteMapeado = mapCliente(cliente);
@@ -188,14 +203,7 @@ export function mapFacturaToData(factura: Factura, _comercio: Comercio, cliente:
     tipoEmision: factura.tipoEmision,
     tipoTransaccion: 1, // 1=Venta
     tipoImpuesto: 1, // 1=IVA
-    condicion: entregas
-      ? {
-          tipo: condicionTipo,
-          entregas,
-        }
-      : {
-          tipo: condicionTipo,
-        },
+    condicion: condicionObj,
     moneda: 'PYG',
     cliente: clienteMapeado,
     factura: {

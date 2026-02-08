@@ -7,6 +7,7 @@ import { createProductoRouter } from './routes/productoRoutes.js';
 import { createClienteRouter } from './routes/clienteRoutes.js';
 import { createFacturaRouter } from './routes/facturaRoutes.js';
 import { createSyncRouter } from './routes/syncRoutes.js';
+import { createReporteRouter } from './routes/reporteRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 /**
@@ -19,6 +20,7 @@ import { errorHandler } from './middleware/errorHandler.js';
  * - /api/v1/clientes
  * - /api/v1/facturas
  * - /api/v1/sync
+ * - /api/v1/reportes
  *
  * El error handler se monta al final para capturar errores de todos los routers.
  *
@@ -45,6 +47,7 @@ export function startServer(deps: AppDependencies, port?: number): Server {
   app.use('/api/v1/clientes', createClienteRouter(deps));
   app.use('/api/v1/facturas', createFacturaRouter(deps));
   app.use('/api/v1/sync', createSyncRouter(deps));
+  app.use('/api/v1/reportes', createReporteRouter(deps));
 
   // Error handler DEBE ser el último middleware
   app.use(errorHandler);

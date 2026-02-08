@@ -217,6 +217,51 @@ describe('SifenDataMapper', () => {
       expect(data.condicion.tipo).toBe(2);
     });
 
+    it('debe mapear credito con tipo=1 y plazo="A convenir" (Grupo F2)', () => {
+      const factura = new Factura({
+        id: 'fac-cred',
+        comercioId: 'com-1',
+        clienteId: 'cli-1',
+        tipoDocumento: 1,
+        timbrado: comercioMock.timbrado,
+        numeroFactura: new NumeroFactura('001', '003', '0000139'),
+        tipoEmision: 1,
+        condicionPago: 'credito',
+        fechaEmision: new Date('2024-06-15T10:30:00Z'),
+      });
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      expect(data.condicion.credito).toEqual({
+        tipo: 1,
+        plazo: 'A convenir',
+      });
+    });
+
+    it('debe NO incluir entregas cuando condicion es credito', () => {
+      const factura = new Factura({
+        id: 'fac-cred-2',
+        comercioId: 'com-1',
+        clienteId: 'cli-1',
+        tipoDocumento: 1,
+        timbrado: comercioMock.timbrado,
+        numeroFactura: new NumeroFactura('001', '003', '0000140'),
+        tipoEmision: 1,
+        condicionPago: 'credito',
+        fechaEmision: new Date('2024-06-15T10:30:00Z'),
+      });
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      expect(data.condicion.entregas).toBeUndefined();
+    });
+
+    it('debe incluir entregas con monto total cuando condicion es contado', () => {
+      const factura = crearFacturaMock();
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      expect(data.condicion.entregas).toBeDefined();
+      expect(data.condicion.entregas).toHaveLength(1);
+      expect(data.condicion.entregas![0]?.tipo).toBe(1);
+      expect(data.condicion.entregas![0]?.moneda).toBe('PYG');
+      expect(data.condicion.credito).toBeUndefined();
+    });
+
     it('debe mapear moneda a "PYG"', () => {
       const factura = crearFacturaMock();
       const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
