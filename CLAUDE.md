@@ -844,9 +844,10 @@ const xmlCancel = await xmlgen.generateXMLEventoCancelacion(id, params, data);
 ### Proceso de Desarrollo
 1. **Desarrollo incremental por bloques:** 1 función → test → verificar → siguiente.
 2. **NUNCA avanzar con tests rotos.** Corregir antes de seguir.
-3. **Siempre consultar documentación oficial** de librerías/tools antes de usarlas. NUNCA asumir. Investigar primero, codear después.
-4. **Error handling específico por capa:** Domain lanza excepciones de dominio, Application las captura y traduce, Infrastructure maneja errores de I/O.
-5. **Logging estructurado:** JSON, con contexto (comercioId, facturaId, CDC).
+3. **Antes de CADA commit:** correr `eslint` y `tsc --noEmit` en nandefact-api/. NUNCA commitear con errores de ESLint o TypeScript. El pre-commit hook lo enforza automáticamente.
+4. **Siempre consultar documentación oficial** de librerías/tools antes de usarlas. NUNCA asumir. Investigar primero, codear después.
+5. **Error handling específico por capa:** Domain lanza excepciones de dominio, Application las captura y traduce, Infrastructure maneja errores de I/O.
+6. **Logging estructurado:** JSON, con contexto (comercioId, facturaId, CDC).
 
 ### Convenciones de Código
 - **Idioma código:** Inglés (variables, funciones, clases)

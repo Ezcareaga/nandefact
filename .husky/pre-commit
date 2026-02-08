@@ -1,0 +1,1 @@
+cd nandefact-api && npx eslint src/ && npx tsc --noEmit
