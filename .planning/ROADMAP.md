@@ -102,11 +102,11 @@ Plans:
   4. User can create client with CI/RUC/pasaporte or as innominado
   5. System autocompletes client search by nombre/RUC/CI with debounce
   6. System validates RUC format and can query SIFEN siConsRUC for verification
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md — Producto domain entity + IProductoRepository + CRUD use cases (TDD)
+- [ ] 05-02-PLAN.md — Cliente CRUD use cases + ConsultarRUC + code cleanup (TDD)
 
 ### Phase 6: Comercio & Auth
 **Goal**: Implement comercio setup, certificate management, and JWT + PIN authentication
