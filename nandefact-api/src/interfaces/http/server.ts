@@ -30,7 +30,7 @@ export function startServer(deps: AppDependencies, port?: number): Server {
   const app = createApp(deps);
   const serverPort = port ?? 3000;
 
-  // Health check (sin autenticación, para load balancers)
+  // Verificación de salud (sin autenticación, para balanceadores de carga)
   app.get('/health', (_req, res) => {
     res.status(200).json({
       status: 'ok',

@@ -156,7 +156,7 @@ export function mapFacturaToData(factura: Factura, _comercio: Comercio, cliente:
   // Extraer codigo de seguridad desde CDC (posiciones 34-42, 9 digitos)
   const codigoSeguridad = factura.cdc?.codigoSeguridad ?? '';
 
-  // Formatear fecha emision como ISO8601 sin timezone
+  // Formatear fecha emisión como ISO8601 sin zona horaria
   const f = factura.fechaEmision;
   const fecha = `${String(f.getUTCFullYear())}-${String(f.getUTCMonth() + 1).padStart(2, '0')}-${String(f.getUTCDate()).padStart(2, '0')}T${String(f.getUTCHours()).padStart(2, '0')}:${String(f.getUTCMinutes()).padStart(2, '0')}:${String(f.getUTCSeconds()).padStart(2, '0')}`;
 

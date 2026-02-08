@@ -42,7 +42,7 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
-  // Log completo del error (con stack) para debugging
+  // Log completo del error (con stack) para depuración
   console.error('Error en endpoint:', {
     method: req.method,
     path: req.path,
@@ -55,7 +55,7 @@ export function errorHandler(
   let errorCode = 'ERROR_INTERNO';
   let errorMessage = 'Error interno del servidor';
 
-  // Zod validation errors (de validateRequest middleware)
+  // Errores de validación Zod (del middleware validateRequest)
   if (err instanceof ZodError) {
     statusCode = 400;
     errorCode = 'VALIDACION';
@@ -85,7 +85,7 @@ export function errorHandler(
     errorCode = 'CUENTA_BLOQUEADA';
     errorMessage = err.message;
   }
-  // NotFound errors (404)
+  // Errores no encontrado (404)
   else if (
     err instanceof FacturaNoEncontradaError ||
     err instanceof ComercioNoEncontradoError ||
@@ -96,7 +96,7 @@ export function errorHandler(
     errorCode = err.name;
     errorMessage = err.message;
   }
-  // Conflict errors (409)
+  // Errores de conflicto (409)
   else if (
     err instanceof FacturaNoAnulableError ||
     err instanceof FacturaInmutableError ||
@@ -107,7 +107,7 @@ export function errorHandler(
     errorCode = err.name;
     errorMessage = err.message;
   }
-  // Unprocessable Entity (422)
+  // Entidad no procesable (422)
   else if (err instanceof KuDENoGenerableError || err instanceof RucDuplicadoError) {
     statusCode = 422;
     errorCode = err.name;

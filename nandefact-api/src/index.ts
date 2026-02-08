@@ -14,7 +14,7 @@
 import { startServer } from './interfaces/http/server.js';
 import type { AppDependencies } from './interfaces/http/app.js';
 
-// Use cases
+// Casos de uso
 import { AutenticarUsuario } from './application/auth/AutenticarUsuario.js';
 import { RefrescarToken } from './application/auth/RefrescarToken.js';
 import { RegistrarComercio } from './application/comercio/RegistrarComercio.js';
@@ -35,7 +35,7 @@ import { InutilizarNumeracion } from './application/facturacion/InutilizarNumera
 import { EncolarFactura } from './application/sync/EncolarFactura.js';
 import { SincronizarPendientes } from './application/sync/SincronizarPendientes.js';
 
-// Ports (interfaces)
+// Puertos (interfaces)
 import type { IAuthService } from './domain/auth/IAuthService.js';
 import type { IFacturaRepository } from './domain/factura/IFacturaRepository.js';
 import type { IComercioRepository } from './domain/comercio/IComercioRepository.js';
@@ -217,7 +217,7 @@ function buildDependencies(): AppDependencies {
   const notificador = new StubNotificador();
   const syncQueue = new StubSyncQueue();
 
-  // Instanciar use cases con stubs
+  // Instanciar casos de uso con stubs
   // @ts-expect-error - Dependencias stub, Phase 8 tendrá implementaciones reales
   const autenticarUsuario = new AutenticarUsuario({ authService });
   // @ts-expect-error - Dependencias stub, Phase 8 tendrá implementaciones reales
@@ -258,7 +258,7 @@ function buildDependencies(): AppDependencies {
   });
 
   return {
-    // Auth
+    // Autenticación
     autenticarUsuario,
     refrescarToken,
     authService,
@@ -281,10 +281,10 @@ function buildDependencies(): AppDependencies {
     anularFactura,
     enviarKuDE,
     inutilizarNumeracion,
-    // Sync
+    // Sincronización
     encolarFactura,
     sincronizarPendientes,
-    // Repos (para queries directas en routes)
+    // Repositorios (para consultas directas en rutas)
     facturaRepository,
     comercioRepository,
     clienteRepository,

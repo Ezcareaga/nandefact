@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import type { RolUsuario } from '../../domain/shared/types.js';
 
-// Use cases
+// Casos de uso
 import type { AutenticarUsuario } from '../../application/auth/AutenticarUsuario.js';
 import type { RefrescarToken } from '../../application/auth/RefrescarToken.js';
 import type { RegistrarComercio } from '../../application/comercio/RegistrarComercio.js';
@@ -24,7 +24,7 @@ import type { InutilizarNumeracion } from '../../application/facturacion/Inutili
 import type { EncolarFactura } from '../../application/sync/EncolarFactura.js';
 import type { SincronizarPendientes } from '../../application/sync/SincronizarPendientes.js';
 
-// Ports
+// Puertos
 import type { IAuthService } from '../../domain/auth/IAuthService.js';
 import type { IFacturaRepository } from '../../domain/factura/IFacturaRepository.js';
 import type { IComercioRepository } from '../../domain/comercio/IComercioRepository.js';
@@ -35,7 +35,7 @@ import type { IClienteRepository } from '../../domain/cliente/IClienteRepository
  * Incluye use cases, servicios y repositorios.
  */
 export interface AppDependencies {
-  // Auth
+  // Autenticación
   autenticarUsuario: AutenticarUsuario;
   refrescarToken: RefrescarToken;
   authService: IAuthService;
@@ -58,10 +58,10 @@ export interface AppDependencies {
   anularFactura: AnularFactura;
   enviarKuDE: EnviarKuDE;
   inutilizarNumeracion: InutilizarNumeracion;
-  // Sync
+  // Sincronización
   encolarFactura: EncolarFactura;
   sincronizarPendientes: SincronizarPendientes;
-  // Repos (para queries directas en routes)
+  // Repositorios (para consultas directas en rutas)
   facturaRepository: IFacturaRepository;
   comercioRepository: IComercioRepository;
   clienteRepository: IClienteRepository;
@@ -103,7 +103,7 @@ export function createApp(deps: AppDependencies): Express {
   // JSON parsing
   app.use(express.json({ limit: '1mb' }));
 
-  // Routes se montarán en planes siguientes
+  // Rutas se montarán en planes siguientes
   // Por ahora, deps está disponible para cuando se necesite
   void deps;
 

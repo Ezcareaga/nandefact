@@ -25,7 +25,7 @@ export interface ComercioRouterDeps {
 const asyncHandler = (fn: RequestHandler): RequestHandler =>
   (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
-// Configurar multer para file upload en memoria (max 5MB)
+// Configurar multer para carga de archivos en memoria (máx 5MB)
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {

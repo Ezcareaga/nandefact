@@ -879,6 +879,15 @@ const xmlCancel = await xmlgen.generateXMLEventoCancelacion(id, params, data);
 - Contingencia (tipo emisión 2) solo cuando SIFEN está caído confirmado
 - Reintentos con backoff exponencial para errores de red
 
+### Reglas para API REST (Phase 7+)
+- Cada endpoint debe tener validación Zod del input ANTES de llamar al use case
+- Errores de dominio → mapear a HTTP status codes: DomainError→400, *NoEncontrado→404, *Inmutable→409, ApplicationError→422
+- NUNCA exponer stack traces en responses de producción
+- NUNCA loggear request bodies que contengan PIN, password, o certificados
+- JWT middleware valida token ANTES de llegar al controller
+- Rate limiting por comercio en endpoints de facturación
+- Responses siempre con estructura consistente: { success: boolean, data?: T, error?: { code: string, message: string } }
+
 ---
 
 ## REFERENCIA RÁPIDA

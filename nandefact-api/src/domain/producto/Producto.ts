@@ -100,11 +100,11 @@ export class Producto {
       activo: cambios.activo ?? this.activo,
     };
 
-    // Handle optional codigo
+    // Manejar código opcional
     const finalCodigo = cambios.codigo !== undefined ? cambios.codigo : this.codigo;
     if (finalCodigo !== null) props.codigo = finalCodigo;
 
-    // Handle optional categoria
+    // Manejar categoría opcional
     const finalCategoria = cambios.categoria !== undefined ? cambios.categoria : this.categoria;
     if (finalCategoria !== null) props.categoria = finalCategoria;
 

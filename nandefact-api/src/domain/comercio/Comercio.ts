@@ -14,7 +14,7 @@ export interface ComercioProps {
   puntoExpedicion: string;
   tipoContribuyente: TipoContribuyente;
   activo?: boolean | undefined;
-  // Campos adicionales para XML SIFEN (Group B: Emisor)
+  // Campos adicionales para XML SIFEN (Grupo B: Emisor)
   direccion?: string;
   numeroCasa?: string;
   departamento?: number;
@@ -142,7 +142,7 @@ export class Comercio {
       activo: cambios.activo ?? this.activo,
     };
 
-    // Handle optional fields — merge cambios con valores actuales
+    // Manejar campos opcionales — combinar cambios con valores actuales
     const camposOpcionales: (keyof ComercioProps)[] = [
       'direccion', 'numeroCasa', 'departamento', 'departamentoDesc',
       'distrito', 'distritoDesc', 'ciudad', 'ciudadDesc',

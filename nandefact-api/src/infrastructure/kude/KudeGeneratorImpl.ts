@@ -43,7 +43,7 @@ export class KudeGeneratorImpl implements IKudeGenerator {
     }
 
     // Generar QR usando xmlgen + qrgen
-    // NOTE: En producción real, el XML firmado debería venir de un repositorio o ser pasado como parámetro.
+    // NOTA: En producción real, el XML firmado debería venir de un repositorio o ser pasado como parámetro.
     // Por ahora, generamos un XML mínimo solo para obtener el QR.
     const xmlFirmado = this.generarXmlMinimo(factura, comercio, cliente);
     const xmlConQr = await this.qrGenerator.generarQr({
@@ -60,7 +60,7 @@ export class KudeGeneratorImpl implements IKudeGenerator {
 
     doc.on('data', (chunk: Buffer) => chunks.push(chunk));
 
-    // Header - Datos del emisor
+    // Encabezado - Datos del emisor
     doc.fontSize(16).text('FACTURA ELECTRÓNICA', { align: 'center' });
     doc.moveDown(0.5);
     doc.fontSize(10).text(`RUC: ${comercio.ruc.value}`, { align: 'center' });
@@ -95,14 +95,14 @@ export class KudeGeneratorImpl implements IKudeGenerator {
     }
     doc.moveDown(1);
 
-    // Items - Tabla
+    // Ítems - Tabla
     doc.fontSize(9).text('ITEMS:', { underline: true });
     doc.moveDown(0.3);
 
     const tableTop = doc.y;
     const colWidths = { cant: 50, desc: 200, precio: 80, subtotal: 80 };
 
-    // Header tabla
+    // Encabezado tabla
     doc.fontSize(8);
     doc.text('Cant.', 50, tableTop, { width: colWidths.cant, continued: true });
     doc.text('Descripción', { width: colWidths.desc, continued: true });
@@ -111,7 +111,7 @@ export class KudeGeneratorImpl implements IKudeGenerator {
 
     let yPosition = tableTop + 15;
 
-    // Items
+    // Ítems
     for (const item of factura.items) {
       doc.text(item.cantidad.toString(), 50, yPosition, { width: colWidths.cant, continued: true });
       doc.text(item.descripcion, { width: colWidths.desc, continued: true });

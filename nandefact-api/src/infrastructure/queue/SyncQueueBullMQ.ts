@@ -28,7 +28,7 @@ export class SyncQueueBullMQ implements ISyncQueue {
       connection: redisConnection,
       defaultJobOptions: {
         removeOnComplete: true,
-        removeOnFail: false, // Keep failed jobs for inspection
+        removeOnFail: false, // Mantener jobs fallidos para inspección
       },
     });
   }
@@ -48,8 +48,8 @@ export class SyncQueueBullMQ implements ISyncQueue {
   }
 
   async completar(_jobId: string): Promise<void> {
-    // BullMQ automatically completes jobs when worker returns successfully
-    // This method is a no-op in the adapter (worker handles completion)
+    // BullMQ completa automáticamente los jobs cuando el worker retorna exitosamente
+    // Este método es no-op en el adaptador (el worker maneja la completación)
   }
 
   async fallar(job: SyncJob, error: string): Promise<void> {

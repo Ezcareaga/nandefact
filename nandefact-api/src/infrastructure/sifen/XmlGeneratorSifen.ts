@@ -23,7 +23,7 @@ export class XmlGeneratorSifen implements IXmlGenerator {
     const params = mapComercioToParams(comercio);
     const data = mapFacturaToData(factura, comercio, cliente);
 
-    // Generar XML usando la librería (dynamic import para CommonJS)
+    // Generar XML usando la librería (importación dinámica para CommonJS)
     const xmlgenModule = await import('facturacionelectronicapy-xmlgen');
     const xml = await xmlgenModule.default.generateXMLDE(params, data, {});
 
@@ -47,7 +47,7 @@ export class XmlGeneratorSifen implements IXmlGenerator {
     };
 
     // Generar XML usando la librería
-    // Type assertion necesaria porque las definiciones TypeScript de xmlgen no incluyen métodos de eventos
+    // Aserción de tipo necesaria porque las definiciones TypeScript de xmlgen no incluyen métodos de eventos
     const xmlgenModule = await import('facturacionelectronicapy-xmlgen');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const xml = await (xmlgenModule.default as any).generateXMLEventoCancelacion(1, params, data);
@@ -89,7 +89,7 @@ export class XmlGeneratorSifen implements IXmlGenerator {
     };
 
     // Generar XML usando la librería
-    // Type assertion necesaria porque las definiciones TypeScript de xmlgen no incluyen métodos de eventos
+    // Aserción de tipo necesaria porque las definiciones TypeScript de xmlgen no incluyen métodos de eventos
     const xmlgenModule = await import('facturacionelectronicapy-xmlgen');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const xml = await (xmlgenModule.default as any).generateXMLEventoInutilizacion(1, params, data);

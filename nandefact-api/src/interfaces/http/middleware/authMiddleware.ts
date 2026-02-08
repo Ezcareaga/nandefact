@@ -24,7 +24,7 @@ interface AuthErrorResponse {
 export function createAuthMiddleware(authService: IAuthService) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      // Extraer Authorization header
+      // Extraer encabezado Authorization
       const authHeader = req.headers.authorization;
 
       if (!authHeader || !authHeader.startsWith('Bearer ')) {

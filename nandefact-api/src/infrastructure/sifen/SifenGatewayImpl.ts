@@ -96,8 +96,8 @@ export class SifenGatewayImpl implements ISifenGateway {
   }
 
   consultarRUC(_ruc: string): Promise<never> {
-    // Stub implementation - real integration pending
-    // TIPS-SA library may expose siConsRUC, but for now we throw
+    // Implementación stub — integración real pendiente
+    // La librería TIPS-SA podría exponer siConsRUC, pero por ahora lanzamos error
     throw new SifenNoImplementadoError('consultarRUC (siConsRUC)');
   }
 

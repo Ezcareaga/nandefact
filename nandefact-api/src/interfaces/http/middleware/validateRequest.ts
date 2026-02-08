@@ -23,17 +23,17 @@ export interface ValidationSchemas {
 export function validateRequest(schemas: ValidationSchemas) {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
-      // Validar body
+      // Validar cuerpo de la petición
       if (schemas.body) {
         req.body = await schemas.body.parseAsync(req.body);
       }
 
-      // Validar params
+      // Validar parámetros
       if (schemas.params) {
         req.params = await schemas.params.parseAsync(req.params) as typeof req.params;
       }
 
-      // Validar query
+      // Validar consulta
       if (schemas.query) {
         req.query = await schemas.query.parseAsync(req.query) as typeof req.query;
       }
