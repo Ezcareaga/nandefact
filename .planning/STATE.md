@@ -10,31 +10,31 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 ## Current Position
 
 Phase: 2 of 10 (SIFEN Integration) — IN PROGRESS
-Plan: 02-02 of 04 completed (Signing and Gateway Implementation)
-Last activity: 2026-02-07 — Completed 02-02-PLAN.md (FirmaDigitalSifen + SifenGatewayImpl)
+Plan: 02-01 of 04 completed (XML Generation)
+Last activity: 2026-02-07 — Completed 02-01-PLAN.md (IXmlGenerator + SifenDataMapper + XmlGeneratorSifen)
 
-Progress: [█░░░░░░░░░] 12%
+Progress: [█░░░░░░░░░] 9%
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 4
-- Average duration: 3.3 min
-- Total execution time: 0.22 hours
+- Average duration: 20.5 min
+- Total execution time: 1.37 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan | Status |
 |-------|-------|-------|----------|--------|
 | 01-application-layer | 3/3 | 8 min | 2.7 min | Complete |
-| 02-sifen-integration | 1/4 | 5 min | 5.0 min | In Progress |
+| 02-sifen-integration | 1/4 | 72 min | 72.0 min | In Progress |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2min), 01-02 (4min), 01-03 (2min), 02-02 (5min)
-- Trend: Phase 2 first plan slightly longer (SIFEN complexity)
+- Last 5 plans: 01-01 (2min), 01-02 (4min), 01-03 (2min), 02-01 (72min)
+- Trend: Phase 2 XML generation much longer due to xmlgen library integration complexity
 
 **Test Coverage:**
-- Total tests: 96 (59 domain + 22 application + 15 sifen)
+- Total tests: 136 (59 domain + 22 application + 55 sifen)
 - All passing, zero regressions
 
 *Updated after each plan completion*
@@ -58,6 +58,9 @@ Recent decisions affecting current work:
 - 01-03: Sequential processing over parallel (Good) — Predictable state updates, easier debugging, acceptable performance for batch sync
 - 01-03: SIFEN rejection counts as successful communication (Good) — Network worked, SIFEN responded, factura correctly marked rechazada
 - 01-03: Continue processing on failure (Good) — Maximizes sync completion, reports all failures in summary
+- 02-01: Price conversion for xmlgen library (Good) — Domain has prices WITH IVA, xmlgen expects WITHOUT IVA. Calculate baseGravada/cantidad.
+- 02-01: xmlgen 'iva' field is rate not amount (Good) — Field naming clarified through library exploration
+- 02-01: Dynamic import for CommonJS xmlgen (Good) — ESM TypeScript project consuming CommonJS library via dynamic import + type assertion
 - 02-02: Type assertions for TIPS-SA CommonJS modules (Good) — TypeScript definitions don't match exports, simplest workaround
 - 02-02: Defensive SIFEN response parsing (Good) — Handles both XML string and object responses from unpredictable library
 - 02-02: Mock fs in tests (Good) — Tests don't require real certificate files, faster execution
@@ -77,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-08T00:25:19Z
-Stopped at: Completed 02-02-PLAN.md (FirmaDigitalSifen + SifenGatewayImpl)
+Last session: 2026-02-07T22:33:52Z
+Stopped at: Completed 02-01-PLAN.md (XML Generation with xmlgen library)
 Resume file: None
