@@ -3,11 +3,16 @@ import { SincronizarPendientes } from '../../../../src/application/sync/Sincroni
 import type { IFacturaRepository } from '../../../../src/domain/factura/IFacturaRepository.js';
 import type { IFirmaDigital } from '../../../../src/domain/factura/IFirmaDigital.js';
 import type { ISifenGateway } from '../../../../src/domain/factura/ISifenGateway.js';
+import type { IXmlGenerator } from '../../../../src/domain/factura/IXmlGenerator.js';
+import type { IComercioRepository } from '../../../../src/domain/comercio/IComercioRepository.js';
+import type { IClienteRepository } from '../../../../src/domain/cliente/IClienteRepository.js';
 import { Factura } from '../../../../src/domain/factura/Factura.js';
 import { ItemFactura } from '../../../../src/domain/factura/ItemFactura.js';
 import { NumeroFactura } from '../../../../src/domain/factura/NumeroFactura.js';
 import { Timbrado } from '../../../../src/domain/comercio/Timbrado.js';
 import { RUC } from '../../../../src/domain/comercio/RUC.js';
+import { Comercio } from '../../../../src/domain/comercio/Comercio.js';
+import { Cliente } from '../../../../src/domain/cliente/Cliente.js';
 
 describe('SincronizarPendientes', () => {
   const timbrado = new Timbrado('12558946', new Date('2024-01-01'), new Date('2025-12-31'));
@@ -15,9 +20,14 @@ describe('SincronizarPendientes', () => {
   const comercioId = '660e8400-e29b-41d4-a716-446655440000';
 
   let facturaRepository: IFacturaRepository;
+  let comercioRepository: IComercioRepository;
+  let clienteRepository: IClienteRepository;
+  let xmlGenerator: IXmlGenerator;
   let firmaDigital: IFirmaDigital;
   let sifenGateway: ISifenGateway;
   let sincronizarPendientes: SincronizarPendientes;
+  let testComercio: Comercio;
+  let testCliente: Cliente;
 
   /**
    * Helper: Crea una factura en estado pendiente con items y CDC generado.
@@ -50,12 +60,48 @@ describe('SincronizarPendientes', () => {
   }
 
   beforeEach(() => {
+    // Crear test comercio
+    testComercio = new Comercio({
+      id: comercioId,
+      ruc,
+      razonSocial: 'Comercio Test S.A.',
+      nombreFantasia: 'Test Store',
+      timbrado,
+      establecimiento: '001',
+      puntoExpedicion: '003',
+      tipoContribuyente: 1,
+    });
+
+    // Crear test cliente
+    testCliente = new Cliente({
+      id: '770e8400-e29b-41d4-a716-446655440000',
+      comercioId,
+      nombre: 'Cliente Test',
+      rucCi: '1234567-8',
+      tipoDocumento: 'CI',
+    });
+
     // Mocks
     facturaRepository = {
       save: vi.fn().mockResolvedValue(undefined),
       findById: vi.fn().mockResolvedValue(null),
       findByComercio: vi.fn().mockResolvedValue([]),
       findPendientes: vi.fn().mockResolvedValue([]),
+    };
+
+    comercioRepository = {
+      findById: vi.fn().mockResolvedValue(testComercio),
+    };
+
+    clienteRepository = {
+      save: vi.fn().mockResolvedValue(undefined),
+      findById: vi.fn().mockResolvedValue(testCliente),
+      findByComercio: vi.fn().mockResolvedValue([]),
+      buscar: vi.fn().mockResolvedValue([]),
+    };
+
+    xmlGenerator = {
+      generarXml: vi.fn().mockResolvedValue('<DE><CDC>test</CDC></DE>'),
     };
 
     firmaDigital = {
@@ -70,6 +116,9 @@ describe('SincronizarPendientes', () => {
 
     sincronizarPendientes = new SincronizarPendientes({
       facturaRepository,
+      comercioRepository,
+      clienteRepository,
+      xmlGenerator,
       firmaDigital,
       sifenGateway,
     });
@@ -254,5 +303,27 @@ describe('SincronizarPendientes', () => {
     // Factura marcada como rechazada
     expect(factura1.estado).toBe('rechazado');
     expect(facturaRepository.save).toHaveBeenCalledWith(factura1);
+  });
+
+  it('debería llamar a xmlGenerator para cada factura pendiente', async () => {
+    // Arrange: 2 facturas
+    const factura1 = crearFacturaPendiente('f1', new Date('2024-01-15'));
+    const factura2 = crearFacturaPendiente('f2', new Date('2024-02-15'));
+
+    vi.mocked(facturaRepository.findPendientes).mockResolvedValue([factura1, factura2]);
+
+    vi.mocked(sifenGateway.enviarDE).mockResolvedValue({
+      codigo: '0260',
+      mensaje: 'Aprobado',
+      cdc: factura1.cdc!.value,
+    });
+
+    // Act
+    await sincronizarPendientes.execute({ comercioId });
+
+    // Assert: xmlGenerator llamado para cada factura
+    expect(xmlGenerator.generarXml).toHaveBeenCalledTimes(2);
+    expect(xmlGenerator.generarXml).toHaveBeenNthCalledWith(1, factura1, testComercio, testCliente);
+    expect(xmlGenerator.generarXml).toHaveBeenNthCalledWith(2, factura2, testComercio, testCliente);
   });
 });

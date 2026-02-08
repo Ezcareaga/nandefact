@@ -1,6 +1,9 @@
 import type { IFacturaRepository } from '../../domain/factura/IFacturaRepository.js';
 import type { IFirmaDigital } from '../../domain/factura/IFirmaDigital.js';
 import type { ISifenGateway } from '../../domain/factura/ISifenGateway.js';
+import type { IXmlGenerator } from '../../domain/factura/IXmlGenerator.js';
+import type { IComercioRepository } from '../../domain/comercio/IComercioRepository.js';
+import type { IClienteRepository } from '../../domain/cliente/IClienteRepository.js';
 import type { Factura } from '../../domain/factura/Factura.js';
 
 export interface SincronizarPendientesInput {
@@ -26,14 +29,14 @@ export interface SincronizarPendientesOutput {
  *
  * Procesa todas las facturas en estado pendiente de un comercio en orden FIFO (más antigua primero).
  * Continúa procesando aunque una factura falle, para maximizar la sincronización.
- *
- * NOTA: La generación de XML aquí es un placeholder. La implementación completa
- * según especificación SIFEN se hará en Phase 2 - SIFEN Integration.
  */
 export class SincronizarPendientes {
   constructor(
     private readonly deps: {
       facturaRepository: IFacturaRepository;
+      comercioRepository: IComercioRepository;
+      clienteRepository: IClienteRepository;
+      xmlGenerator: IXmlGenerator;
       firmaDigital: IFirmaDigital;
       sifenGateway: ISifenGateway;
     },
@@ -113,26 +116,38 @@ export class SincronizarPendientes {
   }
 
   /**
-   * Procesa una factura individual: marca enviada → firma → envía → actualiza estado → guarda.
+   * Procesa una factura individual: carga datos → marca enviada → genera XML → firma → envía → actualiza estado → guarda.
    * Mismo flujo que EnviarDE, pero centralizado aquí para sincronización.
    */
   private async procesarFactura(factura: Factura): Promise<void> {
-    // 1. Marcar como enviada (registra el intento)
+    // 1. Cargar comercio
+    const comercio = await this.deps.comercioRepository.findById(factura.comercioId);
+    if (!comercio) {
+      throw new Error(`Comercio no encontrado: ${factura.comercioId}`);
+    }
+
+    // 2. Cargar cliente
+    const cliente = await this.deps.clienteRepository.findById(factura.clienteId);
+    if (!cliente) {
+      throw new Error(`Cliente no encontrado: ${factura.clienteId}`);
+    }
+
+    // 3. Marcar como enviada (registra el intento)
     factura.marcarEnviada();
 
-    // 2. Generar XML placeholder (será reemplazado en Phase 2)
+    // 4. Generar XML SIFEN completo
     if (!factura.cdc) {
       throw new Error(`Factura ${factura.id} no tiene CDC generado`);
     }
-    const xmlPlaceholder = this.generarXmlPlaceholder(factura.cdc.value);
+    const xml = await this.deps.xmlGenerator.generarXml(factura, comercio, cliente);
 
-    // 3. Firmar XML con certificado CCFE
-    const xmlFirmado = await this.deps.firmaDigital.firmar(xmlPlaceholder);
+    // 5. Firmar XML con certificado CCFE
+    const xmlFirmado = await this.deps.firmaDigital.firmar(xml);
 
-    // 4. Enviar a SIFEN
+    // 6. Enviar a SIFEN
     const response = await this.deps.sifenGateway.enviarDE(xmlFirmado);
 
-    // 5. Actualizar estado según respuesta SIFEN
+    // 7. Actualizar estado según respuesta SIFEN
     // Códigos 0260 y 0261 = aprobado (con o sin observación)
     // Cualquier otro código = rechazado
     const esAprobado = response.codigo === '0260' || response.codigo === '0261';
@@ -142,15 +157,7 @@ export class SincronizarPendientes {
       factura.marcarRechazada();
     }
 
-    // 6. Persistir factura con estado actualizado
+    // 8. Persistir factura con estado actualizado
     await this.deps.facturaRepository.save(factura);
-  }
-
-  /**
-   * Genera XML placeholder para testing.
-   * Este será reemplazado por la generación real según especificación SIFEN en Phase 2.
-   */
-  private generarXmlPlaceholder(cdc: string): string {
-    return `<DE><CDC>${cdc}</CDC></DE>`;
   }
 }
