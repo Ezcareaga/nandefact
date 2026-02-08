@@ -11,7 +11,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **FACT-01**: Sistema puede crear factura con CDC, items, IVA calculado, y guardarla con estado pendiente
 - [x] **FACT-02**: Sistema puede firmar XML con CCFE y enviar DE a SIFEN (siRecepDE)
-- [ ] **FACT-03**: Sistema procesa cola de facturas pendientes en orden FIFO con backoff exponencial
+- [x] **FACT-03**: Sistema procesa cola de facturas pendientes en orden FIFO con backoff exponencial
 - [ ] **FACT-04**: Sistema puede anular DTE aprobado via evento cancelación SIFEN
 - [ ] **FACT-05**: Sistema puede inutilizar rangos de numeración salteados
 - [x] **FACT-06**: Sistema puede consultar estado de DE por CDC (siConsDE)
@@ -98,7 +98,7 @@ Requirements for initial release. Each maps to roadmap phases.
 |-------------|-------|--------|
 | FACT-01 | Phase 1 - Application Layer | Complete |
 | FACT-02 | Phase 2 - SIFEN Integration | Complete |
-| FACT-03 | Phase 3 - Sync & Queue | Pending |
+| FACT-03 | Phase 3 - Sync & Queue | Complete |
 | FACT-04 | Phase 4 - Events & KuDE | Pending |
 | FACT-05 | Phase 4 - Events & KuDE | Pending |
 | FACT-06 | Phase 2 - SIFEN Integration | Complete |
