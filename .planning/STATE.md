@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 ## Current Position
 
 Phase: 7 of 10 (API REST) — IN PROGRESS
-Plan: 2 of 4 (07-01, 07-02 complete)
-Last activity: 2026-02-08 — Completed 07-02-PLAN.md (Auth and Comercio routes)
+Plan: 3 of 4 (07-01, 07-02, 07-03 complete)
+Last activity: 2026-02-08 — Completed 07-03-PLAN.md (Producto and Cliente CRUD routes)
 
-Progress: [██████░░░░] 64.3%
+Progress: [██████░░░░] 67.9%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
-- Average duration: 10.2 min
-- Total execution time: 2.90 hours
+- Total plans completed: 18
+- Average duration: 10.0 min
+- Total execution time: 3.02 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [██████░░░░] 64.3%
 | 04-events-kude | 2/2 | 23 min | 11.5 min | Complete |
 | 05-productos-clientes | 2/2 | 14 min | 7.0 min | Complete |
 | 06-comercio-auth | 2/2 | 28 min | 14.0 min | Complete |
-| 07-api-rest | 2/4 | 7 min | 3.5 min | In Progress |
+| 07-api-rest | 3/4 | 14 min | 4.7 min | In Progress |
 
 **Recent Trend:**
-- Last 5 plans: 06-01 (12min), 06-02 (16min), 07-01 (3min), 07-02 (4min)
-- Trend: API layer tasks very fast (3-4min), domain/business logic slower (12-16min)
+- Last 5 plans: 06-02 (16min), 07-01 (3min), 07-02 (4min), 07-03 (7min)
+- Trend: API layer tasks very fast (3-7min), domain/business logic slower (12-16min)
 
 **Test Coverage:**
 - Total tests: 359 (139 domain + 123 application + 75 sifen + 22 queue/logging/kude)
@@ -104,6 +104,9 @@ Recent decisions affecting current work:
 - 07-02: Explicit req.user checks over non-null assertions (Good) — ESLint forbids non-null assertions, guards ensure type safety
 - 07-02: Type assertions after Zod validation (Good) — req.body is 'any' even after validation, safe to cast to validated type
 - 07-02: Zod v4 pipe syntax for email (Good) — z.string().pipe(z.email()) per Zod v4 deprecation, caught by ESLint pre-commit
+- 07-03: comercioId from JWT (Good) — Always extract from req.user.comercioId to prevent users modifying other comercios' data
+- 07-03: Specific routes before /:id (Good) — /buscar and /ruc defined before /:id prevents Express matching "buscar" as id param
+- 07-03: Spread operators for optional params (Good) — `...(query.page !== undefined && { page: query.page })` satisfies exactOptionalPropertyTypes
 
 ### Pending Todos
 
@@ -124,5 +127,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 07-02 (Auth and Comercio routes), ready for 07-03 (Producto and Cliente routes)
+Stopped at: Completed 07-03 (Producto and Cliente CRUD routes), ready for 07-04 (wire all routers in app.ts)
 Resume file: None
