@@ -11,7 +11,16 @@ vi.mock('facturacionelectronicapy-setapi', () => ({
   }
 }));
 
+// Mock del módulo fs
+vi.mock('fs', () => ({
+  default: {
+    readFileSync: vi.fn()
+  },
+  readFileSync: vi.fn()
+}));
+
 import setApi from 'facturacionelectronicapy-setapi';
+import * as fs from 'fs';
 
 describe('SifenGatewayImpl', () => {
   let config: SifenConfig;
@@ -19,6 +28,10 @@ describe('SifenGatewayImpl', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Mock fs.readFileSync para simular lectura del certificado
+    vi.mocked(fs.readFileSync).mockReturnValue(Buffer.from('fake-cert-data'));
+
     config = new SifenConfig({
       environment: 'test',
       certificatePath: '/path/to/cert.p12',
@@ -43,7 +56,13 @@ describe('SifenGatewayImpl', () => {
 
       await gateway.enviarDE(mockXmlFirmado);
 
-      expect(setApi.recibe).toHaveBeenCalledWith(mockXmlFirmado, 'test');
+      expect(setApi.recibe).toHaveBeenCalledWith(
+        1,
+        mockXmlFirmado,
+        'test',
+        expect.any(Buffer),
+        'password123'
+      );
     });
 
     it('debe parsear respuesta aprobada (0260)', async () => {
@@ -133,7 +152,13 @@ describe('SifenGatewayImpl', () => {
 
       await gateway.consultarEstado(mockCdc);
 
-      expect(setApi.consulta).toHaveBeenCalledWith(mockCdc, 'test');
+      expect(setApi.consulta).toHaveBeenCalledWith(
+        1,
+        mockCdc,
+        'test',
+        expect.any(Buffer),
+        'password123'
+      );
     });
 
     it('debe retornar estado del DE', async () => {
@@ -195,12 +220,18 @@ describe('SifenGatewayImpl', () => {
       await gateway.anularDE(mockCdc, mockMotivo);
 
       expect(setApi.evento).toHaveBeenCalledWith(
+        1,
         expect.stringContaining(mockCdc),
-        'test'
+        'test',
+        expect.any(Buffer),
+        'password123'
       );
       expect(setApi.evento).toHaveBeenCalledWith(
+        1,
         expect.stringContaining(mockMotivo),
-        'test'
+        'test',
+        expect.any(Buffer),
+        'password123'
       );
     });
 

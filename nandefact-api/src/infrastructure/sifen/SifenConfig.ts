@@ -14,7 +14,7 @@ export class SifenConfig {
   private readonly environment: SifenEnvironment;
   private readonly certificatePath: string;
   private readonly certificatePassword: string;
-  private readonly privateKeyPath?: string;
+  private readonly privateKeyPath: string | undefined;
 
   constructor(props: SifenConfigProps) {
     if (!props.certificatePath) {
