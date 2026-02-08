@@ -8,4 +8,10 @@ import type { Comercio } from './Comercio.js';
 export interface IComercioRepository {
   /** Buscar comercio por ID. Retorna null si no existe. */
   findById(id: string): Promise<Comercio | null>;
+
+  /** Buscar comercio por RUC. Retorna null si no existe. */
+  findByRuc(ruc: string): Promise<Comercio | null>;
+
+  /** Guardar comercio (crear o actualizar). */
+  save(comercio: Comercio): Promise<void>;
 }
