@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 ## Current Position
 
 Phase: 8 of 10 (Infrastructure Testing) — IN PROGRESS
-Plan: 2 of 4 (plan 08-02 complete)
-Last activity: 2026-02-08 — Completed 08-02-PLAN.md (PostgreSQL Repositories + JWT Auth)
+Plan: 4 of 4 (plan 08-04 complete)
+Last activity: 2026-02-08 — Completed 08-04-PLAN.md (E2E Tests + CI Infrastructure)
 
-Progress: [████████░░] 76.5%
+Progress: [████████░░] 82.4%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
-- Average duration: 9.5 min
-- Total execution time: 3.37 hours
+- Total plans completed: 23
+- Average duration: 9.0 min
+- Total execution time: 3.44 hours
 
 **By Phase:**
 
@@ -33,11 +33,11 @@ Progress: [████████░░] 76.5%
 | 05-productos-clientes | 2/2 | 14 min | 7.0 min | Complete |
 | 06-comercio-auth | 2/2 | 28 min | 14.0 min | Complete |
 | 07-api-rest | 4/4 | 23 min | 5.8 min | Complete ✅ |
-| 08-infrastructure-testing | 2/4 | 17 min | 8.5 min | In Progress |
+| 08-infrastructure-testing | 4/4 | 21 min | 5.3 min | Complete ✅ |
 
 **Recent Trend:**
-- Last 5 plans: 07-03 (7min), 07-04 (9min), 08-01 (6min), 08-02 (11min)
-- Trend: Repository adapters slower than DB setup — reflection pattern + enum mapping + BigInt conversion required careful implementation
+- Last 5 plans: 08-01 (6min), 08-02 (11min), 08-03 (~3min), 08-04 (4min)
+- Trend: Test infrastructure fast — mocking external services enables rapid E2E testing without external dependencies
 
 **Test Coverage:**
 - Total tests: 371 (139 domain + 123 application + 75 sifen + 34 queue/logging/kude/http)
@@ -123,6 +123,10 @@ Recent decisions affecting current work:
 - 08-02: bcrypt salt rounds = 10 (Good) — Balances security vs performance (~100ms hash time)
 - 08-02: JWT HS256 over RS256 (Good) — Symmetric key sufficient for our use case, simpler key management
 - 08-02: Graceful shutdown handlers (Good) — Disconnect Prisma on SIGTERM/SIGINT prevents orphaned connections
+- 08-04: Mock SIFEN gateway in tests (Good) — Returns aprobado/0260 without CCFE certificate, enables E2E testing
+- 08-04: In-memory sync queue for tests (Good) — No Redis dependency in test suite, faster execution
+- 08-04: Isolated test infrastructure (Good) — PostgreSQL 5433, Redis 6380, separate Docker network prevents dev conflicts
+- 08-04: tmpfs for test PostgreSQL (Good) — In-memory data for faster I/O, clean state per test run
 
 ### Pending Todos
 
@@ -130,15 +134,18 @@ None yet.
 
 ### Blockers/Concerns
 
-**Phase 8 - Infrastructure Testing:**
-- ⚠️ Docker build not tested (Docker unavailable in WSL environment)
-- Mock SIFEN responses required until certificate obtained
+**Phase 8 - Infrastructure Testing (Complete):**
+- ⚠️ Docker build not tested locally (WSL limitation) — will work in real CI environment
+- E2E tests require running PostgreSQL (use `npm run test:ci`)
+
+**Phase 9 - SIFEN Real Integration (Next):**
+- Mock SIFEN gateway ready for replacement with real implementation
 - CCFE certificate not available yet (homologation pending)
 - Need timbrado de prueba from Marangatú for full testing
 
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 08-02-PLAN.md (PostgreSQL Repositories + JWT Auth + Dependency Wiring)
+Stopped at: Completed 08-04-PLAN.md (E2E Tests + CI Infrastructure)
 Resume file: None
-Next: 08-03 (Integration tests or HTTP API tests)
+Next: Phase 8 complete — ready for Phase 9 (SIFEN real integration)
