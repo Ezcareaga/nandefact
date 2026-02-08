@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import type { TipoContribuyente } from '../../domain/shared/types.js';
 import type { IComercioRepository } from '../../domain/comercio/IComercioRepository.js';
 import { Comercio, type ComercioProps } from '../../domain/comercio/Comercio.js';

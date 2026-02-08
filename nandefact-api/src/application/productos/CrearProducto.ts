@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import type { TasaIVA } from '../../domain/shared/types.js';
 import type { IProductoRepository } from '../../domain/producto/IProductoRepository.js';
 import type { IComercioRepository } from '../../domain/comercio/IComercioRepository.js';
