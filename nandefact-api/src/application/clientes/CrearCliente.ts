@@ -3,6 +3,7 @@ import type { IComercioRepository } from '../../domain/comercio/IComercioReposit
 import type { TipoDocumentoIdentidad } from '../../domain/shared/types.js';
 import { Cliente } from '../../domain/cliente/Cliente.js';
 import { RUC } from '../../domain/comercio/RUC.js';
+import { ComercioNoEncontradoError } from '../errors/ComercioNoEncontradoError.js';
 import { randomUUID } from 'crypto';
 
 export interface CrearClienteInput {
@@ -44,19 +45,12 @@ export class CrearCliente {
     // 1. Validar comercio existe
     const comercio = await this.deps.comercioRepository.findById(input.comercioId);
     if (!comercio) {
-      throw new Error(`Comercio no encontrado: ${input.comercioId}`);
+      throw new ComercioNoEncontradoError(input.comercioId);
     }
 
-    // 2. Si es RUC, validar formato
+    // 2. Si es RUC, validar formato (propaga RUCInvalidoError del dominio)
     if (input.tipoDocumento === 'RUC') {
-      try {
-        new RUC(input.rucCi); // Valida formato, lanza RUCInvalidoError si inválido
-      } catch (error) {
-        if (error instanceof Error) {
-          throw new Error(`RUC inválido: ${error.message}`);
-        }
-        throw error;
-      }
+      new RUC(input.rucCi);
     }
 
     // 3. Generar UUID

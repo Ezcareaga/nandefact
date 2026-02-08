@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ConsultarRUC } from '../../../../src/application/clientes/ConsultarRUC.js';
 import type { ISifenGateway } from '../../../../src/domain/factura/ISifenGateway.js';
+import { RUCInvalidoError } from '../../../../src/domain/errors/RUCInvalidoError.js';
 
 describe('ConsultarRUC', () => {
   let useCase: ConsultarRUC;
@@ -53,20 +54,20 @@ describe('ConsultarRUC', () => {
   });
 
   describe('validaciones', () => {
-    it('debe lanzar error si RUC formato inválido', async () => {
+    it('debe propagar RUCInvalidoError si formato inválido', async () => {
       const input = { ruc: '12345-6' }; // Formato inválido
 
       await expect(useCase.execute(input))
-        .rejects.toThrow('RUC inválido');
+        .rejects.toThrow(RUCInvalidoError);
 
       expect(mockSifenGateway.consultarRUC).not.toHaveBeenCalled();
     });
 
-    it('debe lanzar error si RUC vacío', async () => {
+    it('debe propagar RUCInvalidoError si RUC vacío', async () => {
       const input = { ruc: '' };
 
       await expect(useCase.execute(input))
-        .rejects.toThrow('RUC inválido');
+        .rejects.toThrow(RUCInvalidoError);
     });
 
     it('debe propagar error del gateway', async () => {

@@ -5,6 +5,8 @@ import type { IComercioRepository } from '../../../../src/domain/comercio/IComer
 import { Comercio } from '../../../../src/domain/comercio/Comercio.js';
 import { RUC } from '../../../../src/domain/comercio/RUC.js';
 import { Timbrado } from '../../../../src/domain/comercio/Timbrado.js';
+import { ComercioNoEncontradoError } from '../../../../src/application/errors/ComercioNoEncontradoError.js';
+import { RUCInvalidoError } from '../../../../src/domain/errors/RUCInvalidoError.js';
 
 describe('CrearCliente', () => {
   let useCase: CrearCliente;
@@ -124,7 +126,7 @@ describe('CrearCliente', () => {
   });
 
   describe('validaciones', () => {
-    it('debe lanzar error si comercio no encontrado', async () => {
+    it('debe lanzar ComercioNoEncontradoError si comercio no encontrado', async () => {
       vi.mocked(mockComercioRepo.findById).mockResolvedValue(null);
 
       const input = {
@@ -135,10 +137,10 @@ describe('CrearCliente', () => {
       };
 
       await expect(useCase.execute(input))
-        .rejects.toThrow('Comercio no encontrado: inexistente');
+        .rejects.toThrow(ComercioNoEncontradoError);
     });
 
-    it('debe lanzar error si RUC inválido', async () => {
+    it('debe propagar RUCInvalidoError si RUC inválido', async () => {
       const input = {
         comercioId: 'comercio-1',
         nombre: 'Empresa Test',
@@ -147,7 +149,7 @@ describe('CrearCliente', () => {
       };
 
       await expect(useCase.execute(input))
-        .rejects.toThrow('RUC inválido');
+        .rejects.toThrow(RUCInvalidoError);
     });
 
     it('debe lanzar error si nombre vacío', async () => {

@@ -27,15 +27,8 @@ export class ConsultarRUC {
   ) {}
 
   async execute(input: ConsultarRUCInput): Promise<ConsultarRUCOutput> {
-    // 1. Validar formato RUC primero (lanza RUCInvalidoError si inválido)
-    try {
-      new RUC(input.ruc);
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`RUC inválido: ${error.message}`);
-      }
-      throw error;
-    }
+    // 1. Validar formato RUC (propaga RUCInvalidoError del dominio si inválido)
+    new RUC(input.ruc);
 
     // 2. Consultar SIFEN
     const resultado = await this.deps.sifenGateway.consultarRUC(input.ruc);

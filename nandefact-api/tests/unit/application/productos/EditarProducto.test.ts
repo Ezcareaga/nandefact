@@ -117,6 +117,26 @@ describe('EditarProducto', () => {
     );
   });
 
+  it('should apply name change and soft-delete when activo=false with other changes', async () => {
+    const input = {
+      productoId: 'producto-123',
+      cambios: {
+        nombre: 'Mandioca Premium',
+        activo: false,
+      },
+    };
+
+    await editarProducto.execute(input);
+
+    expect(mockProductoRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'producto-123',
+        nombre: 'Mandioca Premium',
+        activo: false,
+      }),
+    );
+  });
+
   it('should throw ProductoNoEncontradoError if producto does not exist', async () => {
     vi.mocked(mockProductoRepository.findById).mockResolvedValue(null);
 

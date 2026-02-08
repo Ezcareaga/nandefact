@@ -31,14 +31,14 @@ export class EditarProducto {
       throw new ProductoNoEncontradoError(input.productoId);
     }
 
-    // 2. Aplicar cambios
-    let productoActualizado;
-    if (input.cambios.activo === false) {
-      // Soft delete
-      productoActualizado = producto.desactivar();
-    } else {
-      // Actualizar con cambios
-      productoActualizado = producto.actualizar(input.cambios);
+    // 2. Aplicar cambios (actualizar primero, desactivar después si corresponde)
+    const { activo, ...otrosCambios } = input.cambios;
+    let productoActualizado = Object.keys(otrosCambios).length > 0
+      ? producto.actualizar(otrosCambios)
+      : producto;
+
+    if (activo === false) {
+      productoActualizado = productoActualizado.desactivar();
     }
 
     // 3. Guardar
