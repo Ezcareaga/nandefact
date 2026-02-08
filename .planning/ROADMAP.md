@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Sync & Queue** - Offline processing with backoff, FIFO queue
 - [x] **Phase 4: Events & KuDE** - Cancelation, inutilization, PDF generation
 - [x] **Phase 5: Productos & Clientes** - CRUD use cases, validation, search
-- [ ] **Phase 6: Comercio & Auth** - Setup, certificate management, JWT + PIN
+- [x] **Phase 6: Comercio & Auth** - Setup, certificate management, JWT + PIN
 - [ ] **Phase 7: API REST** - Express routes, Zod validation, endpoints
 - [ ] **Phase 8: Infrastructure Testing** - Docker Compose, integration, e2e tests
 - [ ] **Phase 9: Android Shared KMP** - Domain/data/sync in Kotlin Multiplatform
@@ -121,8 +121,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Comercio entity extension + RegistrarComercio, CargarCertificado, ConfigurarTimbrado use cases (TDD)
-- [ ] 06-02-PLAN.md — Usuario entity + AutenticarUsuario, RefrescarToken use cases with rate limiting (TDD)
+- [x] 06-01-PLAN.md — Comercio entity extension + RegistrarComercio, CargarCertificado, ConfigurarTimbrado use cases (TDD)
+- [x] 06-02-PLAN.md — Usuario entity + AutenticarUsuario, RefrescarToken use cases with rate limiting (TDD)
 
 ### Phase 7: API REST
 **Goal**: Implement Express/Fastify HTTP layer with routes, Zod validation, and middleware
@@ -203,7 +203,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Sync & Queue | 2/2 | Complete | 2026-02-08 |
 | 4. Events & KuDE | 2/2 | Complete | 2026-02-08 |
 | 5. Productos & Clientes | 2/2 | Complete | 2026-02-08 |
-| 6. Comercio & Auth | 0/TBD | Not started | - |
+| 6. Comercio & Auth | 2/2 | Complete | 2026-02-08 |
 | 7. API REST | 0/TBD | Not started | - |
 | 8. Infrastructure Testing | 0/TBD | Not started | - |
 | 9. Android Shared KMP | 0/TBD | Not started | - |

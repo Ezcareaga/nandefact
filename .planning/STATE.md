@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Doña María puede facturar electrónicamente desde su puesto en el mercado en menos de 30 segundos, con o sin internet, cumpliendo todas las reglas SIFEN/DNIT.
-**Current focus:** Phase 6 - Comercio & Auth (Usuario authentication)
+**Current focus:** Phase 7 - API REST (next)
 
 ## Current Position
 
-Phase: 6 of 10 (Comercio & Auth) — IN PROGRESS
-Plan: 1 of 3 (06-02 complete: Usuario Auth)
-Last activity: 2026-02-08 — Completed 06-02-PLAN.md (Usuario Auth)
+Phase: 6 of 10 (Comercio & Auth) — COMPLETE
+Plan: 2 of 2 (all plans complete)
+Last activity: 2026-02-08 — Phase 6 complete (Comercio & Auth)
 
-Progress: [█████▓░░░░] 52%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 10.9 min
-- Total execution time: 2.42 hours
+- Total plans completed: 15
+- Average duration: 11.1 min
+- Total execution time: 2.78 hours
 
 **By Phase:**
 
@@ -31,15 +31,15 @@ Progress: [█████▓░░░░] 52%
 | 03-sync-queue | 2/2 | 10 min | 5.0 min | Complete |
 | 04-events-kude | 2/2 | 23 min | 11.5 min | Complete |
 | 05-productos-clientes | 2/2 | 14 min | 7.0 min | Complete |
-| 06-comercio-auth | 1/3 | 16 min | 16.0 min | In Progress |
+| 06-comercio-auth | 2/2 | 28 min | 14.0 min | Complete |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (10min), 04-02 (13min), 05-01 (7min), 05-02 (7min), 06-02 (16min)
-- Trend: Stable velocity 7-16min per plan, auth tasks slightly longer
+- Last 5 plans: 05-01 (7min), 05-02 (7min), 06-01 (12min), 06-02 (16min)
+- Trend: Stable velocity 7-16min per plan, auth/comercio tasks slightly longer
 
 **Test Coverage:**
-- Total tests: 342 (124 domain + 106 application + 75 sifen + 37 queue/logging/kude)
-- All passing, zero regressions (49 tests added in 06-02)
+- Total tests: 359 (139 domain + 123 application + 75 sifen + 22 queue/logging/kude)
+- All passing, zero regressions (17 tests added in 06-01 use cases)
 
 *Updated after each plan completion*
 
@@ -115,5 +115,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 06-02-PLAN.md (Usuario Auth)
+Stopped at: Phase 6 complete, ready for Phase 7 (API REST)
 Resume file: None

@@ -35,14 +35,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Comercio
 
-- [ ] **COME-01**: Admin puede registrar comercio con RUC, razón social, establecimiento
-- [ ] **COME-02**: Admin puede cargar certificado CCFE (.p12/.pfx), encriptado AES-256
-- [ ] **COME-03**: Admin puede configurar timbrado activo por punto de expedición
+- [x] **COME-01**: Admin puede registrar comercio con RUC, razón social, establecimiento
+- [x] **COME-02**: Admin puede cargar certificado CCFE (.p12/.pfx), encriptado AES-256
+- [x] **COME-03**: Admin puede configurar timbrado activo por punto de expedición
 
 ### Auth
 
-- [ ] **AUTH-01**: Usuario puede login con teléfono + PIN (JWT access 15min + refresh 7d)
-- [ ] **AUTH-02**: Rate limiting: 5 intentos PIN → bloqueo 30 min
+- [x] **AUTH-01**: Usuario puede login con teléfono + PIN (JWT access 15min + refresh 7d)
+- [x] **AUTH-02**: Rate limiting: 5 intentos PIN → bloqueo 30 min
 
 ### Infraestructura
 
@@ -110,11 +110,11 @@ Requirements for initial release. Each maps to roadmap phases.
 | CLIE-01 | Phase 5 - Productos & Clientes | Complete |
 | CLIE-02 | Phase 5 - Productos & Clientes | Complete |
 | CLIE-03 | Phase 5 - Productos & Clientes | Complete |
-| COME-01 | Phase 6 - Comercio & Auth | Pending |
-| COME-02 | Phase 6 - Comercio & Auth | Pending |
-| COME-03 | Phase 6 - Comercio & Auth | Pending |
-| AUTH-01 | Phase 6 - Comercio & Auth | Pending |
-| AUTH-02 | Phase 6 - Comercio & Auth | Pending |
+| COME-01 | Phase 6 - Comercio & Auth | Complete |
+| COME-02 | Phase 6 - Comercio & Auth | Complete |
+| COME-03 | Phase 6 - Comercio & Auth | Complete |
+| AUTH-01 | Phase 6 - Comercio & Auth | Complete |
+| AUTH-02 | Phase 6 - Comercio & Auth | Complete |
 | INFR-01 | Phase 8 - Infrastructure Testing | Pending |
 | INFR-02 | Phase 8 - Infrastructure Testing | Pending |
 | INFR-03 | Phase 8 - Infrastructure Testing | Pending |
@@ -130,4 +130,4 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-08 after Phase 5 completion*
+*Last updated: 2026-02-08 after Phase 6 completion*
