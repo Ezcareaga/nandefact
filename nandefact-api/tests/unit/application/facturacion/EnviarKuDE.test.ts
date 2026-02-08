@@ -99,6 +99,7 @@ describe('EnviarKuDE', () => {
       new ItemFactura({ descripcion: 'Producto A', cantidad: 2, precioUnitario: 10000, tasaIVA: 10 })
     );
     factura.generarCDC(ruc, comercio.tipoContribuyente);
+    factura.marcarEnviada();
     factura.marcarAprobada();
 
     // Default mocks return values
@@ -203,7 +204,7 @@ describe('EnviarKuDE', () => {
       vi.mocked(mockFacturaRepo.findById).mockResolvedValue(facturaPendiente);
 
       await expect(useCase.execute({ facturaId: 'factura-2' }))
-        .rejects.toThrow('No se puede generar KuDE para factura en estado "pendiente"');
+        .rejects.toThrow('No se puede generar KuDE');
     });
 
     it('debe lanzar error si factura no tiene CDC', async () => {
@@ -221,12 +222,13 @@ describe('EnviarKuDE', () => {
       facturaSinCdc.agregarItem(
         new ItemFactura({ descripcion: 'Test', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 })
       );
+      facturaSinCdc.marcarEnviada();
       facturaSinCdc.marcarAprobada(); // Aprobada pero sin CDC (caso edge)
 
       vi.mocked(mockFacturaRepo.findById).mockResolvedValue(facturaSinCdc);
 
       await expect(useCase.execute({ facturaId: 'factura-3' }))
-        .rejects.toThrow('No se puede generar KuDE sin CDC');
+        .rejects.toThrow('no tiene CDC generado');
     });
 
     it('debe lanzar error si comercio no encontrado', async () => {

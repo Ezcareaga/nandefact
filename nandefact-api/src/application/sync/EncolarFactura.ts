@@ -2,6 +2,8 @@ import type { IFacturaRepository } from '../../domain/factura/IFacturaRepository
 import type { ISyncQueue } from '../../domain/sync/ISyncQueue.js';
 import { SyncJob } from '../../domain/sync/SyncJob.js';
 import { FacturaNoEncontradaError } from '../errors/FacturaNoEncontradaError.js';
+import { CDCSinGenerarError } from '../../domain/errors/CDCSinGenerarError.js';
+import { EstadoInconsistenteAppError } from '../errors/EstadoInconsistenteAppError.js';
 import { randomUUID } from 'node:crypto';
 
 export interface EncolarFacturaInput {
@@ -34,12 +36,12 @@ export class EncolarFactura {
 
     // 2. Validar que tenga CDC generado
     if (!factura.cdc) {
-      throw new Error('Factura no tiene CDC generado');
+      throw new CDCSinGenerarError(input.facturaId);
     }
 
     // 3. Validar que esté en estado pendiente
     if (factura.estado !== 'pendiente') {
-      throw new Error('Solo se pueden encolar facturas en estado pendiente');
+      throw new EstadoInconsistenteAppError(`solo se pueden encolar facturas en estado pendiente, estado actual: ${factura.estado}`);
     }
 
     // 4. Crear SyncJob

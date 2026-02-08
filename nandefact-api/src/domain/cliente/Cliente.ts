@@ -1,4 +1,5 @@
 import type { TipoDocumentoIdentidad } from '../shared/types.js';
+import { ClienteInvalidoError } from '../errors/ClienteInvalidoError.js';
 
 export interface ClienteProps {
   id: string;
@@ -31,11 +32,11 @@ export class Cliente {
 
   constructor(props: ClienteProps) {
     if (props.nombre.trim().length === 0) {
-      throw new Error('El nombre del cliente no puede estar vacío');
+      throw new ClienteInvalidoError('el nombre del cliente no puede estar vacío');
     }
 
     if (props.tipoDocumento !== 'innominado' && props.rucCi.trim().length === 0) {
-      throw new Error('El documento de identidad es obligatorio para clientes no innominados');
+      throw new ClienteInvalidoError('el documento de identidad es obligatorio para clientes no innominados');
     }
 
     this.id = props.id;

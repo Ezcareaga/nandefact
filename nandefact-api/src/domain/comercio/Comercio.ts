@@ -1,6 +1,7 @@
 import type { TipoContribuyente } from '../shared/types.js';
 import type { RUC } from './RUC.js';
 import type { Timbrado } from './Timbrado.js';
+import { ComercioInvalidoError } from '../errors/ComercioInvalidoError.js';
 import { DomainError } from '../errors/DomainError.js';
 
 export interface ComercioProps {
@@ -64,16 +65,16 @@ export class Comercio {
 
   constructor(props: ComercioProps) {
     if (props.razonSocial.trim().length === 0) {
-      throw new Error('La razón social no puede estar vacía');
+      throw new ComercioInvalidoError('la razón social no puede estar vacía');
     }
 
     if (!/^\d{3}$/.test(props.establecimiento)) {
-      throw new Error(`Establecimiento inválido: "${props.establecimiento}", debe ser 3 dígitos`);
+      throw new ComercioInvalidoError(`establecimiento "${props.establecimiento}" debe ser 3 dígitos`);
     }
 
     if (!/^\d{3}$/.test(props.puntoExpedicion)) {
-      throw new Error(
-        `Punto de expedición inválido: "${props.puntoExpedicion}", debe ser 3 dígitos`,
+      throw new ComercioInvalidoError(
+        `punto de expedición "${props.puntoExpedicion}" debe ser 3 dígitos`,
       );
     }
 
@@ -114,37 +115,8 @@ export class Comercio {
       throw new DomainError(`El timbrado ${nuevoTimbrado.numero} ya está vencido`);
     }
 
-    const props: ComercioProps = {
-      id: this.id,
-      ruc: this.ruc,
-      razonSocial: this.razonSocial,
-      nombreFantasia: this.nombreFantasia,
-      timbrado: nuevoTimbrado,
-      establecimiento: this.establecimiento,
-      puntoExpedicion: this.puntoExpedicion,
-      tipoContribuyente: this.tipoContribuyente,
-      activo: this.activo,
-    };
-
-    // Copy optional fields
-    if (this.direccion !== null) props.direccion = this.direccion;
-    if (this.numeroCasa !== null) props.numeroCasa = this.numeroCasa;
-    if (this.departamento !== null) props.departamento = this.departamento;
-    if (this.departamentoDesc !== null) props.departamentoDesc = this.departamentoDesc;
-    if (this.distrito !== null) props.distrito = this.distrito;
-    if (this.distritoDesc !== null) props.distritoDesc = this.distritoDesc;
-    if (this.ciudad !== null) props.ciudad = this.ciudad;
-    if (this.ciudadDesc !== null) props.ciudadDesc = this.ciudadDesc;
-    if (this.telefono !== null) props.telefono = this.telefono;
-    if (this.email !== null) props.email = this.email;
-    if (this.rubro !== null) props.rubro = this.rubro;
-    if (this.actividadEconomicaCodigo !== null)
-      props.actividadEconomicaCodigo = this.actividadEconomicaCodigo;
-    if (this.actividadEconomicaDesc !== null)
-      props.actividadEconomicaDesc = this.actividadEconomicaDesc;
-    if (this.tipoRegimen !== null) props.tipoRegimen = this.tipoRegimen;
-    if (this.cscId !== null) props.cscId = this.cscId;
-
+    const props = this.crearPropsBase({ timbrado: nuevoTimbrado });
+    this.copiarCamposOpcionales(props);
     return new Comercio(props);
   }
 
@@ -170,63 +142,26 @@ export class Comercio {
       activo: cambios.activo ?? this.activo,
     };
 
-    // Handle optional fields
-    const finalDireccion = cambios.direccion !== undefined ? cambios.direccion : this.direccion;
-    if (finalDireccion !== null) props.direccion = finalDireccion;
+    // Handle optional fields — merge cambios con valores actuales
+    const camposOpcionales: (keyof ComercioProps)[] = [
+      'direccion', 'numeroCasa', 'departamento', 'departamentoDesc',
+      'distrito', 'distritoDesc', 'ciudad', 'ciudadDesc',
+      'telefono', 'email', 'rubro', 'actividadEconomicaCodigo',
+      'actividadEconomicaDesc', 'tipoRegimen', 'cscId',
+    ];
 
-    const finalNumeroCasa =
-      cambios.numeroCasa !== undefined ? cambios.numeroCasa : this.numeroCasa;
-    if (finalNumeroCasa !== null) props.numeroCasa = finalNumeroCasa;
-
-    const finalDepartamento =
-      cambios.departamento !== undefined ? cambios.departamento : this.departamento;
-    if (finalDepartamento !== null) props.departamento = finalDepartamento;
-
-    const finalDepartamentoDesc =
-      cambios.departamentoDesc !== undefined ? cambios.departamentoDesc : this.departamentoDesc;
-    if (finalDepartamentoDesc !== null) props.departamentoDesc = finalDepartamentoDesc;
-
-    const finalDistrito = cambios.distrito !== undefined ? cambios.distrito : this.distrito;
-    if (finalDistrito !== null) props.distrito = finalDistrito;
-
-    const finalDistritoDesc =
-      cambios.distritoDesc !== undefined ? cambios.distritoDesc : this.distritoDesc;
-    if (finalDistritoDesc !== null) props.distritoDesc = finalDistritoDesc;
-
-    const finalCiudad = cambios.ciudad !== undefined ? cambios.ciudad : this.ciudad;
-    if (finalCiudad !== null) props.ciudad = finalCiudad;
-
-    const finalCiudadDesc =
-      cambios.ciudadDesc !== undefined ? cambios.ciudadDesc : this.ciudadDesc;
-    if (finalCiudadDesc !== null) props.ciudadDesc = finalCiudadDesc;
-
-    const finalTelefono = cambios.telefono !== undefined ? cambios.telefono : this.telefono;
-    if (finalTelefono !== null) props.telefono = finalTelefono;
-
-    const finalEmail = cambios.email !== undefined ? cambios.email : this.email;
-    if (finalEmail !== null) props.email = finalEmail;
-
-    const finalRubro = cambios.rubro !== undefined ? cambios.rubro : this.rubro;
-    if (finalRubro !== null) props.rubro = finalRubro;
-
-    const finalActividadCodigo =
-      cambios.actividadEconomicaCodigo !== undefined
-        ? cambios.actividadEconomicaCodigo
-        : this.actividadEconomicaCodigo;
-    if (finalActividadCodigo !== null) props.actividadEconomicaCodigo = finalActividadCodigo;
-
-    const finalActividadDesc =
-      cambios.actividadEconomicaDesc !== undefined
-        ? cambios.actividadEconomicaDesc
-        : this.actividadEconomicaDesc;
-    if (finalActividadDesc !== null) props.actividadEconomicaDesc = finalActividadDesc;
-
-    const finalTipoRegimen =
-      cambios.tipoRegimen !== undefined ? cambios.tipoRegimen : this.tipoRegimen;
-    if (finalTipoRegimen !== null) props.tipoRegimen = finalTipoRegimen;
-
-    const finalCscId = cambios.cscId !== undefined ? cambios.cscId : this.cscId;
-    if (finalCscId !== null) props.cscId = finalCscId;
+    for (const campo of camposOpcionales) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      const valorCambio = (cambios as any)[campo];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      const valorActual = (this as any)[campo];
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const valor = valorCambio !== undefined ? valorCambio : valorActual;
+      if (valor !== null && valor !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        (props as any)[campo] = valor;
+      }
+    }
 
     return new Comercio(props);
   }
@@ -236,19 +171,30 @@ export class Comercio {
    * Patrón inmutable: retorna nuevo Comercio con activo=false.
    */
   desactivar(): Comercio {
-    const props: ComercioProps = {
+    const props = this.crearPropsBase({ activo: false });
+    this.copiarCamposOpcionales(props);
+    return new Comercio(props);
+  }
+
+  // --- Helpers privados ---
+
+  /** Crea props base con overrides opcionales */
+  private crearPropsBase(overrides: Partial<ComercioProps> = {}): ComercioProps {
+    return {
       id: this.id,
       ruc: this.ruc,
       razonSocial: this.razonSocial,
       nombreFantasia: this.nombreFantasia,
-      timbrado: this.timbrado,
+      timbrado: overrides.timbrado ?? this.timbrado,
       establecimiento: this.establecimiento,
       puntoExpedicion: this.puntoExpedicion,
       tipoContribuyente: this.tipoContribuyente,
-      activo: false,
+      activo: overrides.activo ?? this.activo,
     };
+  }
 
-    // Copy optional fields
+  /** Copia campos opcionales no-null de this a props */
+  private copiarCamposOpcionales(props: ComercioProps): void {
     if (this.direccion !== null) props.direccion = this.direccion;
     if (this.numeroCasa !== null) props.numeroCasa = this.numeroCasa;
     if (this.departamento !== null) props.departamento = this.departamento;
@@ -266,7 +212,5 @@ export class Comercio {
       props.actividadEconomicaDesc = this.actividadEconomicaDesc;
     if (this.tipoRegimen !== null) props.tipoRegimen = this.tipoRegimen;
     if (this.cscId !== null) props.cscId = this.cscId;
-
-    return new Comercio(props);
   }
 }

@@ -6,6 +6,8 @@ import { Timbrado } from '../../../../src/domain/comercio/Timbrado.js';
 import { RUC } from '../../../../src/domain/comercio/RUC.js';
 import { FacturaSinItemsError } from '../../../../src/domain/errors/FacturaSinItemsError.js';
 import { TimbradoVencidoError } from '../../../../src/domain/errors/TimbradoVencidoError.js';
+import { FacturaInmutableError } from '../../../../src/domain/errors/FacturaInmutableError.js';
+import { EstadoInconsistenteError } from '../../../../src/domain/errors/EstadoInconsistenteError.js';
 
 describe('Factura', () => {
   const timbrado = new Timbrado('12558946', new Date('2024-01-01'), new Date('2025-12-31'));
@@ -111,6 +113,7 @@ describe('Factura', () => {
     factura.agregarItem(
       new ItemFactura({ descripcion: 'Producto', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 }),
     );
+    factura.marcarEnviada();
     factura.marcarAprobada();
 
     expect(factura.estado).toBe('aprobado');
@@ -123,10 +126,10 @@ describe('Factura', () => {
           tasaIVA: 10,
         }),
       ),
-    ).toThrow('No se puede modificar una factura aprobada por SIFEN');
+    ).toThrow(FacturaInmutableError);
   });
 
-  it('debería transicionar estados correctamente', () => {
+  it('debería transicionar estados correctamente: pendiente → enviado → aprobado', () => {
     const factura = new Factura(baseProps);
     expect(factura.estado).toBe('pendiente');
 
@@ -137,11 +140,19 @@ describe('Factura', () => {
     expect(factura.estado).toBe('aprobado');
   });
 
+  it('debería transicionar estados correctamente: enviado → rechazado', () => {
+    const factura = new Factura(baseProps);
+    factura.marcarEnviada();
+    factura.marcarRechazada();
+    expect(factura.estado).toBe('rechazado');
+  });
+
   it('debería marcar factura como cancelada cuando estado es aprobado', () => {
     const factura = new Factura(baseProps);
     factura.agregarItem(
       new ItemFactura({ descripcion: 'Producto', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 }),
     );
+    factura.marcarEnviada();
     factura.marcarAprobada();
 
     factura.marcarCancelada();
@@ -149,23 +160,24 @@ describe('Factura', () => {
     expect(factura.estado).toBe('cancelado');
   });
 
-  it('debería lanzar error al cancelar factura pendiente', () => {
+  it('debería lanzar EstadoInconsistenteError al cancelar factura pendiente', () => {
     const factura = new Factura(baseProps);
     factura.agregarItem(
       new ItemFactura({ descripcion: 'Producto', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 }),
     );
 
-    expect(() => factura.marcarCancelada()).toThrow('Solo se puede cancelar una factura aprobada');
+    expect(() => factura.marcarCancelada()).toThrow(EstadoInconsistenteError);
   });
 
-  it('debería lanzar error al cancelar factura rechazada', () => {
+  it('debería lanzar EstadoInconsistenteError al cancelar factura rechazada', () => {
     const factura = new Factura(baseProps);
     factura.agregarItem(
       new ItemFactura({ descripcion: 'Producto', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 }),
     );
+    factura.marcarEnviada();
     factura.marcarRechazada();
 
-    expect(() => factura.marcarCancelada()).toThrow('Solo se puede cancelar una factura aprobada');
+    expect(() => factura.marcarCancelada()).toThrow(EstadoInconsistenteError);
   });
 
   it('debería impedir modificaciones a factura cancelada', () => {
@@ -173,6 +185,7 @@ describe('Factura', () => {
     factura.agregarItem(
       new ItemFactura({ descripcion: 'Producto', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 }),
     );
+    factura.marcarEnviada();
     factura.marcarAprobada();
     factura.marcarCancelada();
 
@@ -180,6 +193,12 @@ describe('Factura', () => {
       factura.agregarItem(
         new ItemFactura({ descripcion: 'Otro', cantidad: 1, precioUnitario: 5000, tasaIVA: 10 }),
       ),
-    ).toThrow('No se puede modificar una factura aprobada por SIFEN');
+    ).toThrow(FacturaInmutableError);
+  });
+
+  it('debería lanzar EstadoInconsistenteError al hacer transición inválida', () => {
+    const factura = new Factura(baseProps);
+    // pendiente → aprobado es inválido (debe pasar por enviado)
+    expect(() => factura.marcarAprobada()).toThrow(EstadoInconsistenteError);
   });
 });

@@ -1,3 +1,5 @@
+import { NumeroFacturaInvalidoError } from '../errors/NumeroFacturaInvalidoError.js';
+
 /**
  * Value Object — Número de factura con establecimiento, punto de expedición y número correlativo.
  * Formato: XXX-XXX-XXXXXXX (3 dígitos - 3 dígitos - 7 dígitos).
@@ -9,15 +11,15 @@ export class NumeroFactura {
 
   constructor(establecimiento: string, punto: string, numero: string) {
     if (!/^\d{3}$/.test(establecimiento)) {
-      throw new Error(`Establecimiento inválido: "${establecimiento}", debe ser 3 dígitos`);
+      throw new NumeroFacturaInvalidoError('Establecimiento', `${establecimiento}", debe ser 3 dígitos`);
     }
 
     if (!/^\d{3}$/.test(punto)) {
-      throw new Error(`Punto de expedición inválido: "${punto}", debe ser 3 dígitos`);
+      throw new NumeroFacturaInvalidoError('Punto de expedición', `${punto}", debe ser 3 dígitos`);
     }
 
     if (!/^\d{7}$/.test(numero)) {
-      throw new Error(`Número inválido: "${numero}", debe ser 7 dígitos`);
+      throw new NumeroFacturaInvalidoError('Número', `${numero}", debe ser 7 dígitos`);
     }
 
     this.establecimiento = establecimiento;

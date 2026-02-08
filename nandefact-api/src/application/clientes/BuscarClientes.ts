@@ -1,5 +1,6 @@
 import type { IClienteRepository } from '../../domain/cliente/IClienteRepository.js';
 import type { TipoDocumentoIdentidad } from '../../domain/shared/types.js';
+import { ValidacionInputError } from '../errors/ValidacionInputError.js';
 
 export interface BuscarClientesInput {
   comercioId: string;
@@ -34,7 +35,7 @@ export class BuscarClientes {
   async execute(input: BuscarClientesInput): Promise<BuscarClientesOutput> {
     // 1. Validar query mínimo 2 caracteres (previene full-table scan)
     if (input.query.trim().length < 2) {
-      throw new Error('La búsqueda requiere al menos 2 caracteres');
+      throw new ValidacionInputError('La búsqueda requiere al menos 2 caracteres');
     }
 
     // 2. Buscar clientes

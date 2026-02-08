@@ -1,4 +1,5 @@
 import { TimbradoVencidoError } from '../errors/TimbradoVencidoError.js';
+import { TimbradoInvalidoError } from '../errors/TimbradoInvalidoError.js';
 
 /**
  * Value Object — Timbrado DNIT con rango de vigencia.
@@ -11,11 +12,11 @@ export class Timbrado {
 
   constructor(numero: string, fechaInicio: Date, fechaFin: Date) {
     if (!/^\d{8,15}$/.test(numero)) {
-      throw new Error(`Número de timbrado inválido: "${numero}"`);
+      throw new TimbradoInvalidoError(`número "${numero}" debe ser 8-15 dígitos`);
     }
 
     if (fechaInicio >= fechaFin) {
-      throw new Error('Fecha inicio debe ser anterior a fecha fin del timbrado');
+      throw new TimbradoInvalidoError('fecha inicio debe ser anterior a fecha fin');
     }
 
     this.numero = numero;

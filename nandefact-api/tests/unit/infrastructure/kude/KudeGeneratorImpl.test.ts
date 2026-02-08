@@ -92,6 +92,7 @@ describe('KudeGeneratorImpl', () => {
     );
 
     factura.generarCDC(ruc, comercio.tipoContribuyente);
+    factura.marcarEnviada();
     factura.marcarAprobada();
   });
 
@@ -141,7 +142,7 @@ describe('KudeGeneratorImpl', () => {
       );
 
       await expect(generator.generar(facturaSinCdc, comercio, cliente))
-        .rejects.toThrow('No se puede generar KuDE sin CDC');
+        .rejects.toThrow('no tiene CDC generado');
     });
 
     it('debe incluir datos del comercio en el PDF (RUC, razón social, timbrado)', async () => {
@@ -198,6 +199,7 @@ describe('KudeGeneratorImpl', () => {
       );
 
       facturaMultiIVA.generarCDC(ruc, comercio.tipoContribuyente);
+      facturaMultiIVA.marcarEnviada();
       facturaMultiIVA.marcarAprobada();
 
       const result = await generator.generar(facturaMultiIVA, comercio, cliente);

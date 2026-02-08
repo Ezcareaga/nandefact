@@ -1,3 +1,4 @@
+import { randomInt } from 'node:crypto';
 import type { TipoDocumento, TipoContribuyente, TipoEmision } from '../shared/types.js';
 import { CDCInvalidoError } from '../errors/CDCInvalidoError.js';
 
@@ -83,7 +84,7 @@ export class CDC {
 
     const codigoSeguridad =
       params.codigoSeguridad ??
-      String(Math.floor(Math.random() * 1_000_000_000)).padStart(9, '0');
+      randomInt(0, 1_000_000_000).toString().padStart(9, '0');
 
     const base43 = `${tipoDoc}${rucBase}${dvRUC}${est}${punto}${num}${tipoCont}${fechaStr}${tipoEmision}${codigoSeguridad}`;
 

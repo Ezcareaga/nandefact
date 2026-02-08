@@ -3,6 +3,7 @@ import type { Factura } from '../../domain/factura/Factura.js';
 import type { Comercio } from '../../domain/comercio/Comercio.js';
 import type { Cliente } from '../../domain/cliente/Cliente.js';
 import { mapComercioToParams, mapFacturaToData } from './SifenDataMapper.js';
+import { CDCSinGenerarError } from '../../domain/errors/CDCSinGenerarError.js';
 
 /**
  * Adaptador — Genera XML SIFEN v150 usando la librería facturacionelectronicapy-xmlgen.
@@ -15,7 +16,7 @@ export class XmlGeneratorSifen implements IXmlGenerator {
    */
   async generarXml(factura: Factura, comercio: Comercio, cliente: Cliente): Promise<string> {
     if (!factura.cdc) {
-      throw new Error('No se puede generar XML sin CDC. Llamar factura.generarCDC() primero.');
+      throw new CDCSinGenerarError(factura.id);
     }
 
     // Mapear entidades del dominio al formato TIPS-SA

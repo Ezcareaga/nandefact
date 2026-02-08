@@ -1,5 +1,5 @@
 import type { TasaIVA } from '../shared/types.js';
-import { DomainError } from '../errors/DomainError.js';
+import { ProductoInvalidoError } from '../errors/ProductoInvalidoError.js';
 
 export interface ProductoProps {
   id: string;
@@ -32,26 +32,26 @@ export class Producto {
   constructor(props: ProductoProps) {
     // Validar nombre
     if (props.nombre.trim().length === 0) {
-      throw new DomainError('El nombre del producto no puede estar vacio');
+      throw new ProductoInvalidoError('El nombre del producto no puede estar vacio');
     }
 
     // Validar precio unitario
     if (props.precioUnitario <= 0) {
-      throw new DomainError('El precio unitario debe ser mayor a 0');
+      throw new ProductoInvalidoError('El precio unitario debe ser mayor a 0');
     }
 
     if (!Number.isInteger(props.precioUnitario)) {
-      throw new DomainError('El precio unitario debe ser un entero (guaranies sin decimales)');
+      throw new ProductoInvalidoError('El precio unitario debe ser un entero (guaranies sin decimales)');
     }
 
     // Validar unidad de medida
     if (props.unidadMedida.trim().length === 0) {
-      throw new DomainError('La unidad de medida no puede estar vacia');
+      throw new ProductoInvalidoError('La unidad de medida no puede estar vacia');
     }
 
     // Validar tasa IVA
     if (![10, 5, 0].includes(props.tasaIVA)) {
-      throw new DomainError('La tasa IVA debe ser 10, 5, o 0');
+      throw new ProductoInvalidoError('La tasa IVA debe ser 10, 5, o 0');
     }
 
     this.id = props.id;

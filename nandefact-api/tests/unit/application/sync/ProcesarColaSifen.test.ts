@@ -344,6 +344,7 @@ describe('ProcesarColaSifen', () => {
     const fecha = new Date(Date.now() - 1000 * 60 * 60); // 1 hour ago
     const job = crearSyncJob('job1', fecha);
     const factura = crearFacturaPendiente(facturaId, fecha);
+    factura.marcarEnviada();
     factura.marcarAprobada(); // Ya aprobada
 
     vi.mocked(facturaRepository.findById).mockResolvedValue(factura);

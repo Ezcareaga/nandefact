@@ -4,7 +4,7 @@ import type { TipoDocumentoIdentidad } from '../../domain/shared/types.js';
 import { Cliente } from '../../domain/cliente/Cliente.js';
 import { RUC } from '../../domain/comercio/RUC.js';
 import { ComercioNoEncontradoError } from '../errors/ComercioNoEncontradoError.js';
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 
 export interface CrearClienteInput {
   comercioId: string;

@@ -1,6 +1,7 @@
 import type { TasaIVA } from '../shared/types.js';
 import { MontoIVA } from './MontoIVA.js';
 import { MontoInvalidoError } from '../errors/MontoInvalidoError.js';
+import { DescripcionVaciaError } from '../errors/DescripcionVaciaError.js';
 
 export interface ItemFacturaProps {
   descripcion: string;
@@ -36,7 +37,7 @@ export class ItemFactura {
     }
 
     if (props.descripcion.trim().length === 0) {
-      throw new Error('La descripción del item no puede estar vacía');
+      throw new DescripcionVaciaError();
     }
 
     this.descripcion = props.descripcion.trim();
