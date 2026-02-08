@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Events & KuDE** - Cancelation, inutilization, PDF generation
 - [x] **Phase 5: Productos & Clientes** - CRUD use cases, validation, search
 - [x] **Phase 6: Comercio & Auth** - Setup, certificate management, JWT + PIN
-- [ ] **Phase 7: API REST** - Express routes, Zod validation, endpoints
+- [x] **Phase 7: API REST** - Express routes, Zod validation, endpoints
 - [ ] **Phase 8: Infrastructure Testing** - Docker Compose, integration, e2e tests
 - [ ] **Phase 9: Android Shared KMP** - Domain/data/sync in Kotlin Multiplatform
 - [ ] **Phase 10: Android UI** - Jetpack Compose screens, offline-first sync
@@ -138,10 +138,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Express setup + middleware (error handler, Zod validation, JWT auth)
-- [ ] 07-02-PLAN.md — Auth + Comercio routes with Zod schemas
-- [ ] 07-03-PLAN.md — Productos + Clientes routes with Zod schemas
-- [ ] 07-04-PLAN.md — Facturas + Sync routes, server.ts wiring, index.ts bootstrap
+- [x] 07-01-PLAN.md — Express setup + middleware (error handler, Zod validation, JWT auth)
+- [x] 07-02-PLAN.md — Auth + Comercio routes with Zod schemas
+- [x] 07-03-PLAN.md — Productos + Clientes routes with Zod schemas
+- [x] 07-04-PLAN.md — Facturas + Sync routes, server.ts wiring, index.ts bootstrap
 
 ### Phase 8: Infrastructure Testing
 **Goal**: Implement Docker Compose setup and comprehensive integration/e2e tests
@@ -206,7 +206,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. Events & KuDE | 2/2 | Complete | 2026-02-08 |
 | 5. Productos & Clientes | 2/2 | Complete | 2026-02-08 |
 | 6. Comercio & Auth | 2/2 | Complete | 2026-02-08 |
-| 7. API REST | 0/4 | Not started | - |
+| 7. API REST | 4/4 | Complete | 2026-02-08 |
 | 8. Infrastructure Testing | 0/TBD | Not started | - |
 | 9. Android Shared KMP | 0/TBD | Not started | - |
 | 10. Android UI | 0/TBD | Not started | - |

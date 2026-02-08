@@ -5,15 +5,15 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Doña María puede facturar electrónicamente desde su puesto en el mercado en menos de 30 segundos, con o sin internet, cumpliendo todas las reglas SIFEN/DNIT.
-**Current focus:** Phase 7 complete — Next: Phase 8 (Infrastructure adapters)
+**Current focus:** Phase 8 - Infrastructure Testing (next)
 
 ## Current Position
 
-Phase: 7 of 10 (API REST) — COMPLETE ✅
+Phase: 7 of 10 (API REST) — COMPLETE
 Plan: 4 of 4 (all plans complete)
-Last activity: 2026-02-08 — Completed 07-04-PLAN.md (Factura/Sync routes + Server bootstrap)
+Last activity: 2026-02-08 — Phase 7 complete (API REST)
 
-Progress: [███████░░░] 71.4%
+Progress: [███████░░░] 70%
 
 ## Performance Metrics
 
@@ -128,5 +128,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 07-03 (Producto and Cliente CRUD routes), ready for 07-04 (wire all routers in app.ts)
+Stopped at: Phase 7 complete, ready for Phase 8 (Infrastructure Testing)
 Resume file: None
