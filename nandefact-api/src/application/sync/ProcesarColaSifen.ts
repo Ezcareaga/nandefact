@@ -7,6 +7,7 @@ import type { ISifenGateway } from '../../domain/factura/ISifenGateway.js';
 import type { ISyncQueue } from '../../domain/sync/ISyncQueue.js';
 import type { ILogger } from '../../domain/shared/ILogger.js';
 import type { SyncJob } from '../../domain/sync/SyncJob.js';
+import { EnviarFacturaASifen } from '../../domain/factura/EnviarFacturaASifen.js';
 
 export interface ProcesarColaSifenInput {
   job: SyncJob;
@@ -24,6 +25,8 @@ export interface ProcesarColaSifenOutput {
  * Ejecuta el flujo sign-send-update-save para una factura y gestiona reintentos.
  */
 export class ProcesarColaSifen {
+  private readonly enviarFacturaASifen: EnviarFacturaASifen;
+
   constructor(
     private readonly deps: {
       facturaRepository: IFacturaRepository;
@@ -35,7 +38,9 @@ export class ProcesarColaSifen {
       syncQueue: ISyncQueue;
       logger: ILogger;
     },
-  ) {}
+  ) {
+    this.enviarFacturaASifen = new EnviarFacturaASifen(deps);
+  }
 
   async execute(input: ProcesarColaSifenInput): Promise<ProcesarColaSifenOutput> {
     const { job } = input;
@@ -74,9 +79,10 @@ export class ProcesarColaSifen {
         // Factura no existe, completar job
         await this.deps.syncQueue.completar(job.id);
         return {
-          exito: true,
+          exito: false,
           facturaId: job.facturaId,
           cdc: job.cdc,
+          error: 'Factura no encontrada',
         };
       }
 
@@ -90,48 +96,13 @@ export class ProcesarColaSifen {
         };
       }
 
-      // 5. Cargar comercio
-      const comercio = await this.deps.comercioRepository.findById(job.comercioId);
-      if (!comercio) {
-        throw new Error(`Comercio no encontrado: ${job.comercioId}`);
-      }
+      // 5. Ejecutar flujo de envío a SIFEN via servicio de dominio
+      await this.enviarFacturaASifen.ejecutar(factura);
 
-      // 6. Cargar cliente
-      const cliente = await this.deps.clienteRepository.findById(factura.clienteId);
-      if (!cliente) {
-        throw new Error(`Cliente no encontrado: ${factura.clienteId}`);
-      }
-
-      // 7. Marcar como enviada
-      factura.marcarEnviada();
-
-      // 8. Generar XML
-      if (!factura.cdc) {
-        throw new Error(`Factura ${factura.id} no tiene CDC generado`);
-      }
-      const xml = await this.deps.xmlGenerator.generarXml(factura, comercio, cliente);
-
-      // 9. Firmar XML
-      const xmlFirmado = await this.deps.firmaDigital.firmar(xml);
-
-      // 10. Enviar a SIFEN
-      const response = await this.deps.sifenGateway.enviarDE(xmlFirmado);
-
-      // 11. Actualizar estado según respuesta
-      const esAprobado = response.codigo === '0260' || response.codigo === '0261';
-      if (esAprobado) {
-        factura.marcarAprobada();
-      } else {
-        factura.marcarRechazada();
-      }
-
-      // 12. Guardar factura
-      await this.deps.facturaRepository.save(factura);
-
-      // 13. Completar job
+      // 6. Completar job
       await this.deps.syncQueue.completar(job.id);
 
-      // 14. Log resultado
+      // 7. Log resultado
       this.deps.logger.info('Job completado', {
         facturaId: job.facturaId,
         cdc: job.cdc,
@@ -159,7 +130,7 @@ export class ProcesarColaSifen {
           error: errorMessage,
         });
       } else {
-        // Máximo de reintentos alcanzado, dar up
+        // Máximo de reintentos alcanzado, abandonar
         await this.deps.syncQueue.completar(job.id);
 
         this.deps.logger.error('Job fallido, máximo reintentos alcanzado', {
