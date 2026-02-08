@@ -112,6 +112,7 @@ describe('SincronizarPendientes', () => {
       enviarDE: vi.fn(),
       consultarEstado: vi.fn(),
       anularDE: vi.fn(),
+      inutilizarNumeracion: vi.fn(),
     };
 
     sincronizarPendientes = new SincronizarPendientes({

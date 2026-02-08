@@ -18,9 +18,9 @@ Progress: [███░░░░░░░] 30%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 12.0 min
-- Total execution time: 1.69 hours
+- Total plans completed: 9
+- Average duration: 11.8 min
+- Total execution time: 1.78 hours
 
 **By Phase:**
 
@@ -29,14 +29,15 @@ Progress: [███░░░░░░░] 30%
 | 01-application-layer | 3/3 | 8 min | 2.7 min | Complete |
 | 02-sifen-integration | 3/3 | 84 min | 28.0 min | Complete |
 | 03-sync-queue | 2/2 | 10 min | 5.0 min | Complete |
+| 04-events-kude | 1/2 | 10 min | 10.0 min | In Progress |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (72min), 02-02 (6min), 02-03 (6min), 03-01 (6min), 03-02 (4min)
-- Trend: Velocity improving (6min → 4min), infrastructure tasks faster than expected
+- Last 5 plans: 02-02 (6min), 02-03 (6min), 03-01 (6min), 03-02 (4min), 04-01 (10min)
+- Trend: Consistent velocity 4-10min per plan, event implementation slightly longer
 
 **Test Coverage:**
-- Total tests: 172 (59 domain + 33 application + 59 sifen + 21 queue/logging)
-- All passing, zero regressions
+- Total tests: 201 (63 domain + 40 application + 75 sifen + 23 queue/logging)
+- All passing, zero regressions (29 tests added in 04-01)
 
 *Updated after each plan completion*
 
@@ -55,7 +56,7 @@ Recent decisions affecting current work:
 - 01-01: UUID generation at application layer (Good) — Application controls technical IDs, domain focuses on business logic
 - 01-02: Placeholder XML for testing (Good) — Real SIFEN XML generation deferred to Phase 2, allows testing orchestration now
 - 01-02: SIFEN codes 0260/0261 as success (Good) — Consistent pattern for detecting approved responses
-- 01-02: AnularFactura doesn't mutate state (Pending) — Cancelado estado deferred to future phase when state machine is designed
+- 01-02: AnularFactura doesn't mutate state (Resolved in 04-01) — Cancelado state now implemented with marcarCancelada() method
 - 01-03: Sequential processing over parallel (Good) — Predictable state updates, easier debugging, acceptable performance for batch sync
 - 01-03: SIFEN rejection counts as successful communication (Good) — Network worked, SIFEN responded, factura correctly marked rechazada
 - 01-03: Continue processing on failure (Good) — Maximizes sync completion, reports all failures in summary
@@ -75,6 +76,11 @@ Recent decisions affecting current work:
 - 03-02: Rate limiting 10 jobs/min (Good) — Prevents overwhelming SIFEN API with burst traffic
 - 03-02: Exponential backoff in adapter (Good) — Domain remains pure, retry delays calculated in infrastructure
 - 03-02: Mock BullMQ in tests (Good) — Unit tests don't require running Redis instance
+- 04-01: Cancelado state enforces state machine (Good) — Only facturas in 'aprobado' can be cancelled, cancelled facturas immutable
+- 04-01: Use cases load all required aggregates (Good) — AnularFactura and InutilizarNumeracion load Comercio before calling gateway
+- 04-01: ISifenGateway accepts Comercio parameter (Good) — Event methods need emisor data for XML generation
+- 04-01: Type assertions for xmlgen events (Good) — Methods exist but TypeScript definitions incomplete
+- 04-01: InutilizarNumeracion validation (Good) — Validates range and motivo length per SIFEN requirements
 
 ### Pending Todos
 
@@ -90,5 +96,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Phase 3 Sync & Queue complete, verified 10/10
+Stopped at: Completed 04-01-PLAN.md (Events & Cancelation)
 Resume file: None

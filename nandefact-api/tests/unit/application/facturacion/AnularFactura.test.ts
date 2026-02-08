@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AnularFactura } from '../../../../src/application/facturacion/AnularFactura.js';
 import type { IFacturaRepository } from '../../../../src/domain/factura/IFacturaRepository.js';
+import type { IComercioRepository } from '../../../../src/domain/comercio/IComercioRepository.js';
 import type { ISifenGateway } from '../../../../src/domain/factura/ISifenGateway.js';
 import { Factura } from '../../../../src/domain/factura/Factura.js';
 import { ItemFactura } from '../../../../src/domain/factura/ItemFactura.js';
 import { NumeroFactura } from '../../../../src/domain/factura/NumeroFactura.js';
 import { Timbrado } from '../../../../src/domain/comercio/Timbrado.js';
 import { RUC } from '../../../../src/domain/comercio/RUC.js';
+import { Comercio } from '../../../../src/domain/comercio/Comercio.js';
 import { FacturaNoEncontradaError } from '../../../../src/application/errors/FacturaNoEncontradaError.js';
 import { FacturaNoAnulableError } from '../../../../src/application/errors/FacturaNoAnulableError.js';
 
@@ -28,9 +30,11 @@ describe('AnularFactura', () => {
   };
 
   let facturaRepository: IFacturaRepository;
+  let comercioRepository: IComercioRepository;
   let sifenGateway: ISifenGateway;
   let anularFactura: AnularFactura;
   let facturaAprobada: Factura;
+  let testComercio: Comercio;
 
   beforeEach(() => {
     // Crear factura en estado aprobado (con items, CDC, enviada, aprobada)
@@ -46,6 +50,18 @@ describe('AnularFactura', () => {
     facturaAprobada.marcarEnviada();
     facturaAprobada.marcarAprobada();
 
+    // Crear test comercio
+    testComercio = new Comercio({
+      id: baseProps.comercioId,
+      ruc,
+      razonSocial: 'Comercio Test S.A.',
+      nombreFantasia: 'Test Store',
+      timbrado,
+      establecimiento: '001',
+      puntoExpedicion: '003',
+      tipoContribuyente: 1,
+    });
+
     // Mocks
     facturaRepository = {
       save: vi.fn().mockResolvedValue(undefined),
@@ -54,14 +70,20 @@ describe('AnularFactura', () => {
       findPendientes: vi.fn().mockResolvedValue([]),
     };
 
+    comercioRepository = {
+      findById: vi.fn().mockResolvedValue(testComercio),
+    };
+
     sifenGateway = {
       enviarDE: vi.fn(),
       consultarEstado: vi.fn(),
       anularDE: vi.fn(),
+      inutilizarNumeracion: vi.fn(),
     };
 
     anularFactura = new AnularFactura({
       facturaRepository,
+      comercioRepository,
       sifenGateway,
     });
   });
@@ -83,6 +105,7 @@ describe('AnularFactura', () => {
 
     // Assert
     expect(sifenGateway.anularDE).toHaveBeenCalledWith(
+      testComercio,
       facturaAprobada.cdc!.value,
       'Operación no se concretó',
     );
@@ -92,6 +115,8 @@ describe('AnularFactura', () => {
       mensajeRespuesta: 'Cancelación aceptada',
       anulada: true,
     });
+    expect(facturaRepository.save).toHaveBeenCalledWith(facturaAprobada);
+    expect(facturaAprobada.estado).toBe('cancelado');
   });
 
   it('debería lanzar FacturaNoAnulableError si factura está en estado pendiente', async () => {
@@ -189,5 +214,28 @@ describe('AnularFactura', () => {
     // Assert
     expect(result.anulada).toBe(false);
     expect(result.codigoRespuesta).toBe('0300');
+    expect(facturaRepository.save).not.toHaveBeenCalled();
+    expect(facturaAprobada.estado).toBe('aprobado'); // estado no cambia
+  });
+
+  it('debería marcar factura como cancelada cuando SIFEN acepta con codigo 0261', async () => {
+    // Arrange
+    const mockResponse = {
+      codigo: '0261',
+      mensaje: 'Cancelación aceptada con observación',
+      cdc: facturaAprobada.cdc!.value,
+    };
+    vi.mocked(sifenGateway.anularDE).mockResolvedValue(mockResponse);
+
+    // Act
+    const result = await anularFactura.execute({
+      facturaId: baseProps.id,
+      motivo: 'Operación no se concretó',
+    });
+
+    // Assert
+    expect(result.anulada).toBe(true);
+    expect(facturaRepository.save).toHaveBeenCalledWith(facturaAprobada);
+    expect(facturaAprobada.estado).toBe('cancelado');
   });
 });

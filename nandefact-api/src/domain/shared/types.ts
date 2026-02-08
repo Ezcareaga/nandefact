@@ -2,7 +2,7 @@
 export type TasaIVA = 10 | 5 | 0;
 
 /** Estado del DE en SIFEN */
-export type EstadoSifen = 'pendiente' | 'enviado' | 'aprobado' | 'rechazado' | 'contingencia';
+export type EstadoSifen = 'pendiente' | 'enviado' | 'aprobado' | 'rechazado' | 'contingencia' | 'cancelado';
 
 /** Tipo de emisión del DE: 1=Normal, 2=Contingencia */
 export type TipoEmision = 1 | 2;

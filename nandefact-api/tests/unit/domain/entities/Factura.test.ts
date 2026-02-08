@@ -136,4 +136,50 @@ describe('Factura', () => {
     factura.marcarAprobada();
     expect(factura.estado).toBe('aprobado');
   });
+
+  it('debería marcar factura como cancelada cuando estado es aprobado', () => {
+    const factura = new Factura(baseProps);
+    factura.agregarItem(
+      new ItemFactura({ descripcion: 'Producto', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 }),
+    );
+    factura.marcarAprobada();
+
+    factura.marcarCancelada();
+
+    expect(factura.estado).toBe('cancelado');
+  });
+
+  it('debería lanzar error al cancelar factura pendiente', () => {
+    const factura = new Factura(baseProps);
+    factura.agregarItem(
+      new ItemFactura({ descripcion: 'Producto', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 }),
+    );
+
+    expect(() => factura.marcarCancelada()).toThrow('Solo se puede cancelar una factura aprobada');
+  });
+
+  it('debería lanzar error al cancelar factura rechazada', () => {
+    const factura = new Factura(baseProps);
+    factura.agregarItem(
+      new ItemFactura({ descripcion: 'Producto', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 }),
+    );
+    factura.marcarRechazada();
+
+    expect(() => factura.marcarCancelada()).toThrow('Solo se puede cancelar una factura aprobada');
+  });
+
+  it('debería impedir modificaciones a factura cancelada', () => {
+    const factura = new Factura(baseProps);
+    factura.agregarItem(
+      new ItemFactura({ descripcion: 'Producto', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 }),
+    );
+    factura.marcarAprobada();
+    factura.marcarCancelada();
+
+    expect(() =>
+      factura.agregarItem(
+        new ItemFactura({ descripcion: 'Otro', cantidad: 1, precioUnitario: 5000, tasaIVA: 10 }),
+      ),
+    ).toThrow('No se puede modificar una factura aprobada por SIFEN');
+  });
 });

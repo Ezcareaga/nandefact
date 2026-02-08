@@ -42,10 +42,14 @@
     "vitest": "^2.1.0"
   },
   "dependencies": {
+    "@types/pdfkit": "^0.17.4",
     "bullmq": "^5.67.3",
+    "facturacionelectronicapy-kude": "^1.0.18",
+    "facturacionelectronicapy-qrgen": "^1.0.9",
     "facturacionelectronicapy-setapi": "^1.0.34",
     "facturacionelectronicapy-xmlgen": "^1.0.277",
     "facturacionelectronicapy-xmlsign": "^1.0.28",
-    "ioredis": "^5.9.2"
+    "ioredis": "^5.9.2",
+    "pdfkit": "^0.17.2"
   }
 }

@@ -168,10 +168,18 @@ export class Factura {
     this._estado = 'rechazado';
   }
 
+  /** Marca la factura como cancelada (después de evento cancelación aceptado por SIFEN) */
+  marcarCancelada(): void {
+    if (this._estado !== 'aprobado') {
+      throw new Error('Solo se puede cancelar una factura aprobada');
+    }
+    this._estado = 'cancelado';
+  }
+
   // --- Helpers privados ---
 
   private validarMutable(): void {
-    if (this._estado === 'aprobado') {
+    if (this._estado === 'aprobado' || this._estado === 'cancelado') {
       throw new Error('No se puede modificar una factura aprobada por SIFEN');
     }
   }

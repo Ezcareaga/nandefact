@@ -1,12 +1,18 @@
 import type { ISifenGateway, SifenResponse } from '../../domain/factura/ISifenGateway.js';
+import type { Comercio } from '../../domain/comercio/Comercio.js';
 import type { SifenConfig } from './SifenConfig.js';
 import type { SifenResponseObject } from 'facturacionelectronicapy-setapi';
+import { XmlGeneratorSifen } from './XmlGeneratorSifen.js';
 import setApi from 'facturacionelectronicapy-setapi';
 import * as fs from 'fs';
 
 /** Implementación gateway SIFEN usando TIPS-SA setapi */
 export class SifenGatewayImpl implements ISifenGateway {
-  constructor(private readonly config: SifenConfig) {}
+  private readonly xmlGenerator: XmlGeneratorSifen;
+
+  constructor(private readonly config: SifenConfig) {
+    this.xmlGenerator = new XmlGeneratorSifen();
+  }
 
   async enviarDE(xmlFirmado: string): Promise<SifenResponse> {
     const cert = fs.readFileSync(this.config.getCertificatePath());
@@ -38,15 +44,44 @@ export class SifenGatewayImpl implements ISifenGateway {
     return this.parseConsultaResponse(response, cdc);
   }
 
-  async anularDE(cdc: string, motivo: string): Promise<SifenResponse> {
+  async anularDE(comercio: Comercio, cdc: string, motivo: string): Promise<SifenResponse> {
     const cert = fs.readFileSync(this.config.getCertificatePath());
     const env = this.config.isTest() ? 'test' : 'prod';
 
-    // Construir XML de evento de cancelación (simplificado)
-    const xmlEvento = `<rEnvEvento>
-      <Id>${cdc}</Id>
-      <mOtEve>${motivo}</mOtEve>
-    </rEnvEvento>`;
+    // Generar XML de evento de cancelación usando xmlgen
+    const xmlEvento = await this.xmlGenerator.generarXmlEventoCancelacion(comercio, cdc, motivo);
+
+    const response = await setApi.evento(
+      1, // id default
+      xmlEvento,
+      env,
+      cert,
+      this.config.getCertificatePassword()
+    );
+
+    return this.parseEventoResponse(response);
+  }
+
+  async inutilizarNumeracion(
+    comercio: Comercio,
+    establecimiento: string,
+    punto: string,
+    desde: number,
+    hasta: number,
+    motivo: string
+  ): Promise<SifenResponse> {
+    const cert = fs.readFileSync(this.config.getCertificatePath());
+    const env = this.config.isTest() ? 'test' : 'prod';
+
+    // Generar XML de evento de inutilización usando xmlgen
+    const xmlEvento = await this.xmlGenerator.generarXmlEventoInutilizacion(
+      comercio,
+      establecimiento,
+      punto,
+      desde,
+      hasta,
+      motivo
+    );
 
     const response = await setApi.evento(
       1, // id default

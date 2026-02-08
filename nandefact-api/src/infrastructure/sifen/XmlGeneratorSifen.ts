@@ -28,4 +28,72 @@ export class XmlGeneratorSifen implements IXmlGenerator {
 
     return xml;
   }
+
+  /**
+   * Genera XML de evento de cancelación.
+   * @param comercio Comercio emisor del evento
+   * @param cdc CDC del documento a cancelar
+   * @param motivo Motivo de la cancelación
+   * @returns XML del evento de cancelación
+   */
+  async generarXmlEventoCancelacion(comercio: Comercio, cdc: string, motivo: string): Promise<string> {
+    const params = mapComercioToParams(comercio);
+
+    // Datos del evento de cancelación
+    const data = {
+      cdc,
+      motivo,
+    };
+
+    // Generar XML usando la librería
+    // Type assertion necesaria porque las definiciones TypeScript de xmlgen no incluyen métodos de eventos
+    const xmlgenModule = await import('facturacionelectronicapy-xmlgen');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const xml = await (xmlgenModule.default as any).generateXMLEventoCancelacion(1, params, data);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return xml;
+  }
+
+  /**
+   * Genera XML de evento de inutilización de numeración.
+   * @param comercio Comercio emisor del evento
+   * @param establecimiento Código de establecimiento
+   * @param punto Punto de expedición
+   * @param desde Número inicial del rango
+   * @param hasta Número final del rango
+   * @param motivo Motivo de la inutilización
+   * @returns XML del evento de inutilización
+   */
+  async generarXmlEventoInutilizacion(
+    comercio: Comercio,
+    establecimiento: string,
+    punto: string,
+    desde: number,
+    hasta: number,
+    motivo: string
+  ): Promise<string> {
+    const params = mapComercioToParams(comercio);
+
+    // Datos del evento de inutilización
+    // La librería requiere el timbrado y tipoDocumento para eventos de inutilización
+    const data = {
+      tipoDocumento: 1, // 1 = Factura Electrónica (tipo de documento que se inutiliza)
+      establecimiento,
+      punto,
+      desde,
+      hasta,
+      motivo,
+      timbrado: comercio.timbrado.numero,
+    };
+
+    // Generar XML usando la librería
+    // Type assertion necesaria porque las definiciones TypeScript de xmlgen no incluyen métodos de eventos
+    const xmlgenModule = await import('facturacionelectronicapy-xmlgen');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const xml = await (xmlgenModule.default as any).generateXMLEventoInutilizacion(1, params, data);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return xml;
+  }
 }

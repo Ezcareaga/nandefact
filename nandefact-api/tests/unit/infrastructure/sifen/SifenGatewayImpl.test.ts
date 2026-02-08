@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SifenGatewayImpl } from '../../../../src/infrastructure/sifen/SifenGatewayImpl.js';
 import { SifenConfig } from '../../../../src/infrastructure/sifen/SifenConfig.js';
+import { Comercio } from '../../../../src/domain/comercio/Comercio.js';
+import { Timbrado } from '../../../../src/domain/comercio/Timbrado.js';
+import { RUC } from '../../../../src/domain/comercio/RUC.js';
 
 // Mock del módulo facturacionelectronicapy-setapi
 vi.mock('facturacionelectronicapy-setapi', () => ({
@@ -23,8 +26,12 @@ import setApi from 'facturacionelectronicapy-setapi';
 import * as fs from 'fs';
 
 describe('SifenGatewayImpl', () => {
+  const timbrado = new Timbrado('12558946', new Date('2024-01-01'), new Date('2025-12-31'));
+  const ruc = new RUC('80069563-1');
+
   let config: SifenConfig;
   let gateway: SifenGatewayImpl;
+  let mockComercio: Comercio;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -38,6 +45,18 @@ describe('SifenGatewayImpl', () => {
       certificatePassword: 'password123'
     });
     gateway = new SifenGatewayImpl(config);
+
+    // Crear mock comercio para tests de eventos
+    mockComercio = new Comercio({
+      id: '660e8400-e29b-41d4-a716-446655440000',
+      ruc,
+      razonSocial: 'Comercio Test S.A.',
+      nombreFantasia: 'Test Store',
+      timbrado,
+      establecimiento: '001',
+      puntoExpedicion: '003',
+      tipoContribuyente: 1,
+    });
   });
 
   describe('enviarDE', () => {
@@ -203,7 +222,7 @@ describe('SifenGatewayImpl', () => {
   });
 
   describe('anularDE', () => {
-    it('debe llamar a setApi.evento', async () => {
+    it('debe llamar a setApi.evento con XML generado', async () => {
       const mockCdc = '01800695631001003000013712022010619364760029';
       const mockMotivo = 'Venta no concretada';
       const mockResponse = `<env:Envelope>
@@ -217,18 +236,11 @@ describe('SifenGatewayImpl', () => {
 
       vi.mocked(setApi.evento).mockResolvedValue(mockResponse);
 
-      await gateway.anularDE(mockCdc, mockMotivo);
+      await gateway.anularDE(mockComercio, mockCdc, mockMotivo);
 
       expect(setApi.evento).toHaveBeenCalledWith(
         1,
-        expect.stringContaining(mockCdc),
-        'test',
-        expect.any(Buffer),
-        'password123'
-      );
-      expect(setApi.evento).toHaveBeenCalledWith(
-        1,
-        expect.stringContaining(mockMotivo),
+        expect.any(String), // XML generado por xmlgen
         'test',
         expect.any(Buffer),
         'password123'
@@ -249,8 +261,9 @@ describe('SifenGatewayImpl', () => {
       </env:Envelope>`;
 
       vi.mocked(setApi.evento).mockResolvedValue(mockResponse);
+      
 
-      const resultado = await gateway.anularDE(mockCdc, mockMotivo);
+      const resultado = await gateway.anularDE(mockComercio, mockCdc, mockMotivo);
 
       expect(resultado.codigo).toBe('0700');
       expect(resultado.mensaje).toBe('Evento registrado');
@@ -269,11 +282,57 @@ describe('SifenGatewayImpl', () => {
       </env:Envelope>`;
 
       vi.mocked(setApi.evento).mockResolvedValue(mockResponse);
+      
 
-      const resultado = await gateway.anularDE(mockCdc, mockMotivo);
+      const resultado = await gateway.anularDE(mockComercio, mockCdc, mockMotivo);
 
       expect(resultado.codigo).toBe('0702');
       expect(resultado.mensaje).toBe('Error: DE ya cancelado previamente');
+    });
+  });
+
+  describe('inutilizarNumeracion', () => {
+    it('debe llamar a setApi.evento con XML de inutilización', async () => {
+      const mockResponse = `<env:Envelope>
+        <env:Body>
+          <rRetEve>
+            <dCodRes>0260</dCodRes>
+            <dMsgRes>Inutilización aceptada</dMsgRes>
+          </rRetEve>
+        </env:Body>
+      </env:Envelope>`;
+
+      vi.mocked(setApi.evento).mockResolvedValue(mockResponse);
+      
+
+      await gateway.inutilizarNumeracion(mockComercio, '001', '003', 100, 105, 'Formularios dañados');
+
+      expect(setApi.evento).toHaveBeenCalledWith(
+        1,
+        expect.any(String), // XML generado por xmlgen
+        'test',
+        expect.any(Buffer),
+        'password123'
+      );
+    });
+
+    it('debe retornar inutilización exitosa', async () => {
+      const mockResponse = `<env:Envelope>
+        <env:Body>
+          <rRetEve>
+            <dCodRes>0260</dCodRes>
+            <dMsgRes>Inutilización aceptada</dMsgRes>
+          </rRetEve>
+        </env:Body>
+      </env:Envelope>`;
+
+      vi.mocked(setApi.evento).mockResolvedValue(mockResponse);
+      
+
+      const resultado = await gateway.inutilizarNumeracion(mockComercio, '001', '003', 100, 105, 'Formularios dañados durante transporte');
+
+      expect(resultado.codigo).toBe('0260');
+      expect(resultado.mensaje).toBe('Inutilización aceptada');
     });
   });
 });

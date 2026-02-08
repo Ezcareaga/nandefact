@@ -107,6 +107,7 @@ describe('EnviarDE', () => {
       enviarDE: vi.fn(),
       consultarEstado: vi.fn(),
       anularDE: vi.fn(),
+      inutilizarNumeracion: vi.fn(),
     };
 
     enviarDE = new EnviarDE({
