@@ -965,3 +965,8 @@ Después de completar cada fase de GSD (antes de merge a main):
 - Si un plan tiene 5 subtareas, mínimo 5 commits (uno por subtarea)
 - NUNCA acumular más de 3 archivos sin commitear
 - Push a la rama remota después de cada 3 commits como mínimo
+
+### Reglas de dominio
+- NUNCA usar new Error() en domain/. Crear errores tipados específicos.
+- Validar TODAS las props en constructores de entidades.
+- State transitions explícitas: validar estado actual antes de cambiar.
