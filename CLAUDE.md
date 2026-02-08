@@ -812,35 +812,34 @@ const xmlCancel = await xmlgen.generateXMLEventoCancelacion(id, params, data);
 
 ## REGLAS DE DESARROLLO PARA EL AGENTE
 
-### Git Workflow
-**OBLIGATORIO:** Todo desarrollo se hace en ramas. NUNCA commitear directo a `main`.
+### Git Workflow — INSTRUCCIONES IMPERATIVAS
 
-**Estructura de ramas:**
-```
-main                          ← Siempre estable, deployable
-├── feat/scaffolding          ← Features nuevas
-├── feat/domain-factura
-├── feat/sifen-gateway
-├── fix/cdc-validation        ← Bugfixes
-├── refactor/iva-calculation  ← Refactors
-└── test/factura-unit-tests   ← Tests
-```
+**ANTES de escribir cualquier línea de código en cada plan/tarea:**
+1. `git checkout main && git pull`
+2. `git checkout -b <tipo>/<nombre>` (feat/, fix/, refactor/, test/)
+3. CONFIRMAR que estás en la rama correcta: `git branch --show-current`
 
-**Flujo obligatorio:**
-1. Antes de empezar cualquier tarea: `git checkout -b <tipo>/<nombre-descriptivo>`
-2. Commits frecuentes con Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`)
-3. Cuando la feature está completa y tests pasan: merge a `main`
-4. Si algo sale mal: `git checkout main` y la rama rota queda aislada
+**DURANTE el desarrollo:**
+- Cada archivo nuevo o modificado significativamente → `git add . && git commit`
+- Tests pasan → commit INMEDIATO
+- MÁXIMO 15 minutos o 3 archivos sin commit, lo que pase primero
+- Push a rama remota cada 3 commits: `git push -u origin <rama>`
 
-**Reglas:**
-- Commits atómicos: un commit = un cambio lógico
-- Mensaje descriptivo en español: `feat: agregar value object CDC con validación módulo 11`
-- Antes de merge a main: verificar que TODOS los tests pasan
-- NO hacer force push a main
-- NO borrar ramas hasta confirmar que el merge está bien
-- Si el agente se equivoca en una rama, se descarta la rama entera y se empieza de nuevo
+**AL TERMINAR cada plan/tarea:**
+1. `git add . && git commit` (último cambio)
+2. `git push origin <rama>`
+3. Verificar tests: `npm test`
+4. Si tests pasan: `git checkout main && git merge --squash <rama>`
+5. `git commit -m "<conventional commit describiendo el plan completo>"`
+6. `git push origin main`
 
-**Primer commit en main:** solo scaffolding (estructura carpetas + configs). Después todo en ramas.
+**NUNCA:**
+- Commitear directo a main
+- Acumular más de 2 horas sin push
+- Hacer force push a main
+
+**SI ALGO SALE MAL:**
+- `git stash` → `git checkout main` → rama rota queda aislada
 
 ### Proceso de Desarrollo
 1. **Desarrollo incremental por bloques:** 1 función → test → verificar → siguiente.
