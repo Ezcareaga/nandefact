@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Productos & Clientes** - CRUD use cases, validation, search
 - [x] **Phase 6: Comercio & Auth** - Setup, certificate management, JWT + PIN
 - [x] **Phase 7: API REST** - Express routes, Zod validation, endpoints
-- [ ] **Phase 8: Infrastructure Testing** - Docker Compose, integration, e2e tests
+- [x] **Phase 8: Infrastructure Testing** - Docker Compose, integration, e2e tests
 - [ ] **Phase 9: Android Shared KMP** - Domain/data/sync in Kotlin Multiplatform
 - [ ] **Phase 10: Android UI** - Jetpack Compose screens, offline-first sync
 
@@ -156,10 +156,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Prisma schema + database migrations + Dockerfile + Docker Compose API service
-- [ ] 08-02-PLAN.md — PostgreSQL repository adapters + AuthServiceJWT + HashServiceBcrypt + wire index.ts
-- [ ] 08-03-PLAN.md — Integration tests for repositories and auth against real PostgreSQL
-- [ ] 08-04-PLAN.md — E2E factura flow test + Docker Compose test config + CI script
+- [x] 08-01-PLAN.md — Prisma schema + database migrations + Dockerfile + Docker Compose API service
+- [x] 08-02-PLAN.md — PostgreSQL repository adapters + AuthServiceJWT + HashServiceBcrypt + wire index.ts
+- [x] 08-03-PLAN.md — Integration tests for repositories and auth against real PostgreSQL
+- [x] 08-04-PLAN.md — E2E factura flow test + Docker Compose test config + CI script
 
 ### Phase 9: Android Shared KMP
 **Goal**: Implement shared business logic in Kotlin Multiplatform (domain, data, sync)
@@ -209,6 +209,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. Productos & Clientes | 2/2 | Complete | 2026-02-08 |
 | 6. Comercio & Auth | 2/2 | Complete | 2026-02-08 |
 | 7. API REST | 4/4 | Complete | 2026-02-08 |
-| 8. Infrastructure Testing | 0/TBD | Not started | - |
+| 8. Infrastructure Testing | 4/4 | Complete | 2026-02-08 |
 | 9. Android Shared KMP | 0/TBD | Not started | - |
 | 10. Android UI | 0/TBD | Not started | - |

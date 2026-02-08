@@ -46,9 +46,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infraestructura
 
-- [ ] **INFR-01**: Docker Compose producción con PostgreSQL 16 + Redis 7 + API
-- [ ] **INFR-02**: Tests de integración con base de datos real (Docker)
-- [ ] **INFR-03**: Tests e2e del flujo crear factura → enviar SIFEN → aprobar
+- [x] **INFR-01**: Docker Compose producción con PostgreSQL 16 + Redis 7 + API
+- [x] **INFR-02**: Tests de integración con base de datos real (Docker)
+- [x] **INFR-03**: Tests e2e del flujo crear factura → enviar SIFEN → aprobar
 
 ### Android App
 

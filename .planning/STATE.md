@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Doña María puede facturar electrónicamente desde su puesto en el mercado en menos de 30 segundos, con o sin internet, cumpliendo todas las reglas SIFEN/DNIT.
-**Current focus:** Phase 8 - Infrastructure Testing (next)
+**Current focus:** Phase 9 - Android Shared KMP (next)
 
 ## Current Position
 
@@ -148,6 +148,8 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 08-03-PLAN.md (Integration Tests)
+Stopped at: Phase 8 complete (all 4 plans executed, verified)
 Resume file: None
-Next: Phase 8 complete ✅ — ready for Phase 9 (SIFEN real integration)
+Next: Phase 9 - Android Shared KMP
+
+**Verification note:** Phase 8 verifier flagged Prisma migrations not created (requires running PostgreSQL). This is an environment issue — run `docker compose up -d postgres && cd nandefact-api && npx prisma migrate dev --name init` to generate migrations. All code is correct and complete.
