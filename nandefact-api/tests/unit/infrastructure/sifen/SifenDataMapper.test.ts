@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SifenDataMapper } from '../../../../src/infrastructure/sifen/SifenDataMapper.js';
+import { mapComercioToParams, mapFacturaToData, mapItemsToSifenItems } from '../../../../src/infrastructure/sifen/SifenDataMapper.js';
 import { Factura } from '../../../../src/domain/factura/Factura.js';
 import { ItemFactura } from '../../../../src/domain/factura/ItemFactura.js';
 import { NumeroFactura } from '../../../../src/domain/factura/NumeroFactura.js';
@@ -93,53 +93,53 @@ describe('SifenDataMapper', () => {
 
   describe('mapComercioToParams', () => {
     it('debe mapear version a 150', () => {
-      const params = SifenDataMapper.mapComercioToParams(comercioMock);
+      const params = mapComercioToParams(comercioMock);
       expect(params.version).toBe(150);
     });
 
     it('debe mapear RUC completo con DV', () => {
-      const params = SifenDataMapper.mapComercioToParams(comercioMock);
+      const params = mapComercioToParams(comercioMock);
       expect(params.ruc).toBe('80069563-1');
     });
 
     it('debe mapear razonSocial', () => {
-      const params = SifenDataMapper.mapComercioToParams(comercioMock);
+      const params = mapComercioToParams(comercioMock);
       expect(params.razonSocial).toBe('María Mercado SRL');
     });
 
     it('debe mapear nombreFantasia', () => {
-      const params = SifenDataMapper.mapComercioToParams(comercioMock);
+      const params = mapComercioToParams(comercioMock);
       expect(params.nombreFantasia).toBe('Verdulería Doña María');
     });
 
     it('debe mapear timbradoNumero', () => {
-      const params = SifenDataMapper.mapComercioToParams(comercioMock);
+      const params = mapComercioToParams(comercioMock);
       expect(params.timbradoNumero).toBe('12345678');
     });
 
     it('debe mapear timbradoFecha como YYYY-MM-DD', () => {
-      const params = SifenDataMapper.mapComercioToParams(comercioMock);
+      const params = mapComercioToParams(comercioMock);
       expect(params.timbradoFecha).toBe('2024-01-01');
     });
 
     it('debe mapear tipoContribuyente (1=PF)', () => {
-      const params = SifenDataMapper.mapComercioToParams(comercioMock);
+      const params = mapComercioToParams(comercioMock);
       expect(params.tipoContribuyente).toBe(1);
     });
 
     it('debe mapear tipoRegimen a 8 (hardcoded)', () => {
-      const params = SifenDataMapper.mapComercioToParams(comercioMock);
+      const params = mapComercioToParams(comercioMock);
       expect(params.tipoRegimen).toBe(8);
     });
 
     it('debe incluir actividadesEconomicas con codigo 47190', () => {
-      const params = SifenDataMapper.mapComercioToParams(comercioMock);
+      const params = mapComercioToParams(comercioMock);
       expect(params.actividadesEconomicas).toHaveLength(1);
       expect(params.actividadesEconomicas[0]?.codigo).toBe('47190');
     });
 
     it('debe incluir establecimientos con codigo del comercio', () => {
-      const params = SifenDataMapper.mapComercioToParams(comercioMock);
+      const params = mapComercioToParams(comercioMock);
       expect(params.establecimientos).toHaveLength(1);
       expect(params.establecimientos[0]?.codigo).toBe('001');
     });
@@ -148,56 +148,56 @@ describe('SifenDataMapper', () => {
   describe('mapFacturaToData', () => {
     it('debe mapear tipoDocumento (1=FE)', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.tipoDocumento).toBe(1);
     });
 
     it('debe mapear establecimiento', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.establecimiento).toBe('001');
     });
 
     it('debe mapear punto', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.punto).toBe('003');
     });
 
     it('debe mapear numero', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.numero).toBe('0000137');
     });
 
     it('debe mapear codigoSeguridadAleatorio desde CDC (9 digitos)', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.codigoSeguridadAleatorio).toHaveLength(9);
       expect(/^\d{9}$/.test(data.codigoSeguridadAleatorio)).toBe(true);
     });
 
     it('debe mapear fecha como ISO8601 YYYY-MM-DDThh:mm:ss', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.fecha).toBe('2024-06-15T10:30:00');
     });
 
     it('debe mapear tipoEmision (1=Normal)', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.tipoEmision).toBe(1);
     });
 
     it('debe mapear tipoTransaccion a 1 (venta)', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.tipoTransaccion).toBe(1);
     });
 
     it('debe mapear condicion.tipo: contado=1', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.condicion.tipo).toBe(1);
     });
 
@@ -213,19 +213,19 @@ describe('SifenDataMapper', () => {
         condicionPago: 'credito',
         fechaEmision: new Date('2024-06-15T10:30:00Z'),
       });
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.condicion.tipo).toBe(2);
     });
 
     it('debe mapear moneda a "PYG"', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.moneda).toBe('PYG');
     });
 
     it('debe mapear cliente con RUC: contribuyente=true', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.cliente.contribuyente).toBe(true);
       expect(data.cliente.ruc).toBe('5432109-8');
       expect(data.cliente.razonSocial).toBe('Juan Pérez');
@@ -233,7 +233,7 @@ describe('SifenDataMapper', () => {
 
     it('debe mapear cliente con CI: contribuyente=false, documentoTipo=1', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteCIMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteCIMock);
       expect(data.cliente.contribuyente).toBe(false);
       expect(data.cliente.documentoTipo).toBe(1);
       expect(data.cliente.documentoNumero).toBe('1234567');
@@ -242,7 +242,7 @@ describe('SifenDataMapper', () => {
 
     it('debe mapear cliente con pasaporte: documentoTipo=2', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clientePasaporteMock);
+      const data = mapFacturaToData(factura, comercioMock, clientePasaporteMock);
       expect(data.cliente.contribuyente).toBe(false);
       expect(data.cliente.documentoTipo).toBe(2);
       expect(data.cliente.documentoNumero).toBe('AB123456');
@@ -250,7 +250,7 @@ describe('SifenDataMapper', () => {
 
     it('debe mapear cliente innominado: documentoTipo=5', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteInnominadoMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteInnominadoMock);
       expect(data.cliente.contribuyente).toBe(false);
       expect(data.cliente.documentoTipo).toBe(5);
       expect(data.cliente.razonSocial).toBe('Consumidor Final');
@@ -258,7 +258,7 @@ describe('SifenDataMapper', () => {
 
     it('debe incluir items mapeados', () => {
       const factura = crearFacturaMock();
-      const data = SifenDataMapper.mapFacturaToData(factura, comercioMock, clienteRUCMock);
+      const data = mapFacturaToData(factura, comercioMock, clienteRUCMock);
       expect(data.items).toHaveLength(2);
     });
   });
@@ -266,34 +266,34 @@ describe('SifenDataMapper', () => {
   describe('mapItemsToSifenItems', () => {
     it('debe mapear codigo secuencial comenzando en 1', () => {
       const factura = crearFacturaMock();
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
+      const items = mapItemsToSifenItems(factura.items);
       expect(items[0]?.codigo).toBe('1');
       expect(items[1]?.codigo).toBe('2');
     });
 
     it('debe mapear descripcion', () => {
       const factura = crearFacturaMock();
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
+      const items = mapItemsToSifenItems(factura.items);
       expect(items[0]?.descripcion).toBe('Mandioca');
       expect(items[1]?.descripcion).toBe('Tomate');
     });
 
     it('debe mapear unidadMedida a 77 (unidad)', () => {
       const factura = crearFacturaMock();
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
+      const items = mapItemsToSifenItems(factura.items);
       expect(items[0]?.unidadMedida).toBe(77);
     });
 
     it('debe mapear cantidad', () => {
       const factura = crearFacturaMock();
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
+      const items = mapItemsToSifenItems(factura.items);
       expect(items[0]?.cantidad).toBe(3);
       expect(items[1]?.cantidad).toBe(2);
     });
 
     it('debe mapear precioUnitario como base sin IVA', () => {
       const factura = crearFacturaMock();
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
+      const items = mapItemsToSifenItems(factura.items);
       // Mandioca: 15000 total / 1.05 = 14286 base, / 3 unidades = 4762 por unidad
       expect(items[0]?.precioUnitario).toBe(4762);
       // Tomate: 16000 total / 1.10 = 14545 base, / 2 unidades = 7273 por unidad (rounded)
@@ -302,13 +302,13 @@ describe('SifenDataMapper', () => {
 
     it('debe mapear ivaTipo=1 para IVA 10%', () => {
       const factura = crearFacturaMock();
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
+      const items = mapItemsToSifenItems(factura.items);
       expect(items[1]?.ivaTipo).toBe(1); // Tomate 10%
     });
 
     it('debe mapear ivaTipo=1 para IVA 5%', () => {
       const factura = crearFacturaMock();
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
+      const items = mapItemsToSifenItems(factura.items);
       expect(items[0]?.ivaTipo).toBe(1); // Mandioca 5%
     });
 
@@ -334,20 +334,20 @@ describe('SifenDataMapper', () => {
         }),
       );
 
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
+      const items = mapItemsToSifenItems(factura.items);
       expect(items[0]?.ivaTipo).toBe(3); // Exenta
     });
 
     it('debe mapear iva (tasa IVA: 10, 5, 0)', () => {
       const factura = crearFacturaMock();
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
+      const items = mapItemsToSifenItems(factura.items);
       expect(items[0]?.iva).toBe(5);
       expect(items[1]?.iva).toBe(10);
     });
 
     it('debe mapear ivaProporcion=100 (proporcion 100%)', () => {
       const factura = crearFacturaMock();
-      const items = SifenDataMapper.mapItemsToSifenItems(factura.items);
+      const items = mapItemsToSifenItems(factura.items);
       expect(items[0]?.ivaProporcion).toBe(100);
       expect(items[1]?.ivaProporcion).toBe(100);
     });

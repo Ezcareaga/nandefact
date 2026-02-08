@@ -2,7 +2,7 @@ import type { IXmlGenerator } from '../../domain/factura/IXmlGenerator.js';
 import type { Factura } from '../../domain/factura/Factura.js';
 import type { Comercio } from '../../domain/comercio/Comercio.js';
 import type { Cliente } from '../../domain/cliente/Cliente.js';
-import { SifenDataMapper } from './SifenDataMapper.js';
+import { mapComercioToParams, mapFacturaToData } from './SifenDataMapper.js';
 
 /**
  * Adaptador — Genera XML SIFEN v150 usando la librería facturacionelectronicapy-xmlgen.
@@ -19,15 +19,12 @@ export class XmlGeneratorSifen implements IXmlGenerator {
     }
 
     // Mapear entidades del dominio al formato TIPS-SA
-    const params = SifenDataMapper.mapComercioToParams(comercio);
-    const data = SifenDataMapper.mapFacturaToData(factura, comercio, cliente);
+    const params = mapComercioToParams(comercio);
+    const data = mapFacturaToData(factura, comercio, cliente);
 
     // Generar XML usando la librería (dynamic import para CommonJS)
     const xmlgenModule = await import('facturacionelectronicapy-xmlgen');
-    const xmlgen = xmlgenModule.default as unknown as {
-      generateXMLDE: (params: any, data: any, config?: any) => Promise<string>;
-    };
-    const xml = await xmlgen.generateXMLDE(params, data, {});
+    const xml = await xmlgenModule.default.generateXMLDE(params, data, {});
 
     return xml;
   }

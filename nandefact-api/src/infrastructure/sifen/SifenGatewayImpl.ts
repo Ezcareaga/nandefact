@@ -1,10 +1,8 @@
-import { ISifenGateway, SifenResponse } from '../../domain/factura/ISifenGateway.js';
-import { SifenConfig } from './SifenConfig.js';
-import setApiModule from 'facturacionelectronicapy-setapi';
+import type { ISifenGateway, SifenResponse } from '../../domain/factura/ISifenGateway.js';
+import type { SifenConfig } from './SifenConfig.js';
+import type { SifenResponseObject } from 'facturacionelectronicapy-setapi';
+import setApi from 'facturacionelectronicapy-setapi';
 import * as fs from 'fs';
-
-// Type assertion para módulo CommonJS con definiciones incorrectas
-const setApi = setApiModule as any;
 
 /** Implementación gateway SIFEN usando TIPS-SA setapi */
 export class SifenGatewayImpl implements ISifenGateway {
@@ -61,73 +59,49 @@ export class SifenGatewayImpl implements ISifenGateway {
     return this.parseEventoResponse(response);
   }
 
-  /** Parsea respuesta de envío DE */
-  private parseSifenResponse(response: any): SifenResponse {
-    // La respuesta puede ser string XML o un objeto ya parseado
-    let codigo = '';
-    let mensaje = '';
-    let cdc = '';
-
+  /** Parsea respuesta de envío/consulta/evento */
+  private parseSifenResponse(response: string | SifenResponseObject): SifenResponse {
     if (typeof response === 'string') {
-      // Parsear XML string
-      codigo = this.extractXmlValue(response, 'dCodRes') || '';
-      mensaje = this.extractXmlValue(response, 'dMsgRes') || '';
-      cdc = this.extractXmlValue(response, 'CDC') || '';
-    } else {
-      // Ya es un objeto
-      codigo = response.dCodRes || response.codigo || '';
-      mensaje = response.dMsgRes || response.mensaje || '';
-      cdc = response.CDC || response.cdc || '';
+      return {
+        codigo: this.extractXmlValue(response, 'dCodRes') ?? '',
+        mensaje: this.extractXmlValue(response, 'dMsgRes') ?? '',
+        cdc: this.extractXmlValue(response, 'CDC') ?? '',
+      };
     }
 
-    return { codigo, mensaje, cdc };
+    return {
+      codigo: response.dCodRes ?? response.codigo ?? '',
+      mensaje: response.dMsgRes ?? response.mensaje ?? '',
+      cdc: response.CDC ?? response.cdc ?? '',
+    };
   }
 
   /** Parsea respuesta de consulta DE */
-  private parseConsultaResponse(response: any, cdcOriginal: string): SifenResponse {
-    let codigo = '';
-    let mensaje = '';
-    let cdc = cdcOriginal;
-
+  private parseConsultaResponse(response: string | SifenResponseObject, cdcOriginal: string): SifenResponse {
     if (typeof response === 'string') {
-      codigo = this.extractXmlValue(response, 'dCodRes') || '';
-      mensaje = this.extractXmlValue(response, 'dMsgRes') || '';
-      const cdcFromResponse = this.extractXmlValue(response, 'CDC');
-      if (cdcFromResponse) cdc = cdcFromResponse;
-    } else {
-      codigo = response.dCodRes || response.codigo || '';
-      mensaje = response.dMsgRes || response.mensaje || '';
-      if (response.CDC || response.cdc) {
-        cdc = response.CDC || response.cdc;
-      }
+      return {
+        codigo: this.extractXmlValue(response, 'dCodRes') ?? '',
+        mensaje: this.extractXmlValue(response, 'dMsgRes') ?? '',
+        cdc: this.extractXmlValue(response, 'CDC') ?? cdcOriginal,
+      };
     }
 
-    return { codigo, mensaje, cdc };
+    return {
+      codigo: response.dCodRes ?? response.codigo ?? '',
+      mensaje: response.dMsgRes ?? response.mensaje ?? '',
+      cdc: response.CDC ?? response.cdc ?? cdcOriginal,
+    };
   }
 
   /** Parsea respuesta de evento */
-  private parseEventoResponse(response: any): SifenResponse {
-    let codigo = '';
-    let mensaje = '';
-    let cdc = '';
-
-    if (typeof response === 'string') {
-      codigo = this.extractXmlValue(response, 'dCodRes') || '';
-      mensaje = this.extractXmlValue(response, 'dMsgRes') || '';
-      cdc = this.extractXmlValue(response, 'CDC') || '';
-    } else {
-      codigo = response.dCodRes || response.codigo || '';
-      mensaje = response.dMsgRes || response.mensaje || '';
-      cdc = response.CDC || response.cdc || '';
-    }
-
-    return { codigo, mensaje, cdc };
+  private parseEventoResponse(response: string | SifenResponseObject): SifenResponse {
+    return this.parseSifenResponse(response);
   }
 
   /** Extrae valor de tag XML usando regex simple */
   private extractXmlValue(xml: string, tagName: string): string | null {
-    const regex = new RegExp(`<${tagName}>(.*?)<\/${tagName}>`, 's');
+    const regex = new RegExp(`<${tagName}>(.*?)</${tagName}>`, 's');
     const match = xml.match(regex);
-    return match && match[1] ? match[1].trim() : null;
+    return match?.[1]?.trim() ?? null;
   }
 }
