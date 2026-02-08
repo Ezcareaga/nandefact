@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Doña María puede facturar electrónicamente desde su puesto en el mercado en menos de 30 segundos, con o sin internet, cumpliendo todas las reglas SIFEN/DNIT.
-**Current focus:** Phase 5 - Productos & Clientes CRUD
+**Current focus:** Phase 6 - Comercio & Auth (Usuario authentication)
 
 ## Current Position
 
-Phase: 5 of 10 (Productos & Clientes) — COMPLETE
-Plan: 2 of 2 (all plans complete)
-Last activity: 2026-02-08 — Completed 05-02-PLAN.md (Cliente CRUD)
+Phase: 6 of 10 (Comercio & Auth) — IN PROGRESS
+Plan: 1 of 3 (06-02 complete: Usuario Auth)
+Last activity: 2026-02-08 — Completed 06-02-PLAN.md (Usuario Auth)
 
-Progress: [█████░░░░░] 50%
+Progress: [█████▓░░░░] 52%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 10.8 min
-- Total execution time: 2.15 hours
+- Total plans completed: 13
+- Average duration: 10.9 min
+- Total execution time: 2.42 hours
 
 **By Phase:**
 
@@ -31,14 +31,15 @@ Progress: [█████░░░░░] 50%
 | 03-sync-queue | 2/2 | 10 min | 5.0 min | Complete |
 | 04-events-kude | 2/2 | 23 min | 11.5 min | Complete |
 | 05-productos-clientes | 2/2 | 14 min | 7.0 min | Complete |
+| 06-comercio-auth | 1/3 | 16 min | 16.0 min | In Progress |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (4min), 04-01 (10min), 04-02 (13min), 05-01 (7min), 05-02 (7min)
-- Trend: Stable velocity 4-13min per plan, consistent performance
+- Last 5 plans: 04-01 (10min), 04-02 (13min), 05-01 (7min), 05-02 (7min), 06-02 (16min)
+- Trend: Stable velocity 7-16min per plan, auth tasks slightly longer
 
 **Test Coverage:**
-- Total tests: 282 (90 domain + 91 application + 75 sifen + 26 queue/logging/kude)
-- All passing, zero regressions (23 tests added in 05-02)
+- Total tests: 342 (124 domain + 106 application + 75 sifen + 37 queue/logging/kude)
+- All passing, zero regressions (49 tests added in 06-02)
 
 *Updated after each plan completion*
 
@@ -89,12 +90,22 @@ Recent decisions affecting current work:
 - 05-01: Optional properties via conditional assignment (Good) — exactOptionalPropertyTypes prevents undefined in optional props, assign only when defined
 - 05-01: Paginated findByComercio with options object (Good) — Flexible, extensible API with { page, pageSize, soloActivos }
 - 05-01: TasaIVA validation in entity constructor (Good) — Only 10/5/0 allowed per Paraguay tax law, domain enforces business rule
+- 06-02: PIN-based auth over passwords (Good) — Target user (Doña María) needs simple 4-6 digit PIN, not complex password
+- 06-02: Rate limiting in domain entity (Good) — Business rule (5 attempts, 30min lockout) belongs in Usuario, not infrastructure
+- 06-02: Generic auth error messages (Good) — Prevents user enumeration attacks, same message for all auth failures
+- 06-02: Token rotation on refresh (Good) — Security best practice, old refresh token invalidated when new pair generated
+- 06-02: estaBloqueado accepts ahora parameter (Good) — Testability via dependency injection of time
 
 ### Pending Todos
 
 None yet.
 
 ### Blockers/Concerns
+
+**Phase 6-7 - Auth Infrastructure:**
+- Need to implement IAuthService (JWT with jsonwebtoken)
+- Need to implement IHashService (bcrypt for PIN hashing)
+- Need to implement IUsuarioRepository (PostgreSQL adapter)
 
 **Phase 8 - Infrastructure Testing:**
 - Mock SIFEN responses required until certificate obtained
@@ -104,5 +115,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 05-02-PLAN.md (Cliente CRUD) — Phase 5 complete
+Stopped at: Completed 06-02-PLAN.md (Usuario Auth)
 Resume file: None
