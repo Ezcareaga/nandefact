@@ -33,6 +33,7 @@
     "@eslint/js": "^9.17.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.10.0",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^10.0.0",
@@ -55,6 +56,7 @@
     "facturacionelectronicapy-xmlsign": "^1.0.28",
     "helmet": "^8.1.0",
     "ioredis": "^5.9.2",
+    "multer": "^2.0.2",
     "pdfkit": "^0.17.2",
     "zod": "^4.3.6"
   }
