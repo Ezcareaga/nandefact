@@ -23,15 +23,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Productos
 
-- [ ] **PROD-01**: Usuario puede crear producto con nombre, precio PYG, tasa IVA, unidad medida
-- [ ] **PROD-02**: Usuario puede editar y desactivar productos existentes
-- [ ] **PROD-03**: API devuelve lista paginada de productos por comercio
+- [x] **PROD-01**: Usuario puede crear producto con nombre, precio PYG, tasa IVA, unidad medida
+- [x] **PROD-02**: Usuario puede editar y desactivar productos existentes
+- [x] **PROD-03**: API devuelve lista paginada de productos por comercio
 
 ### Clientes
 
-- [ ] **CLIE-01**: Usuario puede crear cliente con CI/RUC o como innominado
-- [ ] **CLIE-02**: Usuario puede buscar cliente por nombre/RUC/CI con autocompletado
-- [ ] **CLIE-03**: Sistema puede validar RUC del cliente contra SIFEN (siConsRUC)
+- [x] **CLIE-01**: Usuario puede crear cliente con CI/RUC o como innominado
+- [x] **CLIE-02**: Usuario puede buscar cliente por nombre/RUC/CI con autocompletado
+- [x] **CLIE-03**: Sistema puede validar RUC del cliente contra SIFEN (siConsRUC)
 
 ### Comercio
 
@@ -104,12 +104,12 @@ Requirements for initial release. Each maps to roadmap phases.
 | FACT-06 | Phase 2 - SIFEN Integration | Complete |
 | KUDE-01 | Phase 4 - Events & KuDE | Complete |
 | KUDE-02 | Phase 4 - Events & KuDE | Complete |
-| PROD-01 | Phase 5 - Productos & Clientes | Pending |
-| PROD-02 | Phase 5 - Productos & Clientes | Pending |
-| PROD-03 | Phase 5 - Productos & Clientes | Pending |
-| CLIE-01 | Phase 5 - Productos & Clientes | Pending |
-| CLIE-02 | Phase 5 - Productos & Clientes | Pending |
-| CLIE-03 | Phase 5 - Productos & Clientes | Pending |
+| PROD-01 | Phase 5 - Productos & Clientes | Complete |
+| PROD-02 | Phase 5 - Productos & Clientes | Complete |
+| PROD-03 | Phase 5 - Productos & Clientes | Complete |
+| CLIE-01 | Phase 5 - Productos & Clientes | Complete |
+| CLIE-02 | Phase 5 - Productos & Clientes | Complete |
+| CLIE-03 | Phase 5 - Productos & Clientes | Complete |
 | COME-01 | Phase 6 - Comercio & Auth | Pending |
 | COME-02 | Phase 6 - Comercio & Auth | Pending |
 | COME-03 | Phase 6 - Comercio & Auth | Pending |
@@ -130,4 +130,4 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-08 after Phase 4 completion*
+*Last updated: 2026-02-08 after Phase 5 completion*

@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: SIFEN Integration** - XML generation, signature, SOAP communication
 - [x] **Phase 3: Sync & Queue** - Offline processing with backoff, FIFO queue
 - [x] **Phase 4: Events & KuDE** - Cancelation, inutilization, PDF generation
-- [ ] **Phase 5: Productos & Clientes** - CRUD use cases, validation, search
+- [x] **Phase 5: Productos & Clientes** - CRUD use cases, validation, search
 - [ ] **Phase 6: Comercio & Auth** - Setup, certificate management, JWT + PIN
 - [ ] **Phase 7: API REST** - Express routes, Zod validation, endpoints
 - [ ] **Phase 8: Infrastructure Testing** - Docker Compose, integration, e2e tests
@@ -105,8 +105,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Producto domain entity + IProductoRepository + CRUD use cases (TDD)
-- [ ] 05-02-PLAN.md — Cliente CRUD use cases + ConsultarRUC + code cleanup (TDD)
+- [x] 05-01-PLAN.md — Producto domain entity + IProductoRepository + CRUD use cases (TDD)
+- [x] 05-02-PLAN.md — Cliente CRUD use cases + ConsultarRUC + code cleanup (TDD)
 
 ### Phase 6: Comercio & Auth
 **Goal**: Implement comercio setup, certificate management, and JWT + PIN authentication
@@ -202,7 +202,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. SIFEN Integration | 3/3 | Complete | 2026-02-08 |
 | 3. Sync & Queue | 2/2 | Complete | 2026-02-08 |
 | 4. Events & KuDE | 2/2 | Complete | 2026-02-08 |
-| 5. Productos & Clientes | 0/TBD | Not started | - |
+| 5. Productos & Clientes | 2/2 | Complete | 2026-02-08 |
 | 6. Comercio & Auth | 0/TBD | Not started | - |
 | 7. API REST | 0/TBD | Not started | - |
 | 8. Infrastructure Testing | 0/TBD | Not started | - |
