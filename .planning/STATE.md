@@ -9,18 +9,18 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 
 ## Current Position
 
-Phase: 7 of 10 (API REST) — COMPLETE
-Plan: 4 of 4 (all plans complete)
-Last activity: 2026-02-08 — Phase 7 complete (API REST)
+Phase: 8 of 10 (Infrastructure Testing) — IN PROGRESS
+Plan: 1 of 4 (plan 08-01 complete)
+Last activity: 2026-02-08 — Completed 08-01-PLAN.md (Prisma ORM + Docker)
 
-Progress: [███████░░░] 70%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
-- Average duration: 9.8 min
-- Total execution time: 3.11 hours
+- Total plans completed: 20
+- Average duration: 9.4 min
+- Total execution time: 3.20 hours
 
 **By Phase:**
 
@@ -33,15 +33,17 @@ Progress: [███████░░░] 70%
 | 05-productos-clientes | 2/2 | 14 min | 7.0 min | Complete |
 | 06-comercio-auth | 2/2 | 28 min | 14.0 min | Complete |
 | 07-api-rest | 4/4 | 23 min | 5.8 min | Complete ✅ |
+| 08-infrastructure-testing | 1/4 | 6 min | 6.0 min | In Progress |
 
 **Recent Trend:**
-- Last 5 plans: 07-01 (3min), 07-02 (4min), 07-03 (7min), 07-04 (9min)
-- Trend: Phase 7 completed in 23 min total - HTTP layer faster than business logic
+- Last 5 plans: 07-02 (4min), 07-03 (7min), 07-04 (9min), 08-01 (6min)
+- Trend: Infrastructure setup faster than expected - Prisma schema straightforward
 
 **Test Coverage:**
-- Total tests: 359 (139 domain + 123 application + 75 sifen + 22 queue/logging/kude)
+- Total tests: 371 (139 domain + 123 application + 75 sifen + 34 queue/logging/kude/http)
 - All passing, zero regressions
-- No new tests in Phase 7 (HTTP layer tests come in Phase 9 - e2e)
+- Phase 7 added 12 HTTP route tests
+- Phase 8-01: No new tests (infrastructure setup only)
 
 *Updated after each plan completion*
 
@@ -108,6 +110,12 @@ Recent decisions affecting current work:
 - 07-03: comercioId from JWT (Good) — Always extract from req.user.comercioId to prevent users modifying other comercios' data
 - 07-03: Specific routes before /:id (Good) — /buscar and /ruc defined before /:id prevents Express matching "buscar" as id param
 - 07-03: Spread operators for optional params (Good) — `...(query.page !== undefined && { page: query.page })` satisfies exactOptionalPropertyTypes
+- 08-01: Prisma ORM over TypeORM (Good) — Type-safe queries, automatic migrations, better TypeScript support
+- 08-01: BigInt for monetary fields (Good) — PYG has no decimals, JavaScript Number unsafe for large integers
+- 08-01: Snapshot productos in FacturaDetalle (Good) — Product prices can change, invoice details immutable
+- 08-01: Cascade delete on Comercio (Good) — All entities belong to Comercio, delete together
+- 08-01: Restrict delete on Cliente (Good) — Cannot delete cliente if facturas exist (audit trail)
+- 08-01: Multi-stage Docker build (Good) — Smaller production image, faster builds with layer caching
 
 ### Pending Todos
 
@@ -115,12 +123,8 @@ None yet.
 
 ### Blockers/Concerns
 
-**Phase 6-7 - Auth Infrastructure:**
-- Need to implement IAuthService (JWT with jsonwebtoken)
-- Need to implement IHashService (bcrypt for PIN hashing)
-- Need to implement IUsuarioRepository (PostgreSQL adapter)
-
 **Phase 8 - Infrastructure Testing:**
+- ⚠️ Docker build not tested (Docker unavailable in WSL environment)
 - Mock SIFEN responses required until certificate obtained
 - CCFE certificate not available yet (homologation pending)
 - Need timbrado de prueba from Marangatú for full testing
@@ -128,5 +132,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Phase 7 complete, ready for Phase 8 (Infrastructure Testing)
+Stopped at: Completed 08-01-PLAN.md (Prisma ORM + Docker infrastructure)
 Resume file: None
+Next: 08-02 (Repository implementations with Prisma)
