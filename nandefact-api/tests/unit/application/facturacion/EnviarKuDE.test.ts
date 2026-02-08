@@ -99,6 +99,7 @@ describe('EnviarKuDE', () => {
       new ItemFactura({ descripcion: 'Producto A', cantidad: 2, precioUnitario: 10000, tasaIVA: 10 })
     );
     factura.generarCDC(ruc, comercio.tipoContribuyente);
+    factura.marcarEnviada();
     factura.marcarAprobada();
 
     // Default mocks return values
@@ -221,6 +222,7 @@ describe('EnviarKuDE', () => {
       facturaSinCdc.agregarItem(
         new ItemFactura({ descripcion: 'Test', cantidad: 1, precioUnitario: 10000, tasaIVA: 10 })
       );
+      facturaSinCdc.marcarEnviada();
       facturaSinCdc.marcarAprobada(); // Aprobada pero sin CDC (caso edge)
 
       vi.mocked(mockFacturaRepo.findById).mockResolvedValue(facturaSinCdc);

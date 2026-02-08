@@ -144,6 +144,7 @@ describe('EncolarFactura', () => {
   it('debería lanzar error cuando la factura no está en estado pendiente', async () => {
     // Arrange: Factura aprobada
     const factura = crearFacturaPendiente(facturaId, new Date('2024-01-15'));
+    factura.marcarEnviada();
     factura.marcarAprobada(); // Cambiar estado a aprobado
 
     vi.mocked(facturaRepository.findById).mockResolvedValue(factura);

@@ -92,6 +92,7 @@ describe('KudeGeneratorImpl', () => {
     );
 
     factura.generarCDC(ruc, comercio.tipoContribuyente);
+    factura.marcarEnviada();
     factura.marcarAprobada();
   });
 
@@ -198,6 +199,7 @@ describe('KudeGeneratorImpl', () => {
       );
 
       facturaMultiIVA.generarCDC(ruc, comercio.tipoContribuyente);
+      facturaMultiIVA.marcarEnviada();
       facturaMultiIVA.marcarAprobada();
 
       const result = await generator.generar(facturaMultiIVA, comercio, cliente);

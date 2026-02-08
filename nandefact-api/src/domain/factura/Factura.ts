@@ -11,6 +11,18 @@ import type { NumeroFactura } from './NumeroFactura.js';
 import type { Timbrado } from '../comercio/Timbrado.js';
 import type { RUC } from '../comercio/RUC.js';
 import { FacturaSinItemsError } from '../errors/FacturaSinItemsError.js';
+import { FacturaInmutableError } from '../errors/FacturaInmutableError.js';
+import { EstadoInconsistenteError } from '../errors/EstadoInconsistenteError.js';
+
+/** Transiciones de estado válidas para la factura */
+const TRANSICIONES_VALIDAS: Record<EstadoSifen, readonly EstadoSifen[]> = {
+  pendiente: ['enviado'],
+  enviado: ['aprobado', 'rechazado'],
+  aprobado: ['cancelado'],
+  rechazado: ['pendiente'],
+  cancelado: [],
+  contingencia: ['enviado'],
+};
 
 export interface FacturaProps {
   id: string;
@@ -154,33 +166,41 @@ export class Factura {
 
   /** Marca la factura como enviada a SIFEN */
   marcarEnviada(): void {
-    this.validarMutable();
+    this.validarTransicion('enviado');
     this._estado = 'enviado';
   }
 
   /** Marca la factura como aprobada por SIFEN (se vuelve inmutable) */
   marcarAprobada(): void {
+    this.validarTransicion('aprobado');
     this._estado = 'aprobado';
   }
 
   /** Marca la factura como rechazada por SIFEN */
   marcarRechazada(): void {
+    this.validarTransicion('rechazado');
     this._estado = 'rechazado';
   }
 
   /** Marca la factura como cancelada (después de evento cancelación aceptado por SIFEN) */
   marcarCancelada(): void {
-    if (this._estado !== 'aprobado') {
-      throw new Error('Solo se puede cancelar una factura aprobada');
-    }
+    this.validarTransicion('cancelado');
     this._estado = 'cancelado';
   }
 
   // --- Helpers privados ---
 
+  /** Valida que la transición de estado sea válida según la state machine */
+  private validarTransicion(destino: EstadoSifen): void {
+    const transicionesPermitidas = TRANSICIONES_VALIDAS[this._estado];
+    if (!transicionesPermitidas.includes(destino)) {
+      throw new EstadoInconsistenteError(this._estado, destino);
+    }
+  }
+
   private validarMutable(): void {
     if (this._estado === 'aprobado' || this._estado === 'cancelado') {
-      throw new Error('No se puede modificar una factura aprobada por SIFEN');
+      throw new FacturaInmutableError();
     }
   }
 }
