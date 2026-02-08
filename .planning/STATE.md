@@ -9,18 +9,18 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 
 ## Current Position
 
-Phase: 8 of 10 (Infrastructure Testing) — IN PROGRESS
-Plan: 4 of 4 (plan 08-04 complete)
-Last activity: 2026-02-08 — Completed 08-04-PLAN.md (E2E Tests + CI Infrastructure)
+Phase: 8 of 10 (Infrastructure Testing) — COMPLETE ✅
+Plan: 4 of 4 (all plans complete)
+Last activity: 2026-02-08 — Completed 08-03-PLAN.md (Integration Tests)
 
-Progress: [████████░░] 82.4%
+Progress: [████████░░] 85.3%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23
-- Average duration: 9.0 min
-- Total execution time: 3.44 hours
+- Total plans completed: 24
+- Average duration: 8.8 min
+- Total execution time: 3.54 hours
 
 **By Phase:**
 
@@ -33,18 +33,18 @@ Progress: [████████░░] 82.4%
 | 05-productos-clientes | 2/2 | 14 min | 7.0 min | Complete |
 | 06-comercio-auth | 2/2 | 28 min | 14.0 min | Complete |
 | 07-api-rest | 4/4 | 23 min | 5.8 min | Complete ✅ |
-| 08-infrastructure-testing | 4/4 | 21 min | 5.3 min | Complete ✅ |
+| 08-infrastructure-testing | 4/4 | 27 min | 6.8 min | Complete ✅ |
 
 **Recent Trend:**
-- Last 5 plans: 08-01 (6min), 08-02 (11min), 08-03 (~3min), 08-04 (4min)
-- Trend: Test infrastructure fast — mocking external services enables rapid E2E testing without external dependencies
+- Last 5 plans: 08-01 (6min), 08-02 (11min), 08-03 (6min), 08-04 (4min)
+- Trend: Test infrastructure complete — 80 integration tests + E2E tests ensure full system coverage
 
 **Test Coverage:**
-- Total tests: 371 (139 domain + 123 application + 75 sifen + 34 queue/logging/kude/http)
+- Total tests: 473 (393 unit + 80 integration)
 - All passing, zero regressions
-- Phase 7 added 12 HTTP route tests
-- Phase 8-01: No new tests (infrastructure setup only)
 - Phase 8-02: No new tests (adapters integrate existing tests)
+- Phase 8-03: 80 integration tests (repositories + auth services)
+- Phase 8-04: E2E tests with Docker Compose test environment
 
 *Updated after each plan completion*
 
@@ -123,6 +123,8 @@ Recent decisions affecting current work:
 - 08-02: bcrypt salt rounds = 10 (Good) — Balances security vs performance (~100ms hash time)
 - 08-02: JWT HS256 over RS256 (Good) — Symmetric key sufficient for our use case, simpler key management
 - 08-02: Graceful shutdown handlers (Good) — Disconnect Prisma on SIGTERM/SIGINT prevents orphaned connections
+- 08-03: JWT timestamp delay in tests (Good) — 1100ms delay ensures different iat claim (JWT uses seconds, not ms)
+- 08-03: Invalid token format in tests (Good) — Generate with wrong secret instead of malformed base64 for realistic validation path
 - 08-04: Mock SIFEN gateway in tests (Good) — Returns aprobado/0260 without CCFE certificate, enables E2E testing
 - 08-04: In-memory sync queue for tests (Good) — No Redis dependency in test suite, faster execution
 - 08-04: Isolated test infrastructure (Good) — PostgreSQL 5433, Redis 6380, separate Docker network prevents dev conflicts
@@ -146,6 +148,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 08-04-PLAN.md (E2E Tests + CI Infrastructure)
+Stopped at: Completed 08-03-PLAN.md (Integration Tests)
 Resume file: None
-Next: Phase 8 complete — ready for Phase 9 (SIFEN real integration)
+Next: Phase 8 complete ✅ — ready for Phase 9 (SIFEN real integration)
