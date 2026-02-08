@@ -153,11 +153,13 @@ Plans:
   3. E2E test completes full flow: create factura → sign XML → mock SIFEN response → update estado
   4. Tests clean up database state after each run (transactions or teardown)
   5. CI pipeline can run all tests in Docker environment
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01-PLAN.md — Prisma schema + database migrations + Dockerfile + Docker Compose API service
+- [ ] 08-02-PLAN.md — PostgreSQL repository adapters + AuthServiceJWT + HashServiceBcrypt + wire index.ts
+- [ ] 08-03-PLAN.md — Integration tests for repositories and auth against real PostgreSQL
+- [ ] 08-04-PLAN.md — E2E factura flow test + Docker Compose test config + CI script
 
 ### Phase 9: Android Shared KMP
 **Goal**: Implement shared business logic in Kotlin Multiplatform (domain, data, sync)
