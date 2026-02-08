@@ -2,7 +2,7 @@ import { Worker, type Job } from 'bullmq';
 import { SyncJob } from '../../domain/sync/SyncJob.js';
 import type { ProcesarColaSifen } from '../../application/sync/ProcesarColaSifen.js';
 import type { ILogger } from '../../domain/shared/ILogger.js';
-import { SyncQueueBullMQ } from './SyncQueueBullMQ.js';
+import { SyncQueueBullMQ, type SyncJobData } from './SyncQueueBullMQ.js';
 
 export interface SyncWorkerDeps {
   procesarColaSifen: ProcesarColaSifen;
@@ -24,9 +24,9 @@ export class SyncWorker {
   }
 
   start(): void {
-    this.worker = new Worker(
+    this.worker = new Worker<SyncJobData>(
       SyncQueueBullMQ.QUEUE_NAME,
-      async (job: Job) => {
+      async (job: Job<SyncJobData>) => {
         const syncJob = this.deserializeJob(job.data);
         this.deps.logger.info('Worker recibió job', {
           jobId: syncJob.id,
@@ -59,7 +59,7 @@ export class SyncWorker {
     );
 
     this.worker.on('completed', (job) => {
-      this.deps.logger.info('Job completado en queue', { jobId: job?.id });
+      this.deps.logger.info('Job completado en queue', { jobId: job.id });
     });
 
     this.worker.on('failed', (job, err) => {
@@ -72,17 +72,17 @@ export class SyncWorker {
     });
   }
 
-  private deserializeJob(data: Record<string, unknown>): SyncJob {
+  private deserializeJob(data: SyncJobData): SyncJob {
     return new SyncJob({
-      id: data.id as string,
-      comercioId: data.comercioId as string,
-      facturaId: data.facturaId as string,
-      cdc: data.cdc as string,
-      fechaEmision: new Date(data.fechaEmision as string),
-      intentos: data.intentos as number,
-      maxIntentos: data.maxIntentos as number,
-      ultimoError: (data.ultimoError as string) ?? undefined,
-      creadoEn: new Date(data.creadoEn as string),
+      id: data.id,
+      comercioId: data.comercioId,
+      facturaId: data.facturaId,
+      cdc: data.cdc,
+      fechaEmision: new Date(data.fechaEmision),
+      intentos: data.intentos,
+      maxIntentos: data.maxIntentos,
+      creadoEn: new Date(data.creadoEn),
+      ...(data.ultimoError !== undefined ? { ultimoError: data.ultimoError } : {}),
     });
   }
 

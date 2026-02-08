@@ -5,6 +5,7 @@ import type { IXmlGenerator } from '../../domain/factura/IXmlGenerator.js';
 import type { IComercioRepository } from '../../domain/comercio/IComercioRepository.js';
 import type { IClienteRepository } from '../../domain/cliente/IClienteRepository.js';
 import type { Factura } from '../../domain/factura/Factura.js';
+import { EnviarFacturaASifen } from '../../domain/factura/EnviarFacturaASifen.js';
 
 export interface SincronizarPendientesInput {
   comercioId: string;
@@ -31,6 +32,8 @@ export interface SincronizarPendientesOutput {
  * Continúa procesando aunque una factura falle, para maximizar la sincronización.
  */
 export class SincronizarPendientes {
+  private readonly enviarFacturaASifen: EnviarFacturaASifen;
+
   constructor(
     private readonly deps: {
       facturaRepository: IFacturaRepository;
@@ -40,7 +43,9 @@ export class SincronizarPendientes {
       firmaDigital: IFirmaDigital;
       sifenGateway: ISifenGateway;
     },
-  ) {}
+  ) {
+    this.enviarFacturaASifen = new EnviarFacturaASifen(deps);
+  }
 
   async execute(input: SincronizarPendientesInput): Promise<SincronizarPendientesOutput> {
     // 1. Cargar facturas pendientes
@@ -68,8 +73,8 @@ export class SincronizarPendientes {
 
     for (const factura of facturasOrdenadas) {
       try {
-        // Procesar factura individual (sign-send-update-save)
-        await this.procesarFactura(factura);
+        // Procesar factura individual via servicio de dominio
+        await this.enviarFacturaASifen.ejecutar(factura);
 
         // Registrar resultado exitoso
         if (!factura.cdc) {
@@ -113,51 +118,5 @@ export class SincronizarPendientes {
     return [...facturas].sort((a, b) => {
       return a.fechaEmision.getTime() - b.fechaEmision.getTime();
     });
-  }
-
-  /**
-   * Procesa una factura individual: carga datos → marca enviada → genera XML → firma → envía → actualiza estado → guarda.
-   * Mismo flujo que EnviarDE, pero centralizado aquí para sincronización.
-   */
-  private async procesarFactura(factura: Factura): Promise<void> {
-    // 1. Cargar comercio
-    const comercio = await this.deps.comercioRepository.findById(factura.comercioId);
-    if (!comercio) {
-      throw new Error(`Comercio no encontrado: ${factura.comercioId}`);
-    }
-
-    // 2. Cargar cliente
-    const cliente = await this.deps.clienteRepository.findById(factura.clienteId);
-    if (!cliente) {
-      throw new Error(`Cliente no encontrado: ${factura.clienteId}`);
-    }
-
-    // 3. Marcar como enviada (registra el intento)
-    factura.marcarEnviada();
-
-    // 4. Generar XML SIFEN completo
-    if (!factura.cdc) {
-      throw new Error(`Factura ${factura.id} no tiene CDC generado`);
-    }
-    const xml = await this.deps.xmlGenerator.generarXml(factura, comercio, cliente);
-
-    // 5. Firmar XML con certificado CCFE
-    const xmlFirmado = await this.deps.firmaDigital.firmar(xml);
-
-    // 6. Enviar a SIFEN
-    const response = await this.deps.sifenGateway.enviarDE(xmlFirmado);
-
-    // 7. Actualizar estado según respuesta SIFEN
-    // Códigos 0260 y 0261 = aprobado (con o sin observación)
-    // Cualquier otro código = rechazado
-    const esAprobado = response.codigo === '0260' || response.codigo === '0261';
-    if (esAprobado) {
-      factura.marcarAprobada();
-    } else {
-      factura.marcarRechazada();
-    }
-
-    // 8. Persistir factura con estado actualizado
-    await this.deps.facturaRepository.save(factura);
   }
 }

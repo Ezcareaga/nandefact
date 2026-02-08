@@ -1,6 +1,7 @@
 import type { IFacturaRepository } from '../../domain/factura/IFacturaRepository.js';
 import type { ISyncQueue } from '../../domain/sync/ISyncQueue.js';
 import { SyncJob } from '../../domain/sync/SyncJob.js';
+import { FacturaNoEncontradaError } from '../errors/FacturaNoEncontradaError.js';
 import { randomUUID } from 'node:crypto';
 
 export interface EncolarFacturaInput {
@@ -28,7 +29,7 @@ export class EncolarFactura {
     // 1. Cargar factura
     const factura = await this.deps.facturaRepository.findById(input.facturaId);
     if (!factura) {
-      throw new Error(`Factura no encontrada: ${input.facturaId}`);
+      throw new FacturaNoEncontradaError(input.facturaId);
     }
 
     // 2. Validar que tenga CDC generado
