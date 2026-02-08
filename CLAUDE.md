@@ -956,3 +956,12 @@ Después de completar cada fase de GSD (antes de merge a main):
 1. Invocar `/project:review` sobre el diff de la rama actual vs main
 2. Si el review reporta problemas, corregirlos ANTES de merge
 3. Solo hacer merge si el review pasa limpio
+
+
+### Regla de commits frecuentes
+- MÁXIMO 15 minutos de trabajo sin commit
+- Después de cada archivo nuevo o modificación significativa: commit
+- Después de que tests pasen: commit INMEDIATO
+- Si un plan tiene 5 subtareas, mínimo 5 commits (uno por subtarea)
+- NUNCA acumular más de 3 archivos sin commitear
+- Push a la rama remota después de cada 3 commits como mínimo
