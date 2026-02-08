@@ -85,11 +85,11 @@ Plans:
   3. System generates KuDE PDF with all mandatory fields (CDC, totales IVA, QR code)
   4. KuDE includes valid QR code with CDC + CSC hash and e-Kuatia URL
   5. INotificador port is implemented (interface ready for WhatsApp, no Meta API integration)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — SIFEN events: fix cancelation state mutation + proper XML, add inutilization use case
+- [ ] 04-02-PLAN.md — KuDE PDF generation with QR code + EnviarKuDE use case + NotificadorStub
 
 ### Phase 5: Productos & Clientes
 **Goal**: Implement CRUD use cases for products and clients with validation
@@ -201,7 +201,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Application Layer | 3/3 | Complete | 2026-02-07 |
 | 2. SIFEN Integration | 3/3 | Complete | 2026-02-08 |
 | 3. Sync & Queue | 2/2 | Complete | 2026-02-08 |
-| 4. Events & KuDE | 0/TBD | Not started | - |
+| 4. Events & KuDE | 0/2 | Not started | - |
 | 5. Productos & Clientes | 0/TBD | Not started | - |
 | 6. Comercio & Auth | 0/TBD | Not started | - |
 | 7. API REST | 0/TBD | Not started | - |
