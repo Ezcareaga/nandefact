@@ -42,8 +42,10 @@
     "vitest": "^2.1.0"
   },
   "dependencies": {
+    "bullmq": "^5.67.3",
     "facturacionelectronicapy-setapi": "^1.0.34",
     "facturacionelectronicapy-xmlgen": "^1.0.277",
-    "facturacionelectronicapy-xmlsign": "^1.0.28"
+    "facturacionelectronicapy-xmlsign": "^1.0.28",
+    "ioredis": "^5.9.2"
   }
 }
