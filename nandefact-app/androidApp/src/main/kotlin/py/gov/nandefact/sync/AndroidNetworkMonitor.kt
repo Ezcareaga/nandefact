@@ -8,7 +8,7 @@ import android.net.NetworkRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import py.gov.nandefact.shared.sync.NetworkMonitor
+import py.gov.nandefact.shared.domain.ports.NetworkMonitor
 
 /**
  * Monitorea conectividad de red usando ConnectivityManager.

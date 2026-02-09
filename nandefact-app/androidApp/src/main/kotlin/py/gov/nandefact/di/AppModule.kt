@@ -33,7 +33,7 @@ import py.gov.nandefact.shared.domain.usecase.LoginUseCase
 import py.gov.nandefact.shared.domain.usecase.SaveClienteUseCase
 import py.gov.nandefact.shared.domain.usecase.SaveProductoUseCase
 import py.gov.nandefact.shared.domain.usecase.SyncPendientesUseCase
-import py.gov.nandefact.shared.sync.NetworkMonitor
+import py.gov.nandefact.shared.domain.ports.NetworkMonitor
 import py.gov.nandefact.shared.sync.SyncManager
 import py.gov.nandefact.sync.AndroidNetworkMonitor
 import py.gov.nandefact.ui.clientes.ClientesViewModel
