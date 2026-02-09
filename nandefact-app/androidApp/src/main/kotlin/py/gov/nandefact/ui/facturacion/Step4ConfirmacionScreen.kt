@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import py.gov.nandefact.ui.components.NfAmountDisplay
 import py.gov.nandefact.ui.components.NfDeliveryButtons
-import py.gov.nandefact.ui.theme.NfSuccess
+import py.gov.nandefact.ui.theme.NfExtendedColors
 
 @Composable
 fun Step4ConfirmacionScreen(
@@ -50,7 +50,7 @@ fun Step4ConfirmacionScreen(
         Icon(
             imageVector = Icons.Filled.CheckCircle,
             contentDescription = null,
-            tint = NfSuccess,
+            tint = NfExtendedColors.success,
             modifier = Modifier.size(80.dp)
         )
 
@@ -109,7 +109,7 @@ fun Step4ConfirmacionScreen(
             )
         ) {
             Text(
-                text = "NUEVA VENTA",
+                text = "Nueva venta",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -124,7 +124,7 @@ fun Step4ConfirmacionScreen(
                 .height(48.dp),
             shape = MaterialTheme.shapes.medium
         ) {
-            Text("Volver al Inicio")
+            Text("Volver al inicio")
         }
 
         Spacer(modifier = Modifier.height(32.dp))

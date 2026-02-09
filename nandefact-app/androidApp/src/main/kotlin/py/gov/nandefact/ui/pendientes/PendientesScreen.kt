@@ -35,7 +35,7 @@ import py.gov.nandefact.ui.components.NfEmptyState
 import py.gov.nandefact.ui.components.NfStatusDot
 import py.gov.nandefact.ui.components.StatusColor
 import py.gov.nandefact.ui.components.formatPYG
-import py.gov.nandefact.ui.theme.NfWarning
+import py.gov.nandefact.ui.theme.NfExtendedColors
 
 @Composable
 fun PendientesScreen(
@@ -62,7 +62,7 @@ fun PendientesScreen(
             Text(
                 text = "${state.pendientes.size} facturas esperando conexión",
                 style = MaterialTheme.typography.titleMedium,
-                color = NfWarning,
+                color = NfExtendedColors.warning,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
@@ -156,7 +156,7 @@ fun PendientesScreen(
                     )
                 } else {
                     Icon(Icons.Filled.Sync, contentDescription = null)
-                    Text(" Sincronizar Ahora", fontWeight = FontWeight.Bold)
+                    Text(" Sincronizar ahora", fontWeight = FontWeight.Bold)
                 }
             }
         }

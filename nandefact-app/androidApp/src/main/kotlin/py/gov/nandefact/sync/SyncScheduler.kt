@@ -10,8 +10,8 @@ import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
 
 /**
- * Configura WorkManager para sincronizar facturas pendientes periodicamente.
- * Ejecuta cada 15 minutos cuando hay conexion a internet.
+ * Configura WorkManager para sincronizar facturas pendientes periódicamente.
+ * Ejecuta cada 15 minutos cuando hay conexión a internet.
  */
 object SyncScheduler {
     private const val SYNC_WORK_NAME = "nandefact_sync_pendientes"

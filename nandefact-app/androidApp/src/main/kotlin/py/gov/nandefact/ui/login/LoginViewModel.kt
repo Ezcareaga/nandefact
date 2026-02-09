@@ -23,7 +23,7 @@ class LoginViewModel(
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     fun onPhoneChange(phone: String) {
-        // Solo digitos, maximo 10 (numero paraguayo sin codigo pais)
+        // Solo dígitos, máximo 10 (número paraguayo sin código país)
         val cleaned = phone.filter { it.isDigit() }.take(10)
         _uiState.value = _uiState.value.copy(phone = cleaned, error = null)
     }
@@ -35,11 +35,11 @@ class LoginViewModel(
     fun onLogin() {
         val state = _uiState.value
         if (state.phone.length < 9) {
-            _uiState.value = state.copy(error = "Numero de telefono invalido")
+            _uiState.value = state.copy(error = "Número de teléfono inválido")
             return
         }
         if (state.pin.length < 4) {
-            _uiState.value = state.copy(error = "PIN debe tener al menos 4 digitos")
+            _uiState.value = state.copy(error = "PIN debe tener al menos 4 dígitos")
             return
         }
 
@@ -54,7 +54,7 @@ class LoginViewModel(
                 onFailure = { e ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = e.message ?: "Error de autenticacion"
+                        error = e.message ?: "Error de autenticación"
                     )
                 }
             )

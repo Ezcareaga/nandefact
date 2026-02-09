@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfStatusDot
-import py.gov.nandefact.ui.theme.NfSuccess
+import py.gov.nandefact.ui.theme.NfExtendedColors
 
 @Composable
 fun ConfigScreen(
@@ -102,7 +102,7 @@ fun ConfigScreen(
             Icon(
                 imageVector = Icons.Filled.CloudDone,
                 contentDescription = null,
-                tint = NfSuccess
+                tint = NfExtendedColors.success
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -134,15 +134,15 @@ fun ConfigScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             // Lista de usuarios mock
-            EquipoMember(nombre = "Maria Rodriguez", rol = "Duena")
+            EquipoMember(nombre = "María Rodríguez", rol = "Dueña")
             Spacer(modifier = Modifier.height(8.dp))
-            EquipoMember(nombre = "Carlos Gomez", rol = "Empleado")
+            EquipoMember(nombre = "Carlos Gómez", rol = "Empleado")
             Spacer(modifier = Modifier.height(8.dp))
-            EquipoMember(nombre = "Ana Martinez", rol = "Empleado")
+            EquipoMember(nombre = "Ana Martínez", rol = "Empleado")
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Boton agregar vendedor (visible solo para rol dueno)
+            // Botón agregar vendedor (visible solo para rol dueño)
             Button(
                 onClick = { /* TODO: Agregar vendedor */ },
                 modifier = Modifier.fillMaxWidth(),

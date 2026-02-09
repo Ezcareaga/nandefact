@@ -1,5 +1,11 @@
 package py.gov.nandefact.shared.domain.usecase
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
+import py.gov.nandefact.shared.domain.model.PeriodFilter
 import py.gov.nandefact.shared.domain.ports.AuthPort
 import py.gov.nandefact.shared.domain.ports.FacturaPort
 
@@ -22,20 +28,25 @@ class GetReportesUseCase(
     private val facturas: FacturaPort,
     private val auth: AuthPort
 ) {
-    suspend operator fun invoke(): ReportesData {
+    suspend operator fun invoke(period: PeriodFilter = PeriodFilter.TODO): ReportesData {
         val comercioId = auth.getComercioId()
             ?: return ReportesData(0, 0, 0, 0, 0, emptyList())
 
         val allFacturas = facturas.getAll(comercioId)
 
-        val totalVentas = allFacturas.sumOf { it.totalBruto }
-        val totalIva10 = allFacturas.sumOf { it.totalIva10 }
-        val totalIva5 = allFacturas.sumOf { it.totalIva5 }
-        val totalExenta = allFacturas.sumOf { it.totalExenta }
+        // Filtrar por periodo usando createdAt (formato ISO: "YYYY-MM-DDThh:mm:ss")
+        val cutoff = calculateCutoff(period)
+        val filtered = if (cutoff.isEmpty()) allFacturas
+            else allFacturas.filter { it.createdAt >= cutoff }
+
+        val totalVentas = filtered.sumOf { it.totalBruto }
+        val totalIva10 = filtered.sumOf { it.totalIva10 }
+        val totalIva5 = filtered.sumOf { it.totalIva5 }
+        val totalExenta = filtered.sumOf { it.totalExenta }
 
         // Top productos por detalles
         val productoCounts = mutableMapOf<String, Pair<Int, Long>>()
-        allFacturas.forEach { factura ->
+        filtered.forEach { factura ->
             val detalles = facturas.getDetalles(factura.id)
             detalles.forEach { detalle ->
                 val key = detalle.descripcion
@@ -49,16 +60,30 @@ class GetReportesUseCase(
 
         val topProductos = productoCounts.entries
             .sortedByDescending { it.value.second }
-            .take(5)
+            .take(10)
             .map { TopProductoData(it.key, it.value.first, it.value.second) }
 
         return ReportesData(
             totalVentas = totalVentas,
-            cantidadFacturas = allFacturas.size,
+            cantidadFacturas = filtered.size,
             totalIva10 = totalIva10,
             totalIva5 = totalIva5,
             totalExenta = totalExenta,
             topProductos = topProductos
         )
+    }
+
+    private fun calculateCutoff(period: PeriodFilter): String {
+        if (period == PeriodFilter.TODO) return ""
+        // Obtener fecha actual del sistema como ISO string para comparación
+        val now = Clock.System.now()
+        val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val cutoffDate = when (period) {
+            PeriodFilter.HOY -> today
+            PeriodFilter.SEMANA -> today.minus(DatePeriod(days = 7))
+            PeriodFilter.MES -> today.minus(DatePeriod(months = 1))
+            PeriodFilter.TODO -> today // No alcanzado, cubierto arriba
+        }
+        return "${cutoffDate}T00:00:00"
     }
 }

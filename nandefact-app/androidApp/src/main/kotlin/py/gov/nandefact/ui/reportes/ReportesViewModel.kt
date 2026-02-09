@@ -6,9 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import py.gov.nandefact.shared.domain.model.PeriodFilter
 import py.gov.nandefact.shared.domain.usecase.GetReportesUseCase
-
-enum class PeriodFilter { HOY, SEMANA, MES, TODO }
 
 data class TopProducto(
     val nombre: String,
@@ -39,7 +38,8 @@ class ReportesViewModel(
 
     private fun loadReportes() {
         viewModelScope.launch {
-            val data = getReportes()
+            val period = _uiState.value.period
+            val data = getReportes(period)
             val topProductos = data.topProductos.map {
                 TopProducto(it.nombre, it.cantidad, it.total)
             }

@@ -22,7 +22,7 @@ import py.gov.nandefact.ui.productos.ProductosListScreen
 import py.gov.nandefact.ui.reportes.ReportesScreen
 import androidx.compose.runtime.collectAsState
 import org.koin.compose.koinInject
-import py.gov.nandefact.shared.sync.NetworkMonitor
+import py.gov.nandefact.shared.domain.ports.NetworkMonitor
 import py.gov.nandefact.ui.theme.NandefactTheme
 
 @Composable
@@ -85,7 +85,8 @@ fun NfNavHost() {
                         onNavigateReportes = { navController.navigate(Routes.Reportes.route) },
                         onNavigateProductos = { navController.navigate(Routes.Productos.route) },
                         onNavigateClientes = { navController.navigate(Routes.Clientes.route) },
-                        onNavigatePendientes = { navController.navigate(Routes.Pendientes.route) }
+                        onNavigatePendientes = { navController.navigate(Routes.Pendientes.route) },
+                        onNavigateHistorial = navigateHistorial
                     )
                 }
             }

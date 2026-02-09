@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,8 +37,7 @@ import py.gov.nandefact.ui.components.NfHeroCard
 import py.gov.nandefact.ui.components.NfStatusDot
 import py.gov.nandefact.ui.components.StatusColor
 import py.gov.nandefact.ui.components.formatPYG
-import py.gov.nandefact.ui.theme.NfWarning
-import py.gov.nandefact.ui.theme.NfWarningContainer
+import py.gov.nandefact.ui.theme.NfExtendedColors
 
 @Composable
 fun HomeScreen(
@@ -47,6 +47,7 @@ fun HomeScreen(
     onNavigateProductos: () -> Unit,
     onNavigateClientes: () -> Unit,
     onNavigatePendientes: () -> Unit,
+    onNavigateHistorial: () -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -113,8 +114,8 @@ fun HomeScreen(
             // Card Pendientes — estilo especial
             NfCard(
                 modifier = Modifier.weight(1f),
-                borderColor = NfWarning,
-                backgroundColor = NfWarningContainer,
+                borderColor = NfExtendedColors.warning,
+                backgroundColor = NfExtendedColors.warningContainer,
                 onClick = onNavigatePendientes
             ) {
                 Row(
@@ -125,7 +126,7 @@ fun HomeScreen(
                     Text(
                         text = "(${state.pendingCount})",
                         style = MaterialTheme.typography.titleMedium,
-                        color = NfWarning,
+                        color = NfExtendedColors.warning,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -160,6 +161,17 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+
+            TextButton(
+                onClick = onNavigateHistorial,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(
+                    text = "Ver historial completo →",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
 

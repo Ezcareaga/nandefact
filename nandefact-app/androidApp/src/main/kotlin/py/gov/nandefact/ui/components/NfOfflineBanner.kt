@@ -15,8 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import py.gov.nandefact.ui.theme.NfWarning
-import py.gov.nandefact.ui.theme.NfWarningContainer
+import py.gov.nandefact.ui.theme.NfExtendedColors
 
 @Composable
 fun NfOfflineBanner(
@@ -25,20 +24,20 @@ fun NfOfflineBanner(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(NfWarningContainer)
+            .background(NfExtendedColors.warningContainer)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Filled.WifiOff,
             contentDescription = null,
-            tint = NfWarning,
+            tint = NfExtendedColors.warning,
             modifier = Modifier.padding(end = 8.dp)
         )
         Text(
             text = "Sin conexión — las facturas se guardan localmente",
             style = MaterialTheme.typography.bodySmall,
-            color = NfWarning
+            color = NfExtendedColors.warning
         )
     }
 }

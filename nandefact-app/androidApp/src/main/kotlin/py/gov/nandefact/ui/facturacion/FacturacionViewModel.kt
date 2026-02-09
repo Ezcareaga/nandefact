@@ -48,7 +48,7 @@ data class FacturacionUiState(
     val facturaNumero: String = "",
     val whatsAppAutoSent: Boolean = false,
     val isLoadingProducts: Boolean = true,
-    // Paginacion
+    // Paginación
     val page: Int = 1,
     val hasMore: Boolean = false
 ) {
@@ -294,6 +294,6 @@ private fun sampleProductos(): List<ProductoItem> = listOf(
     ProductoItem("6", "Aceite", "litro", 18_000, 10),
     ProductoItem("7", "Fideos", "unidad", 4_500, 10),
     ProductoItem("8", "Yerba Mate", "kg", 25_000, 10),
-    ProductoItem("9", "Azucar", "kg", 5_500, 10),
+    ProductoItem("9", "Azúcar", "kg", 5_500, 10),
     ProductoItem("10", "Sal", "kg", 3_000, 10)
 )
