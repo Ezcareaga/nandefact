@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +47,7 @@ fun HomeScreen(
     onNavigateProductos: () -> Unit,
     onNavigateClientes: () -> Unit,
     onNavigatePendientes: () -> Unit,
+    onNavigateHistorial: () -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -159,6 +161,17 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+
+            TextButton(
+                onClick = onNavigateHistorial,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(
+                    text = "Ver historial completo →",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
 
