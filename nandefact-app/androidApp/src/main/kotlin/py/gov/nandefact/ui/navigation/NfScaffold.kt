@@ -43,6 +43,7 @@ fun NfScaffold(
     onNavigateHome: () -> Unit,
     onNavigateBack: (() -> Unit)?,
     onNavigateConfig: () -> Unit,
+    onNavigateHistorial: () -> Unit = {},
     onLogout: () -> Unit,
     isOnlineFlow: StateFlow<Boolean>? = null,
     content: @Composable (PaddingValues) -> Unit
@@ -63,6 +64,10 @@ fun NfScaffold(
                 onNavigateConfig = {
                     scope.launch { drawerState.close() }
                     onNavigateConfig()
+                },
+                onNavigateHistorial = {
+                    scope.launch { drawerState.close() }
+                    onNavigateHistorial()
                 },
                 onLogout = {
                     scope.launch { drawerState.close() }

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Receipt
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +31,7 @@ fun NfDrawerMenu(
     isDarkTheme: Boolean,
     onToggleTheme: () -> Unit,
     onNavigateConfig: () -> Unit,
+    onNavigateHistorial: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -80,6 +82,15 @@ fun NfDrawerMenu(
                 label = { Text("Configuración SIFEN") },
                 selected = false,
                 onClick = onNavigateConfig,
+                colors = drawerColors,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+
+            NavigationDrawerItem(
+                icon = { Icon(Icons.Outlined.Receipt, contentDescription = null) },
+                label = { Text("Historial de ventas") },
+                selected = false,
+                onClick = onNavigateHistorial,
                 colors = drawerColors,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
