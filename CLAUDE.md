@@ -899,6 +899,7 @@ const xmlCancel = await xmlgen.generateXMLEventoCancelacion(id, params, data);
 | `SIFEN_REFERENCIA_COMPLETA.md` | Referencia técnica SIFEN detallada (630 líneas) |
 | `docker-compose.yml` | PostgreSQL + Redis + app |
 | `prisma/schema.prisma` | Schema base de datos |
+| `UI_SPEC_NANDEFACT.md` | Spec completa UI/UX frontend (pantallas, paleta, flujos, decisiones) |
 
 ### Comandos útiles
 ```bash
