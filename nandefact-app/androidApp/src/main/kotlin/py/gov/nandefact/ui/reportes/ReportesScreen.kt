@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
+import py.gov.nandefact.shared.domain.model.PeriodFilter
 import py.gov.nandefact.ui.components.NfAmountDisplay
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.formatPYG
