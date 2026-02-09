@@ -1,9 +1,14 @@
 package py.gov.nandefact.ui.productos
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import py.gov.nandefact.shared.domain.usecase.GetProductosUseCase
+import py.gov.nandefact.shared.domain.usecase.ProductoInput
+import py.gov.nandefact.shared.domain.usecase.SaveProductoUseCase
 
 data class ProductoUi(
     val id: String,
@@ -15,9 +20,12 @@ data class ProductoUi(
 )
 
 data class ProductosUiState(
-    val productos: List<ProductoUi> = sampleProductos(),
+    val productos: List<ProductoUi> = emptyList(),
     val searchQuery: String = "",
-    val isLoading: Boolean = false
+    val isLoading: Boolean = true,
+    // Paginacion
+    val page: Int = 1,
+    val hasMore: Boolean = false
 ) {
     val productosFiltrados: List<ProductoUi>
         get() = if (searchQuery.isBlank()) productos
@@ -38,19 +46,67 @@ data class ProductoFormState(
     val isSaving: Boolean = false
 )
 
-class ProductosViewModel : ViewModel() {
+class ProductosViewModel(
+    private val getProductos: GetProductosUseCase,
+    private val saveProducto: SaveProductoUseCase
+) : ViewModel() {
     private val _listState = MutableStateFlow(ProductosUiState())
     val listState: StateFlow<ProductosUiState> = _listState.asStateFlow()
 
     private val _formState = MutableStateFlow(ProductoFormState())
     val formState: StateFlow<ProductoFormState> = _formState.asStateFlow()
 
+    private var allProductos: List<ProductoUi> = emptyList()
+    private val pageSize = 20
+
+    init {
+        loadProductos()
+    }
+
+    private fun loadProductos() {
+        viewModelScope.launch {
+            val productos = getProductos()
+            allProductos = productos.map { p ->
+                ProductoUi(
+                    id = p.id,
+                    nombre = p.nombre,
+                    precioUnitario = p.precioUnitario,
+                    unidadMedida = p.unidadMedida,
+                    tasaIva = p.tasaIva,
+                    categoria = p.categoria ?: ""
+                )
+            }
+            if (allProductos.isEmpty()) {
+                allProductos = sampleProductos()
+            }
+            val firstPage = allProductos.take(pageSize)
+            _listState.value = _listState.value.copy(
+                productos = firstPage,
+                isLoading = false,
+                page = 1,
+                hasMore = allProductos.size > pageSize
+            )
+        }
+    }
+
+    fun loadMore() {
+        val state = _listState.value
+        if (!state.hasMore) return
+        val nextPage = state.page + 1
+        val endIndex = nextPage * pageSize
+        _listState.value = state.copy(
+            productos = allProductos.take(endIndex),
+            page = nextPage,
+            hasMore = endIndex < allProductos.size
+        )
+    }
+
     fun onSearchChange(query: String) {
         _listState.value = _listState.value.copy(searchQuery = query)
     }
 
     fun loadProductoForEdit(id: String) {
-        val producto = _listState.value.productos.find { it.id == id } ?: return
+        val producto = allProductos.find { it.id == id } ?: return
         _formState.value = ProductoFormState(
             id = producto.id,
             nombre = producto.nombre,
@@ -87,8 +143,25 @@ class ProductosViewModel : ViewModel() {
     }
 
     fun onSave() {
-        // TODO: Conectar con repositorio real
         _formState.value = _formState.value.copy(isSaving = true)
+        val form = _formState.value
+
+        viewModelScope.launch {
+            val result = saveProducto(
+                ProductoInput(
+                    id = form.id,
+                    nombre = form.nombre,
+                    precioUnitario = form.precioUnitario.toLongOrNull() ?: 0,
+                    unidadMedida = form.unidadMedida,
+                    tasaIva = form.tasaIva,
+                    categoria = form.categoria.ifBlank { null }
+                )
+            )
+            _formState.value = _formState.value.copy(isSaving = false)
+            if (result.isSuccess) {
+                loadProductos()
+            }
+        }
     }
 }
 
