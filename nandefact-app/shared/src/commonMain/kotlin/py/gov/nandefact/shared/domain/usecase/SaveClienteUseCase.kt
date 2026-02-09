@@ -1,7 +1,7 @@
 package py.gov.nandefact.shared.domain.usecase
 
 import py.gov.nandefact.shared.data.remote.ClienteApi
-import py.gov.nandefact.shared.data.remote.ClienteDto
+import py.gov.nandefact.shared.data.remote.dto.ClienteDto
 import py.gov.nandefact.shared.data.repository.AuthRepository
 
 data class ClienteInput(
