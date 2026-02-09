@@ -1,5 +1,10 @@
 package py.gov.nandefact.shared.domain.usecase
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
 import py.gov.nandefact.shared.domain.model.PeriodFilter
 import py.gov.nandefact.shared.domain.ports.AuthPort
 import py.gov.nandefact.shared.domain.ports.FacturaPort
@@ -71,12 +76,12 @@ class GetReportesUseCase(
     private fun calculateCutoff(period: PeriodFilter): String {
         if (period == PeriodFilter.TODO) return ""
         // Obtener fecha actual del sistema como ISO string para comparación
-        val now = kotlinx.datetime.Clock.System.now()
-        val today = now.toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault()).date
+        val now = Clock.System.now()
+        val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
         val cutoffDate = when (period) {
             PeriodFilter.HOY -> today
-            PeriodFilter.SEMANA -> today.minus(kotlinx.datetime.DatePeriod(days = 7))
-            PeriodFilter.MES -> today.minus(kotlinx.datetime.DatePeriod(months = 1))
+            PeriodFilter.SEMANA -> today.minus(DatePeriod(days = 7))
+            PeriodFilter.MES -> today.minus(DatePeriod(months = 1))
             PeriodFilter.TODO -> today // No alcanzado, cubierto arriba
         }
         return "${cutoffDate}T00:00:00"
