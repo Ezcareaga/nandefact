@@ -6,6 +6,7 @@ import py.gov.nandefact.shared.domain.ItemFactura
 import py.gov.nandefact.shared.domain.MontoIVA
 import py.gov.nandefact.shared.domain.ports.AuthPort
 import py.gov.nandefact.shared.domain.ports.FacturaPort
+import py.gov.nandefact.shared.domain.util.generateUUID
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -108,11 +109,3 @@ class CrearFacturaLocalUseCase(
     }
 }
 
-// Generador UUID multiplataforma simple (sera reemplazado por expect/actual)
-private fun generateUUID(): String {
-    val chars = "0123456789abcdef"
-    val sections = listOf(8, 4, 4, 4, 12)
-    return sections.joinToString("-") { length ->
-        (1..length).map { chars.random() }.joinToString("")
-    }
-}
