@@ -1,0 +1,193 @@
+package py.gov.nandefact.ui.facturacion
+
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import py.gov.nandefact.ui.components.PaymentCondition
+
+// Producto de muestra
+data class ProductoItem(
+    val id: String,
+    val nombre: String,
+    val unidadMedida: String,
+    val precioUnitario: Long,
+    val tasaIva: Int, // 10, 5, o 0
+    val cantidad: Int = 0
+)
+
+// Cliente seleccionado
+data class ClienteSelection(
+    val id: String? = null,
+    val nombre: String = "",
+    val rucCi: String = "",
+    val tipoDocumento: String = "CI", // CI, RUC, innominado
+    val telefono: String = "",
+    val guardarCliente: Boolean = true,
+    val isInnominado: Boolean = false
+)
+
+data class FacturacionUiState(
+    val currentStep: Int = 0, // 0-3
+    val productos: List<ProductoItem> = sampleProductos(),
+    val searchQuery: String = "",
+    val cliente: ClienteSelection = ClienteSelection(),
+    val clienteSearchQuery: String = "",
+    val condicionPago: PaymentCondition = PaymentCondition.CONTADO,
+    val isGenerating: Boolean = false,
+    val isGenerated: Boolean = false,
+    val facturaNumero: String = "001-001-0000137",
+    val whatsAppAutoSent: Boolean = false
+) {
+    val productosSeleccionados: List<ProductoItem>
+        get() = productos.filter { it.cantidad > 0 }
+
+    val totalBruto: Long
+        get() = productosSeleccionados.sumOf { it.precioUnitario * it.cantidad }
+
+    val totalItems: Int
+        get() = productosSeleccionados.size
+
+    // Desglose IVA
+    val totalGravada10: Long
+        get() = productosSeleccionados.filter { it.tasaIva == 10 }
+            .sumOf { it.precioUnitario * it.cantidad }
+
+    val totalGravada5: Long
+        get() = productosSeleccionados.filter { it.tasaIva == 5 }
+            .sumOf { it.precioUnitario * it.cantidad }
+
+    val totalExenta: Long
+        get() = productosSeleccionados.filter { it.tasaIva == 0 }
+            .sumOf { it.precioUnitario * it.cantidad }
+
+    val iva10: Long
+        get() = totalGravada10 - (totalGravada10 * 100 / 110)
+
+    val iva5: Long
+        get() = totalGravada5 - (totalGravada5 * 100 / 105)
+
+    val productosFiltrados: List<ProductoItem>
+        get() {
+            val filtered = if (searchQuery.isBlank()) productos
+                else productos.filter {
+                    it.nombre.contains(searchQuery, ignoreCase = true)
+                }
+            // Productos con cantidad > 0 flotan al inicio
+            return filtered.sortedByDescending { it.cantidad }
+        }
+
+    val canAdvanceStep1: Boolean
+        get() = productosSeleccionados.isNotEmpty()
+}
+
+class FacturacionViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(FacturacionUiState())
+    val uiState: StateFlow<FacturacionUiState> = _uiState.asStateFlow()
+
+    fun onSearchQueryChange(query: String) {
+        _uiState.value = _uiState.value.copy(searchQuery = query)
+    }
+
+    fun onProductQuantityChange(productoId: String, newQty: Int) {
+        val updated = _uiState.value.productos.map {
+            if (it.id == productoId) it.copy(cantidad = maxOf(0, newQty)) else it
+        }
+        _uiState.value = _uiState.value.copy(productos = updated)
+    }
+
+    fun onProductTap(productoId: String) {
+        // Shortcut: toque simple = +1
+        val updated = _uiState.value.productos.map {
+            if (it.id == productoId) it.copy(cantidad = it.cantidad + 1) else it
+        }
+        _uiState.value = _uiState.value.copy(productos = updated)
+    }
+
+    fun nextStep() {
+        val current = _uiState.value.currentStep
+        if (current < 3) {
+            _uiState.value = _uiState.value.copy(currentStep = current + 1)
+        }
+    }
+
+    fun previousStep() {
+        val current = _uiState.value.currentStep
+        if (current > 0) {
+            _uiState.value = _uiState.value.copy(currentStep = current - 1)
+        }
+    }
+
+    fun onClienteSearchChange(query: String) {
+        _uiState.value = _uiState.value.copy(clienteSearchQuery = query)
+    }
+
+    fun onSelectInnominado() {
+        _uiState.value = _uiState.value.copy(
+            cliente = ClienteSelection(isInnominado = true, nombre = "Sin Nombre", tipoDocumento = "innominado")
+        )
+    }
+
+    fun onClienteNombreChange(nombre: String) {
+        _uiState.value = _uiState.value.copy(
+            cliente = _uiState.value.cliente.copy(nombre = nombre, isInnominado = false)
+        )
+    }
+
+    fun onClienteRucCiChange(rucCi: String) {
+        _uiState.value = _uiState.value.copy(
+            cliente = _uiState.value.cliente.copy(rucCi = rucCi)
+        )
+    }
+
+    fun onClienteTipoDocChange(tipo: String) {
+        _uiState.value = _uiState.value.copy(
+            cliente = _uiState.value.cliente.copy(tipoDocumento = tipo, isInnominado = false)
+        )
+    }
+
+    fun onClienteTelefonoChange(telefono: String) {
+        _uiState.value = _uiState.value.copy(
+            cliente = _uiState.value.cliente.copy(telefono = telefono)
+        )
+    }
+
+    fun onGuardarClienteToggle(guardar: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            cliente = _uiState.value.cliente.copy(guardarCliente = guardar)
+        )
+    }
+
+    fun onCondicionPagoChange(condicion: PaymentCondition) {
+        _uiState.value = _uiState.value.copy(condicionPago = condicion)
+    }
+
+    fun onGenerarFactura() {
+        _uiState.value = _uiState.value.copy(isGenerating = true)
+        // TODO: Generar CDC, XML, guardar SQLDelight
+        // Simular generación instantánea
+        _uiState.value = _uiState.value.copy(
+            isGenerating = false,
+            isGenerated = true,
+            currentStep = 3
+        )
+    }
+
+    fun resetWizard() {
+        _uiState.value = FacturacionUiState()
+    }
+}
+
+// Datos de muestra para desarrollo
+private fun sampleProductos(): List<ProductoItem> = listOf(
+    ProductoItem("1", "Mandioca", "kg", 5_000, 5),
+    ProductoItem("2", "Cebolla", "kg", 4_000, 5),
+    ProductoItem("3", "Banana", "docena", 15_000, 5),
+    ProductoItem("4", "Tomate", "kg", 8_000, 5),
+    ProductoItem("5", "Arroz", "kg", 6_500, 10),
+    ProductoItem("6", "Aceite", "litro", 18_000, 10),
+    ProductoItem("7", "Fideos", "unidad", 4_500, 10),
+    ProductoItem("8", "Yerba Mate", "kg", 25_000, 10),
+    ProductoItem("9", "Azúcar", "kg", 5_500, 10),
+    ProductoItem("10", "Sal", "kg", 3_000, 10)
+)

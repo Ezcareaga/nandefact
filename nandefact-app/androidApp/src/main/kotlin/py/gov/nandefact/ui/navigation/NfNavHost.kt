@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import py.gov.nandefact.ui.facturacion.FacturacionWizardScreen
 import py.gov.nandefact.ui.home.HomeScreen
 import py.gov.nandefact.ui.login.LoginScreen
 import py.gov.nandefact.ui.theme.NandefactTheme
@@ -64,11 +65,16 @@ fun NfNavHost() {
                 }
             }
 
-            // Facturación — full screen modal, sin scaffold (Plan 09-04)
+            // Facturación — full screen modal, sin scaffold
             composable(Routes.Facturacion.route) {
-                PlaceholderScreen(
-                    title = "Facturación",
-                    onBack = { navController.popBackStack() }
+                FacturacionWizardScreen(
+                    onClose = { navController.popBackStack() },
+                    onNuevaVenta = {
+                        // Reemplazar la pantalla actual con una nueva instancia
+                        navController.navigate(Routes.Facturacion.route) {
+                            popUpTo(Routes.Facturacion.route) { inclusive = true }
+                        }
+                    }
                 )
             }
 
