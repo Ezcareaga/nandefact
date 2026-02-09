@@ -1,6 +1,10 @@
 package py.gov.nandefact.ui.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,11 +23,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import py.gov.nandefact.ui.components.NfHomePill
+import py.gov.nandefact.ui.components.NfOfflineBanner
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,10 +44,12 @@ fun NfScaffold(
     onNavigateBack: (() -> Unit)?,
     onNavigateConfig: () -> Unit,
     onLogout: () -> Unit,
+    isOnlineFlow: StateFlow<Boolean>? = null,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val isOnline = isOnlineFlow?.collectAsState()?.value ?: true
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -63,40 +73,51 @@ fun NfScaffold(
     ) {
         Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    },
-                    navigationIcon = {
-                        if (!isHome && onNavigateBack != null) {
-                            IconButton(onClick = onNavigateBack) {
+                Column {
+                    CenterAlignedTopAppBar(
+                        title = {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        },
+                        navigationIcon = {
+                            if (!isHome && onNavigateBack != null) {
+                                IconButton(onClick = onNavigateBack) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Volver",
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = {
+                                scope.launch { drawerState.open() }
+                            }) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Volver",
+                                    imageVector = Icons.Filled.Menu,
+                                    contentDescription = "Menu",
                                     tint = MaterialTheme.colorScheme.onBackground
                                 )
                             }
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = {
-                            scope.launch { drawerState.open() }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = "Menú",
-                                tint = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background
+                        },
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.background
+                        )
                     )
-                )
+
+                    // Banner offline sticky debajo del toolbar
+                    AnimatedVisibility(
+                        visible = !isOnline,
+                        enter = expandVertically(),
+                        exit = shrinkVertically()
+                    ) {
+                        NfOfflineBanner()
+                    }
+                }
             },
             containerColor = MaterialTheme.colorScheme.background
         ) { paddingValues ->
