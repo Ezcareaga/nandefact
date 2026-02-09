@@ -1,9 +1,14 @@
 package py.gov.nandefact.ui.clientes
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import py.gov.nandefact.shared.domain.usecase.ClienteInput
+import py.gov.nandefact.shared.domain.usecase.GetClientesUseCase
+import py.gov.nandefact.shared.domain.usecase.SaveClienteUseCase
 
 data class ClienteUi(
     val id: String,
@@ -15,9 +20,12 @@ data class ClienteUi(
 )
 
 data class ClientesUiState(
-    val clientes: List<ClienteUi> = sampleClientes(),
+    val clientes: List<ClienteUi> = emptyList(),
     val searchQuery: String = "",
-    val isLoading: Boolean = false
+    val isLoading: Boolean = true,
+    // Paginacion
+    val page: Int = 1,
+    val hasMore: Boolean = false
 ) {
     val clientesFiltrados: List<ClienteUi>
         get() = if (searchQuery.isBlank()) clientes
@@ -39,19 +47,67 @@ data class ClienteFormState(
     val isSaving: Boolean = false
 )
 
-class ClientesViewModel : ViewModel() {
+class ClientesViewModel(
+    private val getClientes: GetClientesUseCase,
+    private val saveCliente: SaveClienteUseCase
+) : ViewModel() {
     private val _listState = MutableStateFlow(ClientesUiState())
     val listState: StateFlow<ClientesUiState> = _listState.asStateFlow()
 
     private val _formState = MutableStateFlow(ClienteFormState())
     val formState: StateFlow<ClienteFormState> = _formState.asStateFlow()
 
+    private var allClientes: List<ClienteUi> = emptyList()
+    private val pageSize = 20
+
+    init {
+        loadClientes()
+    }
+
+    private fun loadClientes() {
+        viewModelScope.launch {
+            val clientes = getClientes()
+            allClientes = clientes.map { c ->
+                ClienteUi(
+                    id = c.id,
+                    nombre = c.nombre,
+                    tipoDocumento = c.tipoDocumento,
+                    rucCi = c.rucCi ?: "",
+                    telefono = c.telefono ?: "",
+                    enviarWhatsApp = c.enviarWhatsApp
+                )
+            }
+            if (allClientes.isEmpty()) {
+                allClientes = sampleClientes()
+            }
+            val firstPage = allClientes.take(pageSize)
+            _listState.value = _listState.value.copy(
+                clientes = firstPage,
+                isLoading = false,
+                page = 1,
+                hasMore = allClientes.size > pageSize
+            )
+        }
+    }
+
+    fun loadMore() {
+        val state = _listState.value
+        if (!state.hasMore) return
+        val nextPage = state.page + 1
+        val endIndex = nextPage * pageSize
+        _listState.value = state.copy(
+            clientes = allClientes.take(endIndex),
+            page = nextPage,
+            hasMore = endIndex < allClientes.size
+        )
+    }
+
     fun onSearchChange(query: String) {
         _listState.value = _listState.value.copy(searchQuery = query)
     }
 
     fun loadClienteForEdit(id: String) {
-        val cliente = _listState.value.clientes.find { it.id == id } ?: return
+        val cliente = allClientes.find { it.id == id } ?: return
         _formState.value = ClienteFormState(
             id = cliente.id,
             nombre = cliente.nombre,
@@ -75,15 +131,33 @@ class ClientesViewModel : ViewModel() {
     fun onWhatsAppToggle(enabled: Boolean) { _formState.value = _formState.value.copy(enviarWhatsApp = enabled) }
 
     fun onSave() {
-        // TODO: Conectar con repositorio real
         _formState.value = _formState.value.copy(isSaving = true)
+        val form = _formState.value
+
+        viewModelScope.launch {
+            val result = saveCliente(
+                ClienteInput(
+                    id = form.id,
+                    nombre = form.nombre,
+                    tipoDocumento = form.tipoDocumento,
+                    rucCi = form.rucCi.ifBlank { null },
+                    telefono = form.telefono.ifBlank { null },
+                    email = form.email.ifBlank { null },
+                    enviarWhatsApp = form.enviarWhatsApp
+                )
+            )
+            _formState.value = _formState.value.copy(isSaving = false)
+            if (result.isSuccess) {
+                loadClientes()
+            }
+        }
     }
 }
 
 private fun sampleClientes(): List<ClienteUi> = listOf(
-    ClienteUi("1", "Juan Pérez", "CI", "4.567.890", "0981123456"),
-    ClienteUi("2", "María González", "RUC", "80012345-6", "0991654321"),
-    ClienteUi("3", "Carlos López", "CI", "3.456.789", "0971987654"),
-    ClienteUi("4", "Ana Martínez", "CI", "5.678.901", ""),
+    ClienteUi("1", "Juan Perez", "CI", "4.567.890", "0981123456"),
+    ClienteUi("2", "Maria Gonzalez", "RUC", "80012345-6", "0991654321"),
+    ClienteUi("3", "Carlos Lopez", "CI", "3.456.789", "0971987654"),
+    ClienteUi("4", "Ana Martinez", "CI", "5.678.901", ""),
     ClienteUi("5", "Empresa ABC S.A.", "RUC", "80098765-4", "021456789")
 )

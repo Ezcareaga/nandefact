@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -32,7 +35,8 @@ fun Step1ProductosScreen(
     onSearchChange: (String) -> Unit,
     onProductTap: (String) -> Unit,
     onQuantityChange: (String, Int) -> Unit,
-    onNext: () -> Unit
+    onNext: () -> Unit,
+    onLoadMore: () -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         // Search bar sticky
@@ -43,8 +47,24 @@ fun Step1ProductosScreen(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
-        // Lista de productos
+        // Lista de productos con paginacion
+        val listState = rememberLazyListState()
+
+        // Detectar scroll al final para cargar mas
+        LaunchedEffect(listState) {
+            snapshotFlow {
+                val layoutInfo = listState.layoutInfo
+                val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                lastVisible >= layoutInfo.totalItemsCount - 3
+            }.collect { nearEnd ->
+                if (nearEnd && state.hasMore) {
+                    onLoadMore()
+                }
+            }
+        }
+
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),

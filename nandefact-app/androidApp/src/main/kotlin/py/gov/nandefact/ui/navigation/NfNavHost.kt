@@ -20,12 +20,15 @@ import py.gov.nandefact.ui.pendientes.PendientesScreen
 import py.gov.nandefact.ui.productos.ProductoFormScreen
 import py.gov.nandefact.ui.productos.ProductosListScreen
 import py.gov.nandefact.ui.reportes.ReportesScreen
+import org.koin.compose.koinInject
+import py.gov.nandefact.shared.sync.NetworkMonitor
 import py.gov.nandefact.ui.theme.NandefactTheme
 
 @Composable
 fun NfNavHost() {
     val navController = rememberNavController()
     var isDarkTheme by rememberSaveable { mutableStateOf(true) }
+    val networkMonitor = koinInject<NetworkMonitor>()
 
     // TODO: Verificar token existente para decidir startDestination
     val startDestination = Routes.Login.route
@@ -68,7 +71,8 @@ fun NfNavHost() {
                     onNavigateHome = {},
                     onNavigateBack = null,
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = logout
+                    onLogout = logout,
+                    isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
                     HomeScreen(
                         paddingValues = paddingValues,
@@ -103,7 +107,8 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = logout
+                    onLogout = logout,
+                    isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
                     ProductosListScreen(
                         paddingValues = paddingValues,
@@ -127,7 +132,8 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = logout
+                    onLogout = logout,
+                    isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
                     ProductoFormScreen(paddingValues = paddingValues)
                 }
@@ -143,7 +149,8 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = logout
+                    onLogout = logout,
+                    isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
                     ClientesListScreen(
                         paddingValues = paddingValues,
@@ -167,7 +174,8 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = logout
+                    onLogout = logout,
+                    isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
                     ClienteFormScreen(paddingValues = paddingValues)
                 }
@@ -183,7 +191,8 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = logout
+                    onLogout = logout,
+                    isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
                     HistorialScreen(
                         paddingValues = paddingValues,
@@ -205,7 +214,8 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = logout
+                    onLogout = logout,
+                    isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
                     FacturaDetalleScreen(
                         paddingValues = paddingValues,
@@ -224,7 +234,8 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = logout
+                    onLogout = logout,
+                    isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
                     PendientesScreen(paddingValues = paddingValues)
                 }
@@ -240,7 +251,8 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = logout
+                    onLogout = logout,
+                    isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
                     ReportesScreen(paddingValues = paddingValues)
                 }
@@ -256,7 +268,8 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = {},
-                    onLogout = logout
+                    onLogout = logout,
+                    isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
                     ConfigScreen(paddingValues = paddingValues)
                 }

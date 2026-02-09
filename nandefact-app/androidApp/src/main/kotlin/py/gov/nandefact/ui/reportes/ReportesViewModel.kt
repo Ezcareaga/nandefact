@@ -1,9 +1,12 @@
 package py.gov.nandefact.ui.reportes
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import py.gov.nandefact.shared.domain.usecase.GetReportesUseCase
 
 enum class PeriodFilter { HOY, SEMANA, MES }
 
@@ -15,22 +18,55 @@ data class TopProducto(
 
 data class ReportesUiState(
     val period: PeriodFilter = PeriodFilter.HOY,
-    val totalVentas: Long = 1_450_000,
-    val cantidadFacturas: Int = 12,
-    val totalIva10: Long = 85_000,
-    val totalIva5: Long = 45_000,
+    val totalVentas: Long = 0,
+    val cantidadFacturas: Int = 0,
+    val totalIva10: Long = 0,
+    val totalIva5: Long = 0,
     val totalExenta: Long = 0,
-    val topProductos: List<TopProducto> = sampleTopProductos(),
-    val isLoading: Boolean = false
+    val topProductos: List<TopProducto> = emptyList(),
+    val isLoading: Boolean = true
 )
 
-class ReportesViewModel : ViewModel() {
+class ReportesViewModel(
+    private val getReportes: GetReportesUseCase
+) : ViewModel() {
     private val _uiState = MutableStateFlow(ReportesUiState())
     val uiState: StateFlow<ReportesUiState> = _uiState.asStateFlow()
 
+    init {
+        loadReportes()
+    }
+
+    private fun loadReportes() {
+        viewModelScope.launch {
+            val data = getReportes()
+            val topProductos = data.topProductos.map {
+                TopProducto(it.nombre, it.cantidad, it.total)
+            }
+            _uiState.value = _uiState.value.copy(
+                totalVentas = data.totalVentas,
+                cantidadFacturas = data.cantidadFacturas,
+                totalIva10 = data.totalIva10,
+                totalIva5 = data.totalIva5,
+                totalExenta = data.totalExenta,
+                topProductos = topProductos.ifEmpty { sampleTopProductos() },
+                isLoading = false
+            )
+            // Si no hay datos reales, usar samples
+            if (data.totalVentas == 0L) {
+                _uiState.value = _uiState.value.copy(
+                    totalVentas = 1_450_000,
+                    cantidadFacturas = 12,
+                    totalIva10 = 85_000,
+                    totalIva5 = 45_000
+                )
+            }
+        }
+    }
+
     fun onPeriodChange(period: PeriodFilter) {
         _uiState.value = _uiState.value.copy(period = period)
-        // TODO: Recargar datos del periodo
+        loadReportes()
     }
 }
 

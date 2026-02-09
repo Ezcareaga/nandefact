@@ -29,7 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfEmptyState
 import py.gov.nandefact.ui.components.NfStatusDot
@@ -40,7 +40,8 @@ import py.gov.nandefact.ui.theme.NfWarning
 @Composable
 fun PendientesScreen(
     paddingValues: PaddingValues,
-    viewModel: PendientesViewModel = viewModel()
+    onEditFactura: ((String) -> Unit)? = null,
+    viewModel: PendientesViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -94,7 +95,7 @@ fun PendientesScreen(
                                 )
                                 if (hasError) {
                                     Text(
-                                        text = pendiente.error!!,
+                                        text = pendiente.error ?: "",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.error
                                     )
@@ -118,8 +119,14 @@ fun PendientesScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 8.dp),
-                                horizontalArrangement = Arrangement.End
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
+                                if (onEditFactura != null) {
+                                    TextButton(onClick = { onEditFactura(pendiente.id) }) {
+                                        Text("Editar", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
+                                }
                                 TextButton(onClick = { viewModel.onRetry(pendiente.id) }) {
                                     Text("Reintentar", color = MaterialTheme.colorScheme.primary)
                                 }

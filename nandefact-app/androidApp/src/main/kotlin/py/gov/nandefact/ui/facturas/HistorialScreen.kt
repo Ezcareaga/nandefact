@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.FilterChip
@@ -18,13 +19,15 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfEmptyState
 import py.gov.nandefact.ui.components.NfSearchBar
@@ -36,9 +39,23 @@ import py.gov.nandefact.ui.components.formatPYG
 fun HistorialScreen(
     paddingValues: PaddingValues,
     onFacturaClick: (String) -> Unit,
-    viewModel: HistorialViewModel = viewModel()
+    viewModel: HistorialViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val listState = rememberLazyListState()
+
+    // Paginacion: cargar mas al llegar al final
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            val layoutInfo = listState.layoutInfo
+            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            lastVisible >= layoutInfo.totalItemsCount - 3
+        }.collect { nearEnd ->
+            if (nearEnd && state.hasMore) {
+                viewModel.loadMore()
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -83,10 +100,11 @@ fun HistorialScreen(
             NfEmptyState(
                 icon = Icons.Filled.Receipt,
                 title = "Sin facturas",
-                subtitle = "Las facturas generadas aparecerán aquí"
+                subtitle = "Las facturas generadas apareceran aqui"
             )
         } else {
             LazyColumn(
+                state = listState,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(state.facturasFiltradas, key = { it.id }) { factura ->

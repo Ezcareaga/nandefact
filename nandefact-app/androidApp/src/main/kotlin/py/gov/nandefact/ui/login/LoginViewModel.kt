@@ -1,9 +1,12 @@
 package py.gov.nandefact.ui.login
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import py.gov.nandefact.shared.domain.usecase.LoginUseCase
 
 data class LoginUiState(
     val phone: String = "",
@@ -13,12 +16,14 @@ data class LoginUiState(
     val isAuthenticated: Boolean = false
 )
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(
+    private val loginUseCase: LoginUseCase
+) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     fun onPhoneChange(phone: String) {
-        // Solo dígitos, máximo 10 (número paraguayo sin código país)
+        // Solo digitos, maximo 10 (numero paraguayo sin codigo pais)
         val cleaned = phone.filter { it.isDigit() }.take(10)
         _uiState.value = _uiState.value.copy(phone = cleaned, error = null)
     }
@@ -30,18 +35,29 @@ class LoginViewModel : ViewModel() {
     fun onLogin() {
         val state = _uiState.value
         if (state.phone.length < 9) {
-            _uiState.value = state.copy(error = "Número de teléfono inválido")
+            _uiState.value = state.copy(error = "Numero de telefono invalido")
             return
         }
         if (state.pin.length < 4) {
-            _uiState.value = state.copy(error = "PIN debe tener al menos 4 dígitos")
+            _uiState.value = state.copy(error = "PIN debe tener al menos 4 digitos")
             return
         }
 
-        // TODO: Conectar con AuthRepository real
         _uiState.value = state.copy(isLoading = true, error = null)
 
-        // Simular login exitoso por ahora
-        _uiState.value = state.copy(isLoading = false, isAuthenticated = true)
+        viewModelScope.launch {
+            val result = loginUseCase(state.phone, state.pin)
+            result.fold(
+                onSuccess = {
+                    _uiState.value = _uiState.value.copy(isLoading = false, isAuthenticated = true)
+                },
+                onFailure = { e ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = e.message ?: "Error de autenticacion"
+                    )
+                }
+            )
+        }
     }
 }

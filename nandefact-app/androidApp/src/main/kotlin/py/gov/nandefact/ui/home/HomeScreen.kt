@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import py.gov.nandefact.ui.components.NfAmountDisplay
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfHeroCard
@@ -47,7 +47,7 @@ fun HomeScreen(
     onNavigateProductos: () -> Unit,
     onNavigateClientes: () -> Unit,
     onNavigatePendientes: () -> Unit,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -72,7 +72,7 @@ fun HomeScreen(
 
         // Hero card — GENERAR FACTURA
         NfHeroCard(
-            text = "GENERAR\nFACTURA",
+            text = "GENERAR FACTURA",
             onClick = onNavigateFacturacion
         )
 
