@@ -4,19 +4,13 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Letra Ñ estilizada — ÑandeFact branding -->
+    <!-- N: trazo izquierdo + diagonal + trazo derecho como forma única -->
     <path
         android:fillColor="#7B9CFF"
-        android:pathData="M42,38h24v4h-24z"/>
+        android:pathData="M36,76 L36,42 L42,42 L66,71 L66,42 L72,42 L72,76 L66,76 L42,47 L42,76 Z"/>
+    <!-- Tilde (~) sobre la N -->
     <path
         android:fillColor="#7B9CFF"
-        android:pathData="M42,48h24v4h-24z"/>
-    <path
-        android:fillColor="#7B9CFF"
-        android:pathData="M42,58h16v4h-16z"/>
-    <path
-        android:fillColor="#7B9CFF"
-        android:pathData="M36,30h36v44h-36z"
-        android:strokeColor="#7B9CFF"
-        android:strokeWidth="2"
-        android:fillAlpha="0"/>
+        android:pathData="M40,35 C45,28 49,28 54,35 C59,42 63,42 68,35 L68,31 C63,38 59,38 54,31 C49,24 45,24 40,31 Z"/>
 </vector>

@@ -17,5 +17,4 @@ local.properties
 # Kotlin
 *.class
 
-# Generated
-/androidApp/src/main/res/mipmap-*/
+# Generated (mipmaps are tracked for launcher icons)
