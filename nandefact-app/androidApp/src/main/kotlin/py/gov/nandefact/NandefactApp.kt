@@ -5,6 +5,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import py.gov.nandefact.di.appModule
+import py.gov.nandefact.sync.SyncScheduler
 
 class NandefactApp : Application() {
     override fun onCreate() {
@@ -14,5 +15,8 @@ class NandefactApp : Application() {
             androidContext(this@NandefactApp)
             modules(appModule)
         }
+
+        // Programar sincronizacion periodica cada 15 minutos
+        SyncScheduler.schedule(this)
     }
 }
