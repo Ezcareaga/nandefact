@@ -3,6 +3,7 @@ package py.gov.nandefact.di
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import py.gov.nandefact.BuildConfig
 import py.gov.nandefact.shared.data.local.DatabaseDriverFactory
 import py.gov.nandefact.shared.data.local.SessionManager
 import py.gov.nandefact.shared.data.remote.ApiClient
@@ -80,7 +81,7 @@ val appModule = module {
     single { SyncApi(get()) }
 
     // Ports (interfaces de domain) → implementaciones en data/
-    single<AuthPort> { AuthRepository(get(), get()) }
+    single<AuthPort> { AuthRepository(get(), get(), BuildConfig.DEMO_MODE) }
     single<FacturaPort> { FacturaRepository(get(), get()) }
     single<ProductoPort> { ProductoRepository(get(), get()) }
     single<ClientePort> { ClienteRepository(get(), get()) }

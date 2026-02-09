@@ -6,7 +6,8 @@ import py.gov.nandefact.shared.domain.ports.AuthPort
 
 class AuthRepository(
     private val authApi: AuthApi,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val demoMode: Boolean = false
 ) : AuthPort {
     override fun isLoggedIn(): Boolean = sessionManager.getAccessToken() != null
 
@@ -30,8 +31,23 @@ class AuthRepository(
                 Result.failure(Exception(response.error?.message ?: "Error de autenticación"))
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            if (demoMode) {
+                loginAsDemo()
+            } else {
+                Result.failure(e)
+            }
         }
+    }
+
+    private fun loginAsDemo(): Result<Unit> {
+        sessionManager.saveTokens("demo-token", "demo-refresh")
+        sessionManager.saveUserInfo(
+            userId = "demo-user-001",
+            comercioId = "demo-001",
+            userName = "María (Demo)",
+            comercioName = "Comercio Demo"
+        )
+        return Result.success(Unit)
     }
 
     override fun logout() {
