@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfStatusDot
-import py.gov.nandefact.ui.theme.NfSuccess
+import py.gov.nandefact.ui.theme.NfExtendedColors
 
 @Composable
 fun ConfigScreen(
@@ -102,7 +102,7 @@ fun ConfigScreen(
             Icon(
                 imageVector = Icons.Filled.CloudDone,
                 contentDescription = null,
-                tint = NfSuccess
+                tint = NfExtendedColors.success
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(

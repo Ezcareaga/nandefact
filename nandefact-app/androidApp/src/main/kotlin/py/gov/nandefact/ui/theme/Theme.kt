@@ -4,10 +4,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
     primary = NfPrimary,
-    onPrimary = NfBackground,
+    onPrimary = Color.White,
     secondary = NfPrimaryVariant,
     background = NfBackground,
     surface = NfSurface,
@@ -16,14 +17,14 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = NfOnBackground,
     onSurfaceVariant = NfOnSurfaceVariant,
     error = NfError,
-    onError = NfOnBackground,
+    onError = Color.White,
     outline = NfOutline
 )
 
 // Light mode stub — post-MVP
 private val LightColorScheme = lightColorScheme(
     primary = NfPrimary,
-    onPrimary = NfLightBackground,
+    onPrimary = Color.White,
     secondary = NfPrimaryVariant,
     background = NfLightBackground,
     surface = NfLightSurface,
@@ -32,9 +33,19 @@ private val LightColorScheme = lightColorScheme(
     onSurface = NfLightOnBackground,
     onSurfaceVariant = NfLightOnSurfaceVariant,
     error = NfError,
-    onError = NfLightBackground,
+    onError = Color.White,
     outline = NfLightOutline
 )
+
+/**
+ * Colores semánticos extendidos que Material3 no provee nativamente.
+ * Uso: NfExtendedColors.success, NfExtendedColors.warning, etc.
+ */
+object NfExtendedColors {
+    val success = NfSuccess
+    val warning = NfWarning
+    val warningContainer = NfWarningContainer
+}
 
 @Composable
 fun NandefactTheme(

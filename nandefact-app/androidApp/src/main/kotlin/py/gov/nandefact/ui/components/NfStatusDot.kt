@@ -9,9 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import py.gov.nandefact.ui.theme.NfExtendedColors
 import py.gov.nandefact.ui.theme.NfError
-import py.gov.nandefact.ui.theme.NfSuccess
-import py.gov.nandefact.ui.theme.NfWarning
 
 enum class StatusColor {
     SUCCESS, WARNING, ERROR
@@ -23,8 +22,8 @@ fun NfStatusDot(
     modifier: Modifier = Modifier
 ) {
     val color = when (status) {
-        StatusColor.SUCCESS -> NfSuccess
-        StatusColor.WARNING -> NfWarning
+        StatusColor.SUCCESS -> NfExtendedColors.success
+        StatusColor.WARNING -> NfExtendedColors.warning
         StatusColor.ERROR -> NfError
     }
     NfStatusDot(color = color, modifier = modifier)
