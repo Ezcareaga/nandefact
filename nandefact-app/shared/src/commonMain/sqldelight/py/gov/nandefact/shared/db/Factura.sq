@@ -1,0 +1,78 @@
+CREATE TABLE IF NOT EXISTS factura (
+    id TEXT NOT NULL PRIMARY KEY,
+    comercioId TEXT NOT NULL,
+    usuarioId TEXT,
+    clienteId TEXT,
+    clienteNombre TEXT,
+    cdc TEXT,
+    numero TEXT,
+    tipoDocumento INTEGER NOT NULL DEFAULT 1,
+    establecimiento TEXT,
+    puntoExpedicion TEXT,
+    condicionPago TEXT NOT NULL DEFAULT 'contado',
+    totalBruto INTEGER NOT NULL,
+    totalIva10 INTEGER NOT NULL DEFAULT 0,
+    totalIva5 INTEGER NOT NULL DEFAULT 0,
+    totalExenta INTEGER NOT NULL DEFAULT 0,
+    totalIva INTEGER NOT NULL DEFAULT 0,
+    totalNeto INTEGER NOT NULL DEFAULT 0,
+    estadoSifen TEXT NOT NULL DEFAULT 'pendiente',
+    sifenRespuesta TEXT,
+    whatsappEnviado INTEGER NOT NULL DEFAULT 0,
+    kudePdfPath TEXT,
+    createdOffline INTEGER NOT NULL DEFAULT 0,
+    createdAt TEXT NOT NULL,
+    syncedAt TEXT
+);
+
+CREATE TABLE IF NOT EXISTS facturaDetalle (
+    id TEXT NOT NULL PRIMARY KEY,
+    facturaId TEXT NOT NULL,
+    productoId TEXT,
+    descripcion TEXT NOT NULL,
+    cantidad INTEGER NOT NULL,
+    precioUnitario INTEGER NOT NULL,
+    subtotal INTEGER NOT NULL,
+    ivaTasa INTEGER NOT NULL,
+    ivaBase INTEGER NOT NULL DEFAULT 0,
+    ivaMonto INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (facturaId) REFERENCES factura(id)
+);
+
+selectAll:
+SELECT * FROM factura WHERE comercioId = ? ORDER BY createdAt DESC;
+
+selectById:
+SELECT * FROM factura WHERE id = ?;
+
+selectPendientes:
+SELECT * FROM factura WHERE comercioId = ? AND estadoSifen = 'pendiente' ORDER BY createdAt ASC;
+
+selectByEstado:
+SELECT * FROM factura WHERE comercioId = ? AND estadoSifen = ? ORDER BY createdAt DESC;
+
+countPendientes:
+SELECT COUNT(*) FROM factura WHERE comercioId = ? AND estadoSifen = 'pendiente';
+
+insertFactura:
+INSERT INTO factura (id, comercioId, usuarioId, clienteId, clienteNombre, cdc, numero, tipoDocumento, establecimiento, puntoExpedicion, condicionPago, totalBruto, totalIva10, totalIva5, totalExenta, totalIva, totalNeto, estadoSifen, createdOffline, createdAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+insertDetalle:
+INSERT INTO facturaDetalle (id, facturaId, productoId, descripcion, cantidad, precioUnitario, subtotal, ivaTasa, ivaBase, ivaMonto)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateEstado:
+UPDATE factura SET estadoSifen = ?, sifenRespuesta = ?, syncedAt = ? WHERE id = ?;
+
+selectDetalles:
+SELECT * FROM facturaDetalle WHERE facturaId = ?;
+
+lastFactura:
+SELECT * FROM factura WHERE comercioId = ? ORDER BY createdAt DESC LIMIT 1;
+
+deleteAll:
+DELETE FROM factura WHERE comercioId = ?;
+
+deleteAllDetalles:
+DELETE FROM facturaDetalle;

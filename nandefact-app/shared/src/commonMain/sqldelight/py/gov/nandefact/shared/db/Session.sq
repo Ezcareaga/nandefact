@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS session (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+getByKey:
+SELECT value FROM session WHERE key = ?;
+
+upsert:
+INSERT OR REPLACE INTO session (key, value) VALUES (?, ?);
+
+deleteByKey:
+DELETE FROM session WHERE key = ?;
+
+deleteAll:
+DELETE FROM session;
