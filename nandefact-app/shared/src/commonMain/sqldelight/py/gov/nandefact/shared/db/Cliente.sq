@@ -1,0 +1,28 @@
+CREATE TABLE IF NOT EXISTS cliente (
+    id TEXT NOT NULL PRIMARY KEY,
+    comercioId TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    rucCi TEXT,
+    tipoDocumento TEXT NOT NULL,
+    telefono TEXT,
+    email TEXT,
+    enviarWhatsApp INTEGER NOT NULL DEFAULT 1,
+    frecuente INTEGER NOT NULL DEFAULT 0,
+    createdAt TEXT NOT NULL
+);
+
+selectAll:
+SELECT * FROM cliente WHERE comercioId = ? ORDER BY nombre;
+
+selectById:
+SELECT * FROM cliente WHERE id = ?;
+
+search:
+SELECT * FROM cliente WHERE comercioId = ? AND (nombre LIKE '%' || ? || '%' OR rucCi LIKE '%' || ? || '%') ORDER BY nombre;
+
+upsert:
+INSERT OR REPLACE INTO cliente (id, comercioId, nombre, rucCi, tipoDocumento, telefono, email, enviarWhatsApp, frecuente, createdAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteAll:
+DELETE FROM cliente WHERE comercioId = ?;

@@ -1,0 +1,32 @@
+CREATE TABLE IF NOT EXISTS producto (
+    id TEXT NOT NULL PRIMARY KEY,
+    comercioId TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    codigo TEXT,
+    precioUnitario INTEGER NOT NULL,
+    unidadMedida TEXT NOT NULL,
+    tasaIva INTEGER NOT NULL,
+    categoria TEXT,
+    activo INTEGER NOT NULL DEFAULT 1,
+    createdAt TEXT NOT NULL,
+    updatedAt TEXT NOT NULL
+);
+
+selectAll:
+SELECT * FROM producto WHERE comercioId = ? AND activo = 1 ORDER BY nombre;
+
+selectById:
+SELECT * FROM producto WHERE id = ?;
+
+search:
+SELECT * FROM producto WHERE comercioId = ? AND activo = 1 AND nombre LIKE '%' || ? || '%' ORDER BY nombre;
+
+upsert:
+INSERT OR REPLACE INTO producto (id, comercioId, nombre, codigo, precioUnitario, unidadMedida, tasaIva, categoria, activo, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deactivate:
+UPDATE producto SET activo = 0, updatedAt = ? WHERE id = ?;
+
+deleteAll:
+DELETE FROM producto WHERE comercioId = ?;
