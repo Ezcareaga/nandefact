@@ -156,7 +156,7 @@ fun PendientesScreen(
                     )
                 } else {
                     Icon(Icons.Filled.Sync, contentDescription = null)
-                    Text(" Sincronizar Ahora", fontWeight = FontWeight.Bold)
+                    Text(" Sincronizar ahora", fontWeight = FontWeight.Bold)
                 }
             }
         }

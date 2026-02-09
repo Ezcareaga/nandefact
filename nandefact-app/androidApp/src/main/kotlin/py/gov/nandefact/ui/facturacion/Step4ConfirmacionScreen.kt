@@ -109,7 +109,7 @@ fun Step4ConfirmacionScreen(
             )
         ) {
             Text(
-                text = "NUEVA VENTA",
+                text = "Nueva venta",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -124,7 +124,7 @@ fun Step4ConfirmacionScreen(
                 .height(48.dp),
             shape = MaterialTheme.shapes.medium
         ) {
-            Text("Volver al Inicio")
+            Text("Volver al inicio")
         }
 
         Spacer(modifier = Modifier.height(32.dp))

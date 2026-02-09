@@ -211,7 +211,7 @@ fun Step2ClienteScreen(
                     onClick = onBack,
                     shape = MaterialTheme.shapes.medium
                 ) {
-                    Text("← ATRÁS")
+                    Text("← Atrás")
                 }
                 Button(
                     onClick = onNext,
@@ -220,7 +220,7 @@ fun Step2ClienteScreen(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("SIGUIENTE →")
+                    Text("Siguiente →")
                 }
             }
         }

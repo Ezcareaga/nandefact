@@ -173,7 +173,7 @@ fun Step3PreviewScreen(
                         )
                     ) {
                         Text(
-                            text = "GENERAR FACTURA",
+                            text = "Generar factura",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -184,7 +184,7 @@ fun Step3PreviewScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.medium
                     ) {
-                        Text("← ATRÁS")
+                        Text("← Atrás")
                     }
                 }
             }

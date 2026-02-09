@@ -127,7 +127,7 @@ fun Step1ProductosScreen(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("SIGUIENTE →")
+                    Text("Siguiente →")
                 }
             }
         }
