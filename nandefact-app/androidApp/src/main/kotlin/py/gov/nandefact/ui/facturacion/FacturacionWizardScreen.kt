@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,13 +38,23 @@ fun FacturacionWizardScreen(
     Scaffold(
         topBar = {
             if (!state.isGenerated) {
-                CenterAlignedTopAppBar(
+                TopAppBar(
                     title = {
-                        Text(
-                            text = "Paso ${state.currentStep + 1}/4",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Nueva Factura",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            Text(
+                                text = "Paso ${state.currentStep + 1}/4",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     },
                     navigationIcon = {
                         IconButton(onClick = {
@@ -58,7 +71,7 @@ fun FacturacionWizardScreen(
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.background
                     )
                 )
@@ -88,7 +101,8 @@ fun FacturacionWizardScreen(
                     onSearchChange = viewModel::onSearchQueryChange,
                     onProductTap = viewModel::onProductTap,
                     onQuantityChange = viewModel::onProductQuantityChange,
-                    onNext = viewModel::nextStep
+                    onNext = viewModel::nextStep,
+                    onLoadMore = viewModel::loadMoreProducts
                 )
                 1 -> Step2ClienteScreen(
                     state = state,

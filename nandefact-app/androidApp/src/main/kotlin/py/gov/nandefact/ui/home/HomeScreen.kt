@@ -72,7 +72,7 @@ fun HomeScreen(
 
         // Hero card — GENERAR FACTURA
         NfHeroCard(
-            text = "GENERAR\nFACTURA",
+            text = "GENERAR FACTURA",
             onClick = onNavigateFacturacion
         )
 

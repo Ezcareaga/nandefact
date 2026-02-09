@@ -1,8 +1,10 @@
 package py.gov.nandefact.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -54,7 +56,9 @@ fun NfQuantitySelector(
                 val parsed = value.filter { it.isDigit() }.toIntOrNull() ?: 0
                 onQuantityChange(parsed)
             },
-            modifier = Modifier.widthIn(min = 48.dp, max = 64.dp),
+            modifier = Modifier
+                .width(IntrinsicSize.Min)
+                .widthIn(min = 48.dp),
             textStyle = MaterialTheme.typography.bodyLarge.copy(
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground
