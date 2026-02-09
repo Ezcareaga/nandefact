@@ -29,7 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfEmptyState
 import py.gov.nandefact.ui.components.NfStatusDot
@@ -40,7 +40,7 @@ import py.gov.nandefact.ui.theme.NfWarning
 @Composable
 fun PendientesScreen(
     paddingValues: PaddingValues,
-    viewModel: PendientesViewModel = viewModel()
+    viewModel: PendientesViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 

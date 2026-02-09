@@ -35,13 +35,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductoFormScreen(
     paddingValues: PaddingValues,
-    viewModel: ProductosViewModel = viewModel()
+    viewModel: ProductosViewModel = koinViewModel()
 ) {
     val state by viewModel.formState.collectAsState()
     var unidadExpanded by remember { mutableStateOf(false) }

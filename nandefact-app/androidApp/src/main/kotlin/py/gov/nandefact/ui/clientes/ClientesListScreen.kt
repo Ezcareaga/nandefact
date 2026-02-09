@@ -24,7 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfEmptyState
 import py.gov.nandefact.ui.components.NfSearchBar
@@ -34,7 +34,7 @@ fun ClientesListScreen(
     paddingValues: PaddingValues,
     onClienteClick: (String) -> Unit,
     onCreateClick: () -> Unit,
-    viewModel: ClientesViewModel = viewModel()
+    viewModel: ClientesViewModel = koinViewModel()
 ) {
     val state by viewModel.listState.collectAsState()
 
