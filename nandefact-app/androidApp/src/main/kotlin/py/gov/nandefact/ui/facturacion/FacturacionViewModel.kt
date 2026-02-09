@@ -2,9 +2,12 @@ package py.gov.nandefact.ui.facturacion
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import py.gov.nandefact.shared.domain.usecase.CrearFacturaLocalUseCase
 import py.gov.nandefact.shared.domain.usecase.FacturaInput
@@ -100,9 +103,23 @@ class FacturacionViewModel(
 
     private var allProductos: List<ProductoItem> = emptyList()
     private val pageSize = 20
+    private val _searchInput = MutableStateFlow("")
+    private val _clienteSearchInput = MutableStateFlow("")
 
     init {
         loadProductos()
+        @OptIn(FlowPreview::class)
+        viewModelScope.launch {
+            _searchInput.debounce(300).distinctUntilChanged().collect { query ->
+                _uiState.value = _uiState.value.copy(searchQuery = query)
+            }
+        }
+        @OptIn(FlowPreview::class)
+        viewModelScope.launch {
+            _clienteSearchInput.debounce(300).distinctUntilChanged().collect { query ->
+                _uiState.value = _uiState.value.copy(clienteSearchQuery = query)
+            }
+        }
     }
 
     private fun loadProductos() {
@@ -148,7 +165,7 @@ class FacturacionViewModel(
     }
 
     fun onSearchQueryChange(query: String) {
-        _uiState.value = _uiState.value.copy(searchQuery = query)
+        _searchInput.value = query
     }
 
     fun onProductQuantityChange(productoId: String, newQty: Int) {
@@ -181,7 +198,7 @@ class FacturacionViewModel(
     }
 
     fun onClienteSearchChange(query: String) {
-        _uiState.value = _uiState.value.copy(clienteSearchQuery = query)
+        _clienteSearchInput.value = query
     }
 
     fun onSelectInnominado() {

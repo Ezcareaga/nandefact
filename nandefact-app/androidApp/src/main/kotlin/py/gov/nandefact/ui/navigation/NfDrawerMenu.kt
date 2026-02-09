@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.DarkMode
@@ -37,7 +36,7 @@ fun NfDrawerMenu(
 ) {
     ModalDrawerSheet(
         modifier = modifier
-            .width(280.dp)
+            .fillMaxWidth(0.78f)
             .fillMaxHeight(),
         drawerContainerColor = MaterialTheme.colorScheme.surface
     ) {

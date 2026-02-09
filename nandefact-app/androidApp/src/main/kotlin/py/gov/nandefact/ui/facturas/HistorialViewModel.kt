@@ -2,9 +2,12 @@ package py.gov.nandefact.ui.facturas
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import py.gov.nandefact.shared.domain.usecase.GetFacturasUseCase
 
@@ -49,9 +52,16 @@ class HistorialViewModel(
 
     private var allFacturas: List<FacturaListItem> = emptyList()
     private val pageSize = 20
+    private val _searchInput = MutableStateFlow("")
 
     init {
         loadFacturas()
+        @OptIn(FlowPreview::class)
+        viewModelScope.launch {
+            _searchInput.debounce(300).distinctUntilChanged().collect { query ->
+                _uiState.value = _uiState.value.copy(searchQuery = query)
+            }
+        }
     }
 
     private fun loadFacturas() {
@@ -93,7 +103,7 @@ class HistorialViewModel(
     }
 
     fun onSearchChange(query: String) {
-        _uiState.value = _uiState.value.copy(searchQuery = query)
+        _searchInput.value = query
     }
 
     fun onFilterChange(filter: HistorialFilter) {

@@ -21,10 +21,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
@@ -32,6 +30,7 @@ import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfEmptyState
 import py.gov.nandefact.ui.components.NfSearchBar
 import py.gov.nandefact.ui.components.formatPYG
+import py.gov.nandefact.ui.util.OnNearEnd
 
 @Composable
 fun ProductosListScreen(
@@ -43,17 +42,8 @@ fun ProductosListScreen(
     val state by viewModel.listState.collectAsState()
     val listState = rememberLazyListState()
 
-    // Paginacion: cargar mas al llegar al final
-    LaunchedEffect(listState) {
-        snapshotFlow {
-            val layoutInfo = listState.layoutInfo
-            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            lastVisible >= layoutInfo.totalItemsCount - 3
-        }.collect { nearEnd ->
-            if (nearEnd && state.hasMore) {
-                viewModel.loadMore()
-            }
-        }
+    listState.OnNearEnd {
+        if (state.hasMore) viewModel.loadMore()
     }
 
     Scaffold(

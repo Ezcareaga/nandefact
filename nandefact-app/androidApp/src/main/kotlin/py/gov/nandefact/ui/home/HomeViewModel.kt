@@ -34,7 +34,13 @@ class HomeViewModel(
                 userName = data.userName,
                 pendingCount = data.pendingCount.toInt(),
                 lastSaleAmount = data.lastSaleAmount,
-                lastSaleMinutesAgo = if (data.lastSaleAmount != null) 5 else null
+                lastSaleMinutesAgo = data.lastSaleTime?.let { timeStr ->
+                    try {
+                        val then = java.time.Instant.parse(timeStr)
+                        val now = java.time.Instant.now()
+                        java.time.Duration.between(then, now).toMinutes().toInt()
+                    } catch (_: Exception) { null }
+                }
             )
         }
     }
