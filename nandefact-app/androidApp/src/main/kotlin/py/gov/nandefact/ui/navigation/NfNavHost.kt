@@ -7,11 +7,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import py.gov.nandefact.ui.clientes.ClienteFormScreen
+import py.gov.nandefact.ui.clientes.ClientesListScreen
+import py.gov.nandefact.ui.config.ConfigScreen
 import py.gov.nandefact.ui.facturacion.FacturacionWizardScreen
+import py.gov.nandefact.ui.facturas.FacturaDetalleScreen
+import py.gov.nandefact.ui.facturas.HistorialScreen
 import py.gov.nandefact.ui.home.HomeScreen
 import py.gov.nandefact.ui.login.LoginScreen
+import py.gov.nandefact.ui.pendientes.PendientesScreen
+import py.gov.nandefact.ui.productos.ProductoFormScreen
+import py.gov.nandefact.ui.productos.ProductosListScreen
+import py.gov.nandefact.ui.reportes.ReportesScreen
 import py.gov.nandefact.ui.theme.NandefactTheme
 
 @Composable
@@ -21,6 +29,18 @@ fun NfNavHost() {
 
     // TODO: Verificar token existente para decidir startDestination
     val startDestination = Routes.Login.route
+
+    // Helper para crear scaffold con parámetros comunes
+    val navigateHome: () -> Unit = {
+        navController.navigate(Routes.Home.route) {
+            popUpTo(Routes.Home.route) { inclusive = true }
+        }
+    }
+    val logout: () -> Unit = {
+        navController.navigate(Routes.Login.route) {
+            popUpTo(0) { inclusive = true }
+        }
+    }
 
     NandefactTheme(darkTheme = isDarkTheme) {
         NavHost(
@@ -48,11 +68,7 @@ fun NfNavHost() {
                     onNavigateHome = {},
                     onNavigateBack = null,
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = {
-                        navController.navigate(Routes.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    onLogout = logout
                 ) { paddingValues ->
                     HomeScreen(
                         paddingValues = paddingValues,
@@ -70,7 +86,6 @@ fun NfNavHost() {
                 FacturacionWizardScreen(
                     onClose = { navController.popBackStack() },
                     onNuevaVenta = {
-                        // Reemplazar la pantalla actual con una nueva instancia
                         navController.navigate(Routes.Facturacion.route) {
                             popUpTo(Routes.Facturacion.route) { inclusive = true }
                         }
@@ -78,51 +93,83 @@ fun NfNavHost() {
                 )
             }
 
-            // Productos
+            // Productos lista
             composable(Routes.Productos.route) {
                 NfScaffold(
                     title = "Productos",
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = {
-                        navController.navigate(Routes.Home.route) {
-                            popUpTo(Routes.Home.route) { inclusive = true }
-                        }
-                    },
+                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = {
-                        navController.navigate(Routes.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    onLogout = logout
                 ) { paddingValues ->
-                    PlaceholderContent(paddingValues, "Productos")
+                    ProductosListScreen(
+                        paddingValues = paddingValues,
+                        onProductoClick = { id ->
+                            navController.navigate(Routes.ProductoForm.edit(id))
+                        },
+                        onCreateClick = {
+                            navController.navigate(Routes.ProductoForm.create())
+                        }
+                    )
                 }
             }
 
-            // Clientes
+            // Producto form (crear/editar)
+            composable(Routes.ProductoForm.route) {
+                NfScaffold(
+                    title = "Producto",
+                    isHome = false,
+                    isDarkTheme = isDarkTheme,
+                    onToggleTheme = { isDarkTheme = !isDarkTheme },
+                    onNavigateHome = navigateHome,
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onLogout = logout
+                ) { paddingValues ->
+                    ProductoFormScreen(paddingValues = paddingValues)
+                }
+            }
+
+            // Clientes lista
             composable(Routes.Clientes.route) {
                 NfScaffold(
                     title = "Clientes",
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = {
-                        navController.navigate(Routes.Home.route) {
-                            popUpTo(Routes.Home.route) { inclusive = true }
-                        }
-                    },
+                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = {
-                        navController.navigate(Routes.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    onLogout = logout
                 ) { paddingValues ->
-                    PlaceholderContent(paddingValues, "Clientes")
+                    ClientesListScreen(
+                        paddingValues = paddingValues,
+                        onClienteClick = { id ->
+                            navController.navigate(Routes.ClienteForm.edit(id))
+                        },
+                        onCreateClick = {
+                            navController.navigate(Routes.ClienteForm.create())
+                        }
+                    )
+                }
+            }
+
+            // Cliente form (crear/editar)
+            composable(Routes.ClienteForm.route) {
+                NfScaffold(
+                    title = "Cliente",
+                    isHome = false,
+                    isDarkTheme = isDarkTheme,
+                    onToggleTheme = { isDarkTheme = !isDarkTheme },
+                    onNavigateHome = navigateHome,
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onLogout = logout
+                ) { paddingValues ->
+                    ClienteFormScreen(paddingValues = paddingValues)
                 }
             }
 
@@ -133,20 +180,37 @@ fun NfNavHost() {
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = {
-                        navController.navigate(Routes.Home.route) {
-                            popUpTo(Routes.Home.route) { inclusive = true }
-                        }
-                    },
+                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = {
-                        navController.navigate(Routes.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    onLogout = logout
                 ) { paddingValues ->
-                    PlaceholderContent(paddingValues, "Historial")
+                    HistorialScreen(
+                        paddingValues = paddingValues,
+                        onFacturaClick = { id ->
+                            navController.navigate(Routes.FacturaDetalle.withId(id))
+                        }
+                    )
+                }
+            }
+
+            // Factura detalle
+            composable(Routes.FacturaDetalle.route) { backStackEntry ->
+                val facturaId = backStackEntry.arguments?.getString("facturaId") ?: ""
+                NfScaffold(
+                    title = "Detalle Factura",
+                    isHome = false,
+                    isDarkTheme = isDarkTheme,
+                    onToggleTheme = { isDarkTheme = !isDarkTheme },
+                    onNavigateHome = navigateHome,
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onLogout = logout
+                ) { paddingValues ->
+                    FacturaDetalleScreen(
+                        paddingValues = paddingValues,
+                        facturaId = facturaId
+                    )
                 }
             }
 
@@ -157,20 +221,12 @@ fun NfNavHost() {
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = {
-                        navController.navigate(Routes.Home.route) {
-                            popUpTo(Routes.Home.route) { inclusive = true }
-                        }
-                    },
+                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = {
-                        navController.navigate(Routes.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    onLogout = logout
                 ) { paddingValues ->
-                    PlaceholderContent(paddingValues, "Pendientes")
+                    PendientesScreen(paddingValues = paddingValues)
                 }
             }
 
@@ -181,20 +237,12 @@ fun NfNavHost() {
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = {
-                        navController.navigate(Routes.Home.route) {
-                            popUpTo(Routes.Home.route) { inclusive = true }
-                        }
-                    },
+                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onLogout = {
-                        navController.navigate(Routes.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    onLogout = logout
                 ) { paddingValues ->
-                    PlaceholderContent(paddingValues, "Reportes")
+                    ReportesScreen(paddingValues = paddingValues)
                 }
             }
 
@@ -205,20 +253,12 @@ fun NfNavHost() {
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = {
-                        navController.navigate(Routes.Home.route) {
-                            popUpTo(Routes.Home.route) { inclusive = true }
-                        }
-                    },
+                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = {},
-                    onLogout = {
-                        navController.navigate(Routes.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    onLogout = logout
                 ) { paddingValues ->
-                    PlaceholderContent(paddingValues, "Configuración")
+                    ConfigScreen(paddingValues = paddingValues)
                 }
             }
         }
