@@ -1,11 +1,14 @@
 package py.gov.nandefact.shared.domain
 
+import kotlinx.serialization.Serializable
+
 /**
  * Calcula base gravada y monto IVA para PYG (sin decimales).
  * Los precios en Paraguay INCLUYEN IVA.
  */
 object MontoIVA {
 
+    @Serializable
     data class Resultado(
         val baseGravada: Long,
         val montoIva: Long

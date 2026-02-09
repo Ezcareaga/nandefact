@@ -29,7 +29,7 @@ class ApiClient(
         }
 
         install(Logging) {
-            level = LogLevel.BODY
+            level = LogLevel.HEADERS
         }
 
         install(Auth) {

@@ -3,6 +3,7 @@ package py.gov.nandefact.shared.data.remote
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
@@ -13,7 +14,10 @@ import py.gov.nandefact.shared.data.remote.dto.ProductoDto
 class ProductoApi(private val client: ApiClient) {
 
     suspend fun getAll(page: Int = 1, limit: Int = 50): ApiResponse<PaginatedResponse<ProductoDto>> {
-        return client.httpClient.get("api/v1/productos?page=$page&limit=$limit").body()
+        return client.httpClient.get("api/v1/productos") {
+            parameter("page", page)
+            parameter("limit", limit)
+        }.body()
     }
 
     suspend fun create(producto: ProductoDto): ApiResponse<ProductoDto> {

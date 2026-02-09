@@ -2,6 +2,7 @@ package py.gov.nandefact.shared.data.remote
 
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import py.gov.nandefact.shared.data.remote.dto.ApiResponse
@@ -18,7 +19,10 @@ class FacturaApi(private val client: ApiClient) {
     }
 
     suspend fun getAll(page: Int = 1, limit: Int = 50): ApiResponse<PaginatedResponse<FacturaDto>> {
-        return client.httpClient.get("api/v1/facturas?page=$page&limit=$limit").body()
+        return client.httpClient.get("api/v1/facturas") {
+            parameter("page", page)
+            parameter("limit", limit)
+        }.body()
     }
 
     suspend fun getById(id: String): ApiResponse<FacturaDto> {

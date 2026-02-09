@@ -2,6 +2,7 @@ package py.gov.nandefact.shared.data.remote
 
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import kotlinx.serialization.Serializable
@@ -41,7 +42,9 @@ class SyncApi(private val client: ApiClient) {
     }
 
     suspend fun pull(since: String): ApiResponse<SyncPullResponse> {
-        return client.httpClient.get("api/v1/sync/pull?since=$since").body()
+        return client.httpClient.get("api/v1/sync/pull") {
+            parameter("since", since)
+        }.body()
     }
 
     suspend fun status(): ApiResponse<Map<String, String>> {
