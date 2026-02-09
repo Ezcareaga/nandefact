@@ -90,7 +90,7 @@ fun HistorialScreen(
             NfEmptyState(
                 icon = Icons.Filled.Receipt,
                 title = "Sin facturas",
-                subtitle = "Las facturas generadas apareceran aqui"
+                subtitle = "Las facturas generadas aparecerán aquí"
             )
         } else {
             LazyColumn(

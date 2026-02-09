@@ -26,7 +26,7 @@ data class ClientesUiState(
     val clientes: List<ClienteUi> = emptyList(),
     val searchQuery: String = "",
     val isLoading: Boolean = true,
-    // Paginacion
+    // Paginación
     val page: Int = 1,
     val hasMore: Boolean = false
 ) {
@@ -165,9 +165,9 @@ class ClientesViewModel(
 }
 
 private fun sampleClientes(): List<ClienteUi> = listOf(
-    ClienteUi("1", "Juan Perez", "CI", "4.567.890", "0981123456"),
-    ClienteUi("2", "Maria Gonzalez", "RUC", "80012345-6", "0991654321"),
-    ClienteUi("3", "Carlos Lopez", "CI", "3.456.789", "0971987654"),
-    ClienteUi("4", "Ana Martinez", "CI", "5.678.901", ""),
+    ClienteUi("1", "Juan Pérez", "CI", "4.567.890", "0981123456"),
+    ClienteUi("2", "María González", "RUC", "80012345-6", "0991654321"),
+    ClienteUi("3", "Carlos López", "CI", "3.456.789", "0971987654"),
+    ClienteUi("4", "Ana Martínez", "CI", "5.678.901", ""),
     ClienteUi("5", "Empresa ABC S.A.", "RUC", "80098765-4", "021456789")
 )

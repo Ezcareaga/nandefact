@@ -27,7 +27,7 @@ data class HistorialUiState(
     val searchQuery: String = "",
     val filter: HistorialFilter = HistorialFilter.HOY,
     val isLoading: Boolean = true,
-    // Paginacion
+    // Paginación
     val page: Int = 1,
     val hasMore: Boolean = false
 ) {
@@ -113,9 +113,9 @@ class HistorialViewModel(
 }
 
 private fun sampleFacturas(): List<FacturaListItem> = listOf(
-    FacturaListItem("1", "001-001-0000140", "Juan Perez", 45_000, "14:30", "aprobado"),
+    FacturaListItem("1", "001-001-0000140", "Juan Pérez", 45_000, "14:30", "aprobado"),
     FacturaListItem("2", "001-001-0000139", "Sin documento", 12_000, "13:15", "pendiente"),
-    FacturaListItem("3", "001-001-0000138", "Maria Gonzalez", 85_000, "11:45", "aprobado"),
-    FacturaListItem("4", "001-001-0000137", "Carlos Lopez", 32_000, "10:20", "rechazado"),
-    FacturaListItem("5", "001-001-0000136", "Ana Martinez", 156_000, "09:00", "aprobado")
+    FacturaListItem("3", "001-001-0000138", "María González", 85_000, "11:45", "aprobado"),
+    FacturaListItem("4", "001-001-0000137", "Carlos López", 32_000, "10:20", "rechazado"),
+    FacturaListItem("5", "001-001-0000136", "Ana Martínez", 156_000, "09:00", "aprobado")
 )

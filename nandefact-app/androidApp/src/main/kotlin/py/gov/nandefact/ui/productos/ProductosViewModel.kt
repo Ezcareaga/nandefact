@@ -26,7 +26,7 @@ data class ProductosUiState(
     val productos: List<ProductoUi> = emptyList(),
     val searchQuery: String = "",
     val isLoading: Boolean = true,
-    // Paginacion
+    // Paginación
     val page: Int = 1,
     val hasMore: Boolean = false
 ) {

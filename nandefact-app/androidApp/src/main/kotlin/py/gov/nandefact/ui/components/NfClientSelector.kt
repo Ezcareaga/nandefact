@@ -44,7 +44,7 @@ fun NfClientSelector(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Boton SIN NOMBRE
+        // Botón SIN NOMBRE
         OutlinedButton(
             onClick = onSinNombre,
             modifier = Modifier

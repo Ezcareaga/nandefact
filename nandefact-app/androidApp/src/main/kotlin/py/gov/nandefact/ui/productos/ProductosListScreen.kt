@@ -76,7 +76,7 @@ fun ProductosListScreen(
                 NfEmptyState(
                     icon = Icons.Filled.Inventory2,
                     title = "Sin productos",
-                    subtitle = "Agrega tu primer producto con el boton +"
+                    subtitle = "Agrega tu primer producto con el botón +"
                 )
             } else {
                 LazyColumn(

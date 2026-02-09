@@ -127,7 +127,7 @@ fun LoginScreen(
             // Error
             if (state.error != null) {
                 Text(
-                    text = state.error!!,
+                    text = state.error.orEmpty(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(bottom = 16.dp)

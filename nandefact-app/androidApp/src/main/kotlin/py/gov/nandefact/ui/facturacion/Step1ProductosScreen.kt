@@ -46,7 +46,7 @@ fun Step1ProductosScreen(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
-        // Lista de productos con paginacion
+        // Lista de productos con paginación
         val listState = rememberLazyListState()
 
         listState.OnNearEnd {
