@@ -287,7 +287,12 @@ fun NfNavHost() {
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
-                    ConfigScreen(paddingValues = paddingValues)
+                    ConfigScreen(
+                        paddingValues = paddingValues,
+                        isDarkTheme = isDarkTheme,
+                        onToggleTheme = { isDarkTheme = !isDarkTheme },
+                        onLogout = logout
+                    )
                 }
             }
         }
