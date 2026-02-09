@@ -1,19 +1,19 @@
 package py.gov.nandefact.shared.domain.usecase
 
-import py.gov.nandefact.shared.data.repository.AuthRepository
-import py.gov.nandefact.shared.data.repository.ProductoRepository
 import py.gov.nandefact.shared.domain.Producto
+import py.gov.nandefact.shared.domain.ports.AuthPort
+import py.gov.nandefact.shared.domain.ports.ProductoPort
 
 class GetProductosUseCase(
-    private val productoRepository: ProductoRepository,
-    private val authRepository: AuthRepository
+    private val productos: ProductoPort,
+    private val auth: AuthPort
 ) {
     suspend operator fun invoke(query: String = ""): List<Producto> {
-        val comercioId = authRepository.getComercioId() ?: return emptyList()
+        val comercioId = auth.getComercioId() ?: return emptyList()
         return if (query.isBlank()) {
-            productoRepository.getAll(comercioId)
+            productos.getAll(comercioId)
         } else {
-            productoRepository.search(comercioId, query)
+            productos.search(comercioId, query)
         }
     }
 }

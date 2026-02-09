@@ -1,11 +1,11 @@
 package py.gov.nandefact.shared.domain.usecase
 
-import py.gov.nandefact.shared.data.repository.AuthRepository
-import py.gov.nandefact.shared.data.repository.FacturaRepository
 import py.gov.nandefact.shared.domain.CDC
 import py.gov.nandefact.shared.domain.Factura
 import py.gov.nandefact.shared.domain.ItemFactura
 import py.gov.nandefact.shared.domain.MontoIVA
+import py.gov.nandefact.shared.domain.ports.AuthPort
+import py.gov.nandefact.shared.domain.ports.FacturaPort
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -26,15 +26,15 @@ data class FacturaInput(
 )
 
 class CrearFacturaLocalUseCase(
-    private val facturaRepository: FacturaRepository,
-    private val authRepository: AuthRepository
+    private val facturas: FacturaPort,
+    private val auth: AuthPort
 ) {
     suspend operator fun invoke(input: FacturaInput): Result<Factura> {
         if (input.items.isEmpty()) {
             return Result.failure(IllegalArgumentException("Debe tener al menos 1 item"))
         }
 
-        val comercioId = authRepository.getComercioId()
+        val comercioId = auth.getComercioId()
             ?: return Result.failure(IllegalStateException("Sin comercio autenticado"))
 
         val now = Clock.System.now()
@@ -44,9 +44,8 @@ class CrearFacturaLocalUseCase(
             "${localDate.dayOfMonth.toString().padStart(2, '0')}"
 
         val facturaId = generateUUID()
-        val numero = now.toEpochMilliseconds() % 10_000_000 // Correlativo temporal
+        val numero = now.toEpochMilliseconds() % 10_000_000
 
-        // Generar CDC
         val cdc = CDC.generar(
             tipoDocumento = 1,
             ruc = "80069563",
@@ -59,7 +58,6 @@ class CrearFacturaLocalUseCase(
             tipoEmision = 1
         )
 
-        // Calcular items con IVA
         val itemsFactura = input.items.mapIndexed { index, item ->
             val subtotal = item.cantidad * item.precioUnitario
             val iva = MontoIVA.calcular(subtotal, item.tasaIva)
@@ -77,7 +75,6 @@ class CrearFacturaLocalUseCase(
             )
         }
 
-        // Calcular totales
         val totalBruto = itemsFactura.sumOf { it.subtotal }
         val totalIva10 = itemsFactura.filter { it.ivaTasa == 10 }.sumOf { it.ivaMonto }
         val totalIva5 = itemsFactura.filter { it.ivaTasa == 5 }.sumOf { it.ivaMonto }
@@ -106,12 +103,12 @@ class CrearFacturaLocalUseCase(
             createdAt = now.toString()
         )
 
-        facturaRepository.createLocal(factura, itemsFactura)
+        facturas.createLocal(factura, itemsFactura)
         return Result.success(factura)
     }
 }
 
-// Generador UUID multiplataforma simple
+// Generador UUID multiplataforma simple (sera reemplazado por expect/actual)
 private fun generateUUID(): String {
     val chars = "0123456789abcdef"
     val sections = listOf(8, 4, 4, 4, 12)

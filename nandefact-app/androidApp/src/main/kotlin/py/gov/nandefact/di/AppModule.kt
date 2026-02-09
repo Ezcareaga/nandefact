@@ -17,6 +17,11 @@ import py.gov.nandefact.shared.data.repository.ClienteRepository
 import py.gov.nandefact.shared.data.repository.FacturaRepository
 import py.gov.nandefact.shared.data.repository.ProductoRepository
 import py.gov.nandefact.shared.db.NandefactDatabase
+import py.gov.nandefact.shared.domain.ports.AuthPort
+import py.gov.nandefact.shared.domain.ports.ClientePort
+import py.gov.nandefact.shared.domain.ports.FacturaPort
+import py.gov.nandefact.shared.domain.ports.ProductoPort
+import py.gov.nandefact.shared.domain.ports.SyncPort
 import py.gov.nandefact.shared.domain.usecase.CrearFacturaLocalUseCase
 import py.gov.nandefact.shared.domain.usecase.GetClientesUseCase
 import py.gov.nandefact.shared.domain.usecase.GetFacturasUseCase
@@ -74,28 +79,26 @@ val appModule = module {
     single { FacturaApi(get()) }
     single { SyncApi(get()) }
 
-    // Repositorios
-    single { AuthRepository(get(), get()) }
-    single { ProductoRepository(get(), get()) }
-    single { ClienteRepository(get(), get()) }
-    single { FacturaRepository(get(), get()) }
-
-    // Sync
-    single { SyncManager(get<FacturaRepository>(), get<SyncApi>(), get<NandefactDatabase>()) }
+    // Ports (interfaces de domain) → implementaciones en data/
+    single<AuthPort> { AuthRepository(get(), get()) }
+    single<FacturaPort> { FacturaRepository(get(), get()) }
+    single<ProductoPort> { ProductoRepository(get(), get()) }
+    single<ClientePort> { ClienteRepository(get(), get()) }
+    single<SyncPort> { SyncManager(get(), get()) }
     single<NetworkMonitor> { AndroidNetworkMonitor(androidContext()) }
 
-    // UseCases
-    factory { GetHomeDataUseCase(get<AuthRepository>(), get<FacturaRepository>()) }
-    factory { LoginUseCase(get<AuthRepository>()) }
-    factory { CrearFacturaLocalUseCase(get<FacturaRepository>(), get<AuthRepository>()) }
-    factory { GetProductosUseCase(get<ProductoRepository>(), get<AuthRepository>()) }
-    factory { GetClientesUseCase(get<ClienteRepository>(), get<AuthRepository>()) }
-    factory { GetFacturasUseCase(get<FacturaRepository>(), get<AuthRepository>()) }
-    factory { GetPendientesUseCase(get<FacturaRepository>(), get<AuthRepository>()) }
-    factory { GetReportesUseCase(get<FacturaRepository>(), get<AuthRepository>()) }
-    factory { SyncPendientesUseCase(get<FacturaRepository>(), get<SyncApi>(), get<AuthRepository>()) }
-    factory { SaveProductoUseCase(get<ProductoApi>(), get<AuthRepository>()) }
-    factory { SaveClienteUseCase(get<ClienteApi>(), get<AuthRepository>()) }
+    // UseCases — inyectan SOLO ports (interfaces de domain)
+    factory { GetHomeDataUseCase(get(), get()) }
+    factory { LoginUseCase(get()) }
+    factory { CrearFacturaLocalUseCase(get(), get()) }
+    factory { GetProductosUseCase(get(), get()) }
+    factory { GetClientesUseCase(get(), get()) }
+    factory { GetFacturasUseCase(get(), get()) }
+    factory { GetPendientesUseCase(get(), get()) }
+    factory { GetReportesUseCase(get(), get()) }
+    factory { SyncPendientesUseCase(get(), get()) }
+    factory { SaveProductoUseCase(get(), get()) }
+    factory { SaveClienteUseCase(get(), get()) }
 
     // ViewModels
     viewModel { HomeViewModel(get()) }

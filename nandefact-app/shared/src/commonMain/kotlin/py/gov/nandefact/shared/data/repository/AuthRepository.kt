@@ -2,14 +2,15 @@ package py.gov.nandefact.shared.data.repository
 
 import py.gov.nandefact.shared.data.local.SessionManager
 import py.gov.nandefact.shared.data.remote.AuthApi
+import py.gov.nandefact.shared.domain.ports.AuthPort
 
 class AuthRepository(
     private val authApi: AuthApi,
     private val sessionManager: SessionManager
-) {
-    fun isLoggedIn(): Boolean = sessionManager.getAccessToken() != null
+) : AuthPort {
+    override fun isLoggedIn(): Boolean = sessionManager.getAccessToken() != null
 
-    suspend fun login(telefono: String, pin: String): Result<Unit> {
+    override suspend fun login(telefono: String, pin: String): Result<Unit> {
         return try {
             val response = authApi.login(telefono, pin)
             if (response.success && response.data != null) {
@@ -33,11 +34,11 @@ class AuthRepository(
         }
     }
 
-    fun logout() {
+    override fun logout() {
         sessionManager.clearSession()
     }
 
-    fun getUserName(): String = sessionManager.getUserName() ?: "Usuario"
-    fun getComercioName(): String = sessionManager.getComercioName() ?: "Mi Comercio"
-    fun getComercioId(): String? = sessionManager.getComercioId()
+    override fun getUserName(): String = sessionManager.getUserName() ?: "Usuario"
+    override fun getComercioName(): String = sessionManager.getComercioName() ?: "Mi Comercio"
+    override fun getComercioId(): String? = sessionManager.getComercioId()
 }

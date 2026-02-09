@@ -1,25 +1,54 @@
 package py.gov.nandefact.shared.data.repository
 
 import py.gov.nandefact.shared.data.remote.ClienteApi
+import py.gov.nandefact.shared.data.remote.dto.ClienteDto
 import py.gov.nandefact.shared.db.NandefactDatabase
 import py.gov.nandefact.shared.domain.Cliente
+import py.gov.nandefact.shared.domain.ports.ClientePort
 
 class ClienteRepository(
     private val api: ClienteApi,
     private val database: NandefactDatabase
-) {
+) : ClientePort {
     private val queries = database.clienteQueries
 
-    fun getAll(comercioId: String): List<Cliente> {
+    override fun getAll(comercioId: String): List<Cliente> {
         return queries.selectAll(comercioId).executeAsList().map { it.toDomain() }
     }
 
-    fun search(comercioId: String, query: String): List<Cliente> {
+    override fun search(comercioId: String, query: String): List<Cliente> {
         return queries.search(comercioId, query, query).executeAsList().map { it.toDomain() }
     }
 
-    fun getById(id: String): Cliente? {
+    override fun getById(id: String): Cliente? {
         return queries.selectById(id).executeAsOneOrNull()?.toDomain()
+    }
+
+    /** Guarda cliente via API (create o update) */
+    override suspend fun save(cliente: Cliente): Result<Unit> {
+        val dto = ClienteDto(
+            id = cliente.id,
+            comercioId = cliente.comercioId,
+            nombre = cliente.nombre,
+            rucCi = cliente.rucCi,
+            tipoDocumento = cliente.tipoDocumento,
+            telefono = cliente.telefono,
+            email = cliente.email,
+            enviarWhatsapp = cliente.enviarWhatsApp,
+            frecuente = cliente.frecuente,
+            createdAt = cliente.createdAt.ifBlank { null }
+        )
+        return try {
+            val response = if (cliente.id.isNotBlank()) {
+                api.update(cliente.id, dto)
+            } else {
+                api.create(dto)
+            }
+            if (response.success) Result.success(Unit)
+            else Result.failure(Exception(response.error?.message ?: "Error guardando cliente"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     suspend fun refresh(comercioId: String): Result<List<Cliente>> {

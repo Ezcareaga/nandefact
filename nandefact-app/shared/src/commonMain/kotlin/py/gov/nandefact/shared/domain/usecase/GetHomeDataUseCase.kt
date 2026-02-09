@@ -1,7 +1,7 @@
 package py.gov.nandefact.shared.domain.usecase
 
-import py.gov.nandefact.shared.data.repository.AuthRepository
-import py.gov.nandefact.shared.data.repository.FacturaRepository
+import py.gov.nandefact.shared.domain.ports.AuthPort
+import py.gov.nandefact.shared.domain.ports.FacturaPort
 
 data class HomeData(
     val comercioName: String,
@@ -12,24 +12,24 @@ data class HomeData(
 )
 
 class GetHomeDataUseCase(
-    private val authRepository: AuthRepository,
-    private val facturaRepository: FacturaRepository
+    private val auth: AuthPort,
+    private val facturas: FacturaPort
 ) {
     suspend operator fun invoke(): HomeData {
-        val comercioId = authRepository.getComercioId() ?: return HomeData(
-            comercioName = authRepository.getComercioName(),
-            userName = authRepository.getUserName(),
+        val comercioId = auth.getComercioId() ?: return HomeData(
+            comercioName = auth.getComercioName(),
+            userName = auth.getUserName(),
             pendingCount = 0,
             lastSaleAmount = null,
             lastSaleTime = null
         )
 
-        val pendingCount = facturaRepository.countPendientes(comercioId)
-        val lastFactura = facturaRepository.getLastFactura(comercioId)
+        val pendingCount = facturas.countPendientes(comercioId)
+        val lastFactura = facturas.getLastFactura(comercioId)
 
         return HomeData(
-            comercioName = authRepository.getComercioName(),
-            userName = authRepository.getUserName(),
+            comercioName = auth.getComercioName(),
+            userName = auth.getUserName(),
             pendingCount = pendingCount,
             lastSaleAmount = lastFactura?.totalBruto,
             lastSaleTime = lastFactura?.createdAt

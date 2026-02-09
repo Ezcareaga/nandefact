@@ -4,15 +4,16 @@ import py.gov.nandefact.shared.data.remote.FacturaApi
 import py.gov.nandefact.shared.db.NandefactDatabase
 import py.gov.nandefact.shared.domain.Factura
 import py.gov.nandefact.shared.domain.ItemFactura
+import py.gov.nandefact.shared.domain.ports.FacturaPort
 
 class FacturaRepository(
     private val api: FacturaApi,
     private val database: NandefactDatabase
-) {
+) : FacturaPort {
     private val queries = database.facturaQueries
 
     /** Guarda factura localmente (offline-first) */
-    fun createLocal(factura: Factura, items: List<ItemFactura>) {
+    override fun createLocal(factura: Factura, items: List<ItemFactura>) {
         queries.insertFactura(
             id = factura.id,
             comercioId = factura.comercioId,
@@ -52,23 +53,23 @@ class FacturaRepository(
         }
     }
 
-    fun getAll(comercioId: String): List<Factura> {
+    override fun getAll(comercioId: String): List<Factura> {
         return queries.selectAll(comercioId).executeAsList().map { it.toDomain() }
     }
 
-    fun getPendientes(comercioId: String): List<Factura> {
+    override fun getPendientes(comercioId: String): List<Factura> {
         return queries.selectPendientes(comercioId).executeAsList().map { it.toDomain() }
     }
 
-    fun countPendientes(comercioId: String): Long {
+    override fun countPendientes(comercioId: String): Long {
         return queries.countPendientes(comercioId).executeAsOne()
     }
 
-    fun getLastFactura(comercioId: String): Factura? {
+    override fun getLastFactura(comercioId: String): Factura? {
         return queries.lastFactura(comercioId).executeAsOneOrNull()?.toDomain()
     }
 
-    fun getDetalles(facturaId: String): List<ItemFactura> {
+    override fun getDetalles(facturaId: String): List<ItemFactura> {
         return queries.selectDetalles(facturaId).executeAsList().map { row ->
             ItemFactura(
                 id = row.id,
@@ -85,7 +86,7 @@ class FacturaRepository(
         }
     }
 
-    fun updateEstado(facturaId: String, estado: String, respuesta: String?, syncedAt: String) {
+    override fun updateEstado(facturaId: String, estado: String, respuesta: String?, syncedAt: String) {
         queries.updateEstado(
             estadoSifen = estado,
             sifenRespuesta = respuesta,

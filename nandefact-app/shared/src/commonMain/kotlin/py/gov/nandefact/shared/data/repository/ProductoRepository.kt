@@ -1,26 +1,59 @@
 package py.gov.nandefact.shared.data.repository
 
 import py.gov.nandefact.shared.data.remote.ProductoApi
+import py.gov.nandefact.shared.data.remote.dto.ProductoDto
 import py.gov.nandefact.shared.db.NandefactDatabase
 import py.gov.nandefact.shared.domain.Producto
+import py.gov.nandefact.shared.domain.ports.ProductoPort
 
 class ProductoRepository(
     private val api: ProductoApi,
     private val database: NandefactDatabase
-) {
+) : ProductoPort {
     private val queries = database.productoQueries
 
     /** Retorna productos del cache local */
-    fun getAll(comercioId: String): List<Producto> {
+    override fun getAll(comercioId: String): List<Producto> {
         return queries.selectAll(comercioId).executeAsList().map { it.toDomain() }
     }
 
-    fun search(comercioId: String, query: String): List<Producto> {
+    override fun search(comercioId: String, query: String): List<Producto> {
         return queries.search(comercioId, query).executeAsList().map { it.toDomain() }
     }
 
-    fun getById(id: String): Producto? {
+    override fun getById(id: String): Producto? {
         return queries.selectById(id).executeAsOneOrNull()?.toDomain()
+    }
+
+    /** Guarda producto via API (create o update) */
+    override suspend fun save(producto: Producto): Result<Unit> {
+        val dto = ProductoDto(
+            id = producto.id,
+            comercioId = producto.comercioId,
+            nombre = producto.nombre,
+            codigo = producto.codigo,
+            precioUnitario = producto.precioUnitario,
+            unidadMedida = producto.unidadMedida,
+            ivaTipo = when (producto.tasaIva) {
+                10 -> "10%"
+                5 -> "5%"
+                else -> "exenta"
+            },
+            categoria = producto.categoria,
+            createdAt = producto.createdAt.ifBlank { null },
+            updatedAt = producto.updatedAt.ifBlank { null }
+        )
+        return try {
+            val response = if (producto.id.isNotBlank()) {
+                api.update(producto.id, dto)
+            } else {
+                api.create(dto)
+            }
+            if (response.success) Result.success(Unit)
+            else Result.failure(Exception(response.error?.message ?: "Error guardando producto"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     /** Sincroniza desde API y actualiza cache local */
