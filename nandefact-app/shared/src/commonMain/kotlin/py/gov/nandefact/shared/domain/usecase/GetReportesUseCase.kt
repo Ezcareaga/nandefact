@@ -1,8 +1,7 @@
 package py.gov.nandefact.shared.domain.usecase
 
-import py.gov.nandefact.shared.data.repository.AuthRepository
-import py.gov.nandefact.shared.data.repository.FacturaRepository
-import py.gov.nandefact.shared.domain.MontoIVA
+import py.gov.nandefact.shared.domain.ports.AuthPort
+import py.gov.nandefact.shared.domain.ports.FacturaPort
 
 data class ReportesData(
     val totalVentas: Long,
@@ -20,24 +19,24 @@ data class TopProductoData(
 )
 
 class GetReportesUseCase(
-    private val facturaRepository: FacturaRepository,
-    private val authRepository: AuthRepository
+    private val facturas: FacturaPort,
+    private val auth: AuthPort
 ) {
     suspend operator fun invoke(): ReportesData {
-        val comercioId = authRepository.getComercioId()
+        val comercioId = auth.getComercioId()
             ?: return ReportesData(0, 0, 0, 0, 0, emptyList())
 
-        val facturas = facturaRepository.getAll(comercioId)
+        val allFacturas = facturas.getAll(comercioId)
 
-        val totalVentas = facturas.sumOf { it.totalBruto }
-        val totalIva10 = facturas.sumOf { it.totalIva10 }
-        val totalIva5 = facturas.sumOf { it.totalIva5 }
-        val totalExenta = facturas.sumOf { it.totalExenta }
+        val totalVentas = allFacturas.sumOf { it.totalBruto }
+        val totalIva10 = allFacturas.sumOf { it.totalIva10 }
+        val totalIva5 = allFacturas.sumOf { it.totalIva5 }
+        val totalExenta = allFacturas.sumOf { it.totalExenta }
 
         // Top productos por detalles
         val productoCounts = mutableMapOf<String, Pair<Int, Long>>()
-        facturas.forEach { factura ->
-            val detalles = facturaRepository.getDetalles(factura.id)
+        allFacturas.forEach { factura ->
+            val detalles = facturas.getDetalles(factura.id)
             detalles.forEach { detalle ->
                 val key = detalle.descripcion
                 val current = productoCounts[key] ?: Pair(0, 0L)
@@ -55,7 +54,7 @@ class GetReportesUseCase(
 
         return ReportesData(
             totalVentas = totalVentas,
-            cantidadFacturas = facturas.size,
+            cantidadFacturas = allFacturas.size,
             totalIva10 = totalIva10,
             totalIva5 = totalIva5,
             totalExenta = totalExenta,

@@ -1,9 +1,8 @@
 package py.gov.nandefact.shared.domain.usecase
 
-import py.gov.nandefact.shared.data.remote.ProductoApi
-import py.gov.nandefact.shared.data.remote.dto.ProductoDto
-import py.gov.nandefact.shared.data.repository.AuthRepository
-import py.gov.nandefact.shared.data.repository.ProductoRepository
+import py.gov.nandefact.shared.domain.Producto
+import py.gov.nandefact.shared.domain.ports.AuthPort
+import py.gov.nandefact.shared.domain.ports.ProductoPort
 
 data class ProductoInput(
     val id: String? = null,
@@ -15,8 +14,8 @@ data class ProductoInput(
 )
 
 class SaveProductoUseCase(
-    private val productoApi: ProductoApi,
-    private val authRepository: AuthRepository
+    private val productos: ProductoPort,
+    private val auth: AuthPort
 ) {
     suspend operator fun invoke(input: ProductoInput): Result<Unit> {
         if (input.nombre.isBlank()) {
@@ -26,36 +25,19 @@ class SaveProductoUseCase(
             return Result.failure(IllegalArgumentException("Precio debe ser mayor a 0"))
         }
 
-        val comercioId = authRepository.getComercioId()
+        val comercioId = auth.getComercioId()
             ?: return Result.failure(IllegalStateException("Sin comercio autenticado"))
 
-        val dto = ProductoDto(
+        val producto = Producto(
             id = input.id ?: "",
             comercioId = comercioId,
             nombre = input.nombre,
-            codigo = null,
             precioUnitario = input.precioUnitario,
             unidadMedida = input.unidadMedida,
-            ivaTipo = when (input.tasaIva) {
-                10 -> "10%"
-                5 -> "5%"
-                else -> "exenta"
-            },
-            categoria = input.categoria,
-            createdAt = null,
-            updatedAt = null
+            tasaIva = input.tasaIva,
+            categoria = input.categoria
         )
 
-        return try {
-            val response = if (input.id != null) {
-                productoApi.update(input.id, dto)
-            } else {
-                productoApi.create(dto)
-            }
-            if (response.success) Result.success(Unit)
-            else Result.failure(Exception(response.error?.message ?: "Error guardando producto"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return productos.save(producto)
     }
 }

@@ -2,9 +2,12 @@ package py.gov.nandefact.ui.clientes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import py.gov.nandefact.shared.domain.usecase.ClienteInput
 import py.gov.nandefact.shared.domain.usecase.GetClientesUseCase
@@ -59,9 +62,16 @@ class ClientesViewModel(
 
     private var allClientes: List<ClienteUi> = emptyList()
     private val pageSize = 20
+    private val _searchInput = MutableStateFlow("")
 
     init {
         loadClientes()
+        @OptIn(FlowPreview::class)
+        viewModelScope.launch {
+            _searchInput.debounce(300).distinctUntilChanged().collect { query ->
+                _listState.value = _listState.value.copy(searchQuery = query)
+            }
+        }
     }
 
     private fun loadClientes() {
@@ -103,7 +113,7 @@ class ClientesViewModel(
     }
 
     fun onSearchChange(query: String) {
-        _listState.value = _listState.value.copy(searchQuery = query)
+        _searchInput.value = query
     }
 
     fun loadClienteForEdit(id: String) {

@@ -1,9 +1,9 @@
 package py.gov.nandefact.shared.domain.usecase
 
-import py.gov.nandefact.shared.data.repository.AuthRepository
+import py.gov.nandefact.shared.domain.ports.AuthPort
 
 class LoginUseCase(
-    private val authRepository: AuthRepository
+    private val auth: AuthPort
 ) {
     suspend operator fun invoke(phone: String, pin: String): Result<Unit> {
         if (phone.length < 9) {
@@ -12,6 +12,6 @@ class LoginUseCase(
         if (pin.length < 4) {
             return Result.failure(IllegalArgumentException("PIN debe tener al menos 4 digitos"))
         }
-        return authRepository.login(phone, pin)
+        return auth.login(phone, pin)
     }
 }

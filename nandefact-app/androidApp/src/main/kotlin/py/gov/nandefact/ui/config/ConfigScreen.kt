@@ -16,13 +16,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,7 +41,10 @@ import py.gov.nandefact.ui.theme.NfSuccess
 
 @Composable
 fun ConfigScreen(
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    isDarkTheme: Boolean = true,
+    onToggleTheme: () -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -147,6 +156,75 @@ fun ConfigScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Agregar vendedor")
             }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Apariencia
+        NfCard {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = if (isDarkTheme) Icons.Filled.DarkMode else Icons.Filled.LightMode,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Modo oscuro",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.weight(1f)
+                )
+                Switch(
+                    checked = isDarkTheme,
+                    onCheckedChange = { onToggleTheme() },
+                    colors = SwitchDefaults.colors(
+                        checkedTrackColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Plan
+        NfCard {
+            Text(
+                text = "Plan",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "ÑandeFact Básico",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Gs 100.000/mes",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Cerrar sesión
+        OutlinedButton(
+            onClick = onLogout,
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.error
+            )
+        ) {
+            Text("Cerrar sesión")
         }
 
         Spacer(modifier = Modifier.height(80.dp))

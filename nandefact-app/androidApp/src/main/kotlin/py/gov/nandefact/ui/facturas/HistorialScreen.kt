@@ -19,10 +19,8 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +32,7 @@ import py.gov.nandefact.ui.components.NfSearchBar
 import py.gov.nandefact.ui.components.NfStatusDot
 import py.gov.nandefact.ui.components.StatusColor
 import py.gov.nandefact.ui.components.formatPYG
+import py.gov.nandefact.ui.util.OnNearEnd
 
 @Composable
 fun HistorialScreen(
@@ -44,17 +43,8 @@ fun HistorialScreen(
     val state by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
 
-    // Paginacion: cargar mas al llegar al final
-    LaunchedEffect(listState) {
-        snapshotFlow {
-            val layoutInfo = listState.layoutInfo
-            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            lastVisible >= layoutInfo.totalItemsCount - 3
-        }.collect { nearEnd ->
-            if (nearEnd && state.hasMore) {
-                viewModel.loadMore()
-            }
-        }
+    listState.OnNearEnd {
+        if (state.hasMore) viewModel.loadMore()
     }
 
     Column(

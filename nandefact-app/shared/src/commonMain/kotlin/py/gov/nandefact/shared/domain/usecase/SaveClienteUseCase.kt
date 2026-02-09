@@ -1,8 +1,8 @@
 package py.gov.nandefact.shared.domain.usecase
 
-import py.gov.nandefact.shared.data.remote.ClienteApi
-import py.gov.nandefact.shared.data.remote.dto.ClienteDto
-import py.gov.nandefact.shared.data.repository.AuthRepository
+import py.gov.nandefact.shared.domain.Cliente
+import py.gov.nandefact.shared.domain.ports.AuthPort
+import py.gov.nandefact.shared.domain.ports.ClientePort
 
 data class ClienteInput(
     val id: String? = null,
@@ -15,18 +15,18 @@ data class ClienteInput(
 )
 
 class SaveClienteUseCase(
-    private val clienteApi: ClienteApi,
-    private val authRepository: AuthRepository
+    private val clientes: ClientePort,
+    private val auth: AuthPort
 ) {
     suspend operator fun invoke(input: ClienteInput): Result<Unit> {
         if (input.nombre.isBlank()) {
             return Result.failure(IllegalArgumentException("Nombre es obligatorio"))
         }
 
-        val comercioId = authRepository.getComercioId()
+        val comercioId = auth.getComercioId()
             ?: return Result.failure(IllegalStateException("Sin comercio autenticado"))
 
-        val dto = ClienteDto(
+        val cliente = Cliente(
             id = input.id ?: "",
             comercioId = comercioId,
             nombre = input.nombre,
@@ -34,20 +34,9 @@ class SaveClienteUseCase(
             tipoDocumento = input.tipoDocumento,
             telefono = input.telefono,
             email = input.email,
-            enviarWhatsapp = input.enviarWhatsApp,
-            createdAt = null
+            enviarWhatsApp = input.enviarWhatsApp
         )
 
-        return try {
-            val response = if (input.id != null) {
-                clienteApi.update(input.id, dto)
-            } else {
-                clienteApi.create(dto)
-            }
-            if (response.success) Result.success(Unit)
-            else Result.failure(Exception(response.error?.message ?: "Error guardando cliente"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return clientes.save(cliente)
     }
 }

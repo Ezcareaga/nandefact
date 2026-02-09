@@ -2,9 +2,12 @@ package py.gov.nandefact.ui.productos
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import py.gov.nandefact.shared.domain.usecase.GetProductosUseCase
 import py.gov.nandefact.shared.domain.usecase.ProductoInput
@@ -58,9 +61,16 @@ class ProductosViewModel(
 
     private var allProductos: List<ProductoUi> = emptyList()
     private val pageSize = 20
+    private val _searchInput = MutableStateFlow("")
 
     init {
         loadProductos()
+        @OptIn(FlowPreview::class)
+        viewModelScope.launch {
+            _searchInput.debounce(300).distinctUntilChanged().collect { query ->
+                _listState.value = _listState.value.copy(searchQuery = query)
+            }
+        }
     }
 
     private fun loadProductos() {
@@ -102,7 +112,7 @@ class ProductosViewModel(
     }
 
     fun onSearchChange(query: String) {
-        _listState.value = _listState.value.copy(searchQuery = query)
+        _searchInput.value = query
     }
 
     fun loadProductoForEdit(id: String) {

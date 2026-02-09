@@ -54,6 +54,7 @@ fun ReportesScreen(
                     PeriodFilter.HOY -> "Hoy"
                     PeriodFilter.SEMANA -> "Semana"
                     PeriodFilter.MES -> "Mes"
+                    PeriodFilter.TODO -> "Todo"
                 }
                 FilterChip(
                     selected = state.period == period,

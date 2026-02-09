@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
+import py.gov.nandefact.ui.components.NfOfflineBanner
 import py.gov.nandefact.ui.components.NfProgressBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,12 +35,14 @@ import py.gov.nandefact.ui.components.NfProgressBar
 fun FacturacionWizardScreen(
     onClose: () -> Unit,
     onNuevaVenta: () -> Unit,
+    isOnline: Boolean = true,
     viewModel: FacturacionViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
+            Column {
             if (!state.isGenerated) {
                 TopAppBar(
                     title = {
@@ -75,6 +81,14 @@ fun FacturacionWizardScreen(
                         containerColor = MaterialTheme.colorScheme.background
                     )
                 )
+            }
+            AnimatedVisibility(
+                visible = !isOnline,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                NfOfflineBanner()
+            }
             }
         },
         containerColor = MaterialTheme.colorScheme.background

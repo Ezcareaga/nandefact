@@ -149,7 +149,7 @@ fun HomeScreen(
                 ) {
                     NfStatusDot(status = StatusColor.SUCCESS)
                     Text(
-                        text = " Última: ${formatPYG(state.lastSaleAmount!!)}",
+                        text = " Última: ${state.lastSaleAmount?.let { formatPYG(it) } ?: ""}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.weight(1f)

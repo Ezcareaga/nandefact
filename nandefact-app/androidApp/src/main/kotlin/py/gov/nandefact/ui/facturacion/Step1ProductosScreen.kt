@@ -11,8 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
+import py.gov.nandefact.ui.util.OnNearEnd
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -50,17 +49,8 @@ fun Step1ProductosScreen(
         // Lista de productos con paginacion
         val listState = rememberLazyListState()
 
-        // Detectar scroll al final para cargar mas
-        LaunchedEffect(listState) {
-            snapshotFlow {
-                val layoutInfo = listState.layoutInfo
-                val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-                lastVisible >= layoutInfo.totalItemsCount - 3
-            }.collect { nearEnd ->
-                if (nearEnd && state.hasMore) {
-                    onLoadMore()
-                }
-            }
+        listState.OnNearEnd {
+            if (state.hasMore) onLoadMore()
         }
 
         LazyColumn(

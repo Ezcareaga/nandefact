@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.DarkMode
@@ -14,6 +13,7 @@ import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Receipt
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,12 +30,13 @@ fun NfDrawerMenu(
     isDarkTheme: Boolean,
     onToggleTheme: () -> Unit,
     onNavigateConfig: () -> Unit,
+    onNavigateHistorial: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ModalDrawerSheet(
         modifier = modifier
-            .width(280.dp)
+            .fillMaxWidth(0.78f)
             .fillMaxHeight(),
         drawerContainerColor = MaterialTheme.colorScheme.surface
     ) {
@@ -80,6 +81,15 @@ fun NfDrawerMenu(
                 label = { Text("Configuración SIFEN") },
                 selected = false,
                 onClick = onNavigateConfig,
+                colors = drawerColors,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+
+            NavigationDrawerItem(
+                icon = { Icon(Icons.Outlined.Receipt, contentDescription = null) },
+                label = { Text("Historial de ventas") },
+                selected = false,
+                onClick = onNavigateHistorial,
                 colors = drawerColors,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )

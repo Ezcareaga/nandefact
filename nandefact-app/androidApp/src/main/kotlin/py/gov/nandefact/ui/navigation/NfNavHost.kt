@@ -20,6 +20,7 @@ import py.gov.nandefact.ui.pendientes.PendientesScreen
 import py.gov.nandefact.ui.productos.ProductoFormScreen
 import py.gov.nandefact.ui.productos.ProductosListScreen
 import py.gov.nandefact.ui.reportes.ReportesScreen
+import androidx.compose.runtime.collectAsState
 import org.koin.compose.koinInject
 import py.gov.nandefact.shared.sync.NetworkMonitor
 import py.gov.nandefact.ui.theme.NandefactTheme
@@ -38,6 +39,9 @@ fun NfNavHost() {
         navController.navigate(Routes.Home.route) {
             popUpTo(Routes.Home.route) { inclusive = true }
         }
+    }
+    val navigateHistorial: () -> Unit = {
+        navController.navigate(Routes.Historial.route)
     }
     val logout: () -> Unit = {
         navController.navigate(Routes.Login.route) {
@@ -71,6 +75,7 @@ fun NfNavHost() {
                     onNavigateHome = {},
                     onNavigateBack = null,
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -87,8 +92,10 @@ fun NfNavHost() {
 
             // Facturación — full screen modal, sin scaffold
             composable(Routes.Facturacion.route) {
+                val isOnline by networkMonitor.isOnline.collectAsState()
                 FacturacionWizardScreen(
                     onClose = { navController.popBackStack() },
+                    isOnline = isOnline,
                     onNuevaVenta = {
                         navController.navigate(Routes.Facturacion.route) {
                             popUpTo(Routes.Facturacion.route) { inclusive = true }
@@ -107,6 +114,7 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -132,6 +140,7 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -149,6 +158,7 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -174,6 +184,7 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -191,6 +202,7 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -214,6 +226,7 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -234,6 +247,7 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -251,6 +265,7 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = { navController.navigate(Routes.Config.route) },
+                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -268,10 +283,16 @@ fun NfNavHost() {
                     onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateConfig = {},
+                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
-                    ConfigScreen(paddingValues = paddingValues)
+                    ConfigScreen(
+                        paddingValues = paddingValues,
+                        isDarkTheme = isDarkTheme,
+                        onToggleTheme = { isDarkTheme = !isDarkTheme },
+                        onLogout = logout
+                    )
                 }
             }
         }

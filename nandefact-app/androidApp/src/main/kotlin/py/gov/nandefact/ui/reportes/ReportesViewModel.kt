@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import py.gov.nandefact.shared.domain.usecase.GetReportesUseCase
 
-enum class PeriodFilter { HOY, SEMANA, MES }
+enum class PeriodFilter { HOY, SEMANA, MES, TODO }
 
 data class TopProducto(
     val nombre: String,

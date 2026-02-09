@@ -30,14 +30,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import py.gov.nandefact.ui.components.ClienteSelectorItem
+import py.gov.nandefact.ui.components.NfClientSelector
 import py.gov.nandefact.ui.components.NfPaymentToggle
-import py.gov.nandefact.ui.components.NfSearchBar
 import py.gov.nandefact.ui.components.PaymentCondition
 
 @Composable
 fun Step2ClienteScreen(
     state: FacturacionUiState,
     onClienteSearchChange: (String) -> Unit,
+    clientesDisponibles: List<ClienteSelectorItem> = emptyList(),
     onSelectInnominado: () -> Unit,
     onTipoDocChange: (String) -> Unit,
     onRucCiChange: (String) -> Unit,
@@ -71,32 +73,17 @@ fun Step2ClienteScreen(
                 modifier = Modifier.padding(vertical = 12.dp)
             )
 
-            NfSearchBar(
-                query = state.clienteSearchQuery,
-                onQueryChange = onClienteSearchChange,
-                placeholder = "Buscar por nombre o CI/RUC..."
+            NfClientSelector(
+                clientes = clientesDisponibles,
+                searchQuery = state.clienteSearchQuery,
+                onSearchChange = onClienteSearchChange,
+                onClienteSelected = { selected ->
+                    onNombreChange(selected.nombre)
+                    onTipoDocChange(selected.tipoDocumento)
+                    if (!selected.rucCi.isNullOrBlank()) onRucCiChange(selected.rucCi)
+                },
+                onSinNombre = onSelectInnominado
             )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Botón SIN NOMBRE
-            OutlinedButton(
-                onClick = onSelectInnominado,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = MaterialTheme.shapes.medium,
-                border = ButtonDefaults.outlinedButtonBorder(enabled = true)
-            ) {
-                Text(
-                    text = "SIN NOMBRE",
-                    fontWeight = FontWeight.Bold,
-                    color = if (state.cliente.isInnominado)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
