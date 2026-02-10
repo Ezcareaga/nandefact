@@ -14,8 +14,35 @@ class ClienteRepository(
 ) : ClientePort {
     private val queries = database.clienteQueries
 
+    private var seeded = false
+
     override fun getAll(comercioId: String): List<Cliente> {
-        return queries.selectAll(comercioId).executeAsList().map { it.toDomain() }
+        val results = queries.selectAll(comercioId).executeAsList()
+        if (results.isEmpty() && demoMode && !seeded) {
+            seedDemoData(comercioId)
+            seeded = true
+            return queries.selectAll(comercioId).executeAsList().map { it.toDomain() }
+        }
+        return results.map { it.toDomain() }
+    }
+
+    private fun seedDemoData(comercioId: String) {
+        val seeds = listOf(
+            Cliente("seed-c-01", comercioId, "Juan Pérez", "4567890", "CI", "0981123456"),
+            Cliente("seed-c-02", comercioId, "María González", "80012345-6", "RUC", "0991654321"),
+            Cliente("seed-c-03", comercioId, "Carlos López", "3456789", "CI", "0971987654"),
+            Cliente("seed-c-04", comercioId, "Ana Martínez", "5678901", "CI"),
+            Cliente("seed-c-05", comercioId, "Empresa ABC S.A.", "80098765-4", "RUC", "021456789")
+        )
+        seeds.forEach { c ->
+            queries.upsert(
+                id = c.id, comercioId = c.comercioId, nombre = c.nombre,
+                rucCi = c.rucCi, tipoDocumento = c.tipoDocumento,
+                telefono = c.telefono, email = c.email,
+                enviarWhatsApp = if (c.enviarWhatsApp) 1L else 0L,
+                frecuente = if (c.frecuente) 1L else 0L, createdAt = ""
+            )
+        }
     }
 
     override fun search(comercioId: String, query: String): List<Cliente> {

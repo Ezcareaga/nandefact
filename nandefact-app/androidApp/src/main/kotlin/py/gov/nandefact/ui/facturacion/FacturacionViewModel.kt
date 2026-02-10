@@ -9,10 +9,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import py.gov.nandefact.shared.domain.usecase.ClienteInput
 import py.gov.nandefact.shared.domain.usecase.CrearFacturaLocalUseCase
 import py.gov.nandefact.shared.domain.usecase.FacturaInput
 import py.gov.nandefact.shared.domain.usecase.GetProductosUseCase
 import py.gov.nandefact.shared.domain.usecase.ItemInput
+import py.gov.nandefact.shared.domain.usecase.SaveClienteUseCase
 import py.gov.nandefact.ui.components.PaymentCondition
 
 // Producto en el wizard
@@ -92,7 +94,8 @@ data class FacturacionUiState(
 
 class FacturacionViewModel(
     private val getProductos: GetProductosUseCase,
-    private val crearFacturaLocal: CrearFacturaLocalUseCase
+    private val crearFacturaLocal: CrearFacturaLocalUseCase,
+    private val saveCliente: SaveClienteUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(FacturacionUiState())
     val uiState: StateFlow<FacturacionUiState> = _uiState.asStateFlow()
@@ -129,10 +132,6 @@ class FacturacionViewModel(
                     precioUnitario = p.precioUnitario,
                     tasaIva = p.tasaIva
                 )
-            }
-            // Si no hay productos en DB, usar samples
-            if (allProductos.isEmpty()) {
-                allProductos = sampleProductos()
             }
             val firstPage = allProductos.take(pageSize)
             _uiState.value = _uiState.value.copy(
@@ -181,8 +180,31 @@ class FacturacionViewModel(
 
     fun nextStep() {
         val current = _uiState.value.currentStep
+        if (current == 1) {
+            saveClienteIfNeeded()
+        }
         if (current < 3) {
             _uiState.value = _uiState.value.copy(currentStep = current + 1)
+        }
+    }
+
+    private fun saveClienteIfNeeded() {
+        val cliente = _uiState.value.cliente
+        if (!cliente.guardarCliente || cliente.isInnominado) return
+        if (cliente.nombre.isBlank()) return
+
+        viewModelScope.launch {
+            val result = saveCliente(
+                ClienteInput(
+                    nombre = cliente.nombre,
+                    tipoDocumento = cliente.tipoDocumento,
+                    rucCi = cliente.rucCi.ifBlank { null },
+                    telefono = cliente.telefono.ifBlank { null }
+                )
+            )
+            if (result.isSuccess) {
+                // Cliente guardado — se mostrará en la lista de clientes
+            }
         }
     }
 
@@ -279,17 +301,3 @@ class FacturacionViewModel(
         loadProductos()
     }
 }
-
-// Datos de muestra para desarrollo (cuando no hay productos en DB)
-private fun sampleProductos(): List<ProductoItem> = listOf(
-    ProductoItem("1", "Mandioca", "kg", 5_000, 5),
-    ProductoItem("2", "Cebolla", "kg", 4_000, 5),
-    ProductoItem("3", "Banana", "docena", 15_000, 5),
-    ProductoItem("4", "Tomate", "kg", 8_000, 5),
-    ProductoItem("5", "Arroz", "kg", 6_500, 10),
-    ProductoItem("6", "Aceite", "litro", 18_000, 10),
-    ProductoItem("7", "Fideos", "unidad", 4_500, 10),
-    ProductoItem("8", "Yerba Mate", "kg", 25_000, 10),
-    ProductoItem("9", "Azúcar", "kg", 5_500, 10),
-    ProductoItem("10", "Sal", "kg", 3_000, 10)
-)

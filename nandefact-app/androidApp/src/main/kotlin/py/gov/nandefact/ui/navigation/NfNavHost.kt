@@ -132,9 +132,10 @@ fun NfNavHost() {
             }
 
             // Producto form (crear/editar)
-            composable(Routes.ProductoForm.route) {
+            composable(Routes.ProductoForm.route) { backStackEntry ->
+                val productoId = backStackEntry.arguments?.getString("productoId")
                 NfScaffold(
-                    title = "Producto",
+                    title = if (productoId != null && productoId != "new") "Editar producto" else "Nuevo producto",
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
@@ -147,6 +148,7 @@ fun NfNavHost() {
                 ) { paddingValues ->
                     ProductoFormScreen(
                         paddingValues = paddingValues,
+                        productoId = productoId,
                         onSaveSuccess = { navController.popBackStack() }
                     )
                 }
@@ -179,9 +181,10 @@ fun NfNavHost() {
             }
 
             // Cliente form (crear/editar)
-            composable(Routes.ClienteForm.route) {
+            composable(Routes.ClienteForm.route) { backStackEntry ->
+                val clienteId = backStackEntry.arguments?.getString("clienteId")
                 NfScaffold(
-                    title = "Cliente",
+                    title = if (clienteId != null && clienteId != "new") "Editar cliente" else "Nuevo cliente",
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
@@ -194,6 +197,7 @@ fun NfNavHost() {
                 ) { paddingValues ->
                     ClienteFormScreen(
                         paddingValues = paddingValues,
+                        clienteId = clienteId,
                         onSaveSuccess = { navController.popBackStack() }
                     )
                 }

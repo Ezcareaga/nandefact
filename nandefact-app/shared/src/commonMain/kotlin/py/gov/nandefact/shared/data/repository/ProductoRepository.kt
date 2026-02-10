@@ -14,9 +14,40 @@ class ProductoRepository(
 ) : ProductoPort {
     private val queries = database.productoQueries
 
-    /** Retorna productos del cache local */
+    private var seeded = false
+
+    /** Retorna productos del cache local; en demo mode siembra datos iniciales */
     override fun getAll(comercioId: String): List<Producto> {
-        return queries.selectAll(comercioId).executeAsList().map { it.toDomain() }
+        val results = queries.selectAll(comercioId).executeAsList()
+        if (results.isEmpty() && demoMode && !seeded) {
+            seedDemoData(comercioId)
+            seeded = true
+            return queries.selectAll(comercioId).executeAsList().map { it.toDomain() }
+        }
+        return results.map { it.toDomain() }
+    }
+
+    private fun seedDemoData(comercioId: String) {
+        val seeds = listOf(
+            Producto("seed-p-01", comercioId, "Mandioca", null, 5_000, "kg", 5, "Verduras"),
+            Producto("seed-p-02", comercioId, "Cebolla", null, 4_000, "kg", 5, "Verduras"),
+            Producto("seed-p-03", comercioId, "Banana", null, 15_000, "docena", 5, "Frutas"),
+            Producto("seed-p-04", comercioId, "Tomate", null, 8_000, "kg", 5, "Verduras"),
+            Producto("seed-p-05", comercioId, "Arroz", null, 6_500, "kg", 10, "Granos"),
+            Producto("seed-p-06", comercioId, "Aceite", null, 18_000, "litro", 10, "Comestibles"),
+            Producto("seed-p-07", comercioId, "Fideos", null, 4_500, "unidad", 10, "Comestibles"),
+            Producto("seed-p-08", comercioId, "Yerba Mate", null, 25_000, "kg", 10, "Bebidas"),
+            Producto("seed-p-09", comercioId, "Azúcar", null, 5_500, "kg", 10, "Comestibles"),
+            Producto("seed-p-10", comercioId, "Sal", null, 3_000, "kg", 10, "Comestibles")
+        )
+        seeds.forEach { p ->
+            queries.upsert(
+                id = p.id, comercioId = p.comercioId, nombre = p.nombre,
+                codigo = p.codigo, precioUnitario = p.precioUnitario,
+                unidadMedida = p.unidadMedida, tasaIva = p.tasaIva.toLong(),
+                categoria = p.categoria, activo = 1L, createdAt = "", updatedAt = ""
+            )
+        }
     }
 
     override fun search(comercioId: String, query: String): List<Producto> {

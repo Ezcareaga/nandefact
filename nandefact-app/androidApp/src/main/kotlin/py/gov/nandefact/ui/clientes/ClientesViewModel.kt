@@ -93,9 +93,6 @@ class ClientesViewModel(
                     enviarWhatsApp = c.enviarWhatsApp
                 )
             }
-            if (allClientes.isEmpty()) {
-                allClientes = sampleClientes()
-            }
             val firstPage = allClientes.take(pageSize)
             _listState.value = _listState.value.copy(
                 clientes = firstPage,
@@ -122,17 +119,21 @@ class ClientesViewModel(
         _searchInput.value = query
     }
 
-    fun loadClienteForEdit(id: String) {
-        val cliente = allClientes.find { it.id == id } ?: return
-        _formState.value = ClienteFormState(
-            id = cliente.id,
-            nombre = cliente.nombre,
-            tipoDocumento = cliente.tipoDocumento,
-            rucCi = cliente.rucCi,
-            telefono = cliente.telefono,
-            enviarWhatsApp = cliente.enviarWhatsApp,
-            isEditing = true
-        )
+    fun loadForEdit(id: String) {
+        viewModelScope.launch {
+            val clientes = getClientes()
+            val found = clientes.find { it.id == id } ?: return@launch
+            _formState.value = ClienteFormState(
+                id = found.id,
+                nombre = found.nombre,
+                tipoDocumento = found.tipoDocumento,
+                rucCi = found.rucCi ?: "",
+                telefono = found.telefono ?: "",
+                email = found.email ?: "",
+                enviarWhatsApp = found.enviarWhatsApp,
+                isEditing = true
+            )
+        }
     }
 
     fun resetForm() {
@@ -170,11 +171,3 @@ class ClientesViewModel(
         }
     }
 }
-
-private fun sampleClientes(): List<ClienteUi> = listOf(
-    ClienteUi("1", "Juan Pérez", "CI", "4.567.890", "0981123456"),
-    ClienteUi("2", "María González", "RUC", "80012345-6", "0991654321"),
-    ClienteUi("3", "Carlos López", "CI", "3.456.789", "0971987654"),
-    ClienteUi("4", "Ana Martínez", "CI", "5.678.901", ""),
-    ClienteUi("5", "Empresa ABC S.A.", "RUC", "80098765-4", "021456789")
-)

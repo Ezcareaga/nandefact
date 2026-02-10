@@ -104,7 +104,7 @@ val appModule = module {
     // ViewModels
     viewModel { HomeViewModel(get()) }
     viewModel { LoginViewModel(get()) }
-    viewModel { FacturacionViewModel(get(), get()) }
+    viewModel { FacturacionViewModel(get(), get(), get()) }
     viewModel { ProductosViewModel(get(), get()) }
     viewModel { ClientesViewModel(get(), get()) }
     viewModel { HistorialViewModel(get()) }

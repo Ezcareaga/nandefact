@@ -35,10 +35,19 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ClienteFormScreen(
     paddingValues: PaddingValues,
+    clienteId: String? = null,
     onSaveSuccess: () -> Unit = {},
     viewModel: ClientesViewModel = koinViewModel()
 ) {
     val state by viewModel.formState.collectAsState()
+
+    LaunchedEffect(clienteId) {
+        if (clienteId != null && clienteId != "new") {
+            viewModel.loadForEdit(clienteId)
+        } else {
+            viewModel.resetForm()
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.saveSuccess.collect { onSaveSuccess() }

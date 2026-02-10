@@ -92,9 +92,6 @@ class ProductosViewModel(
                     categoria = p.categoria ?: ""
                 )
             }
-            if (allProductos.isEmpty()) {
-                allProductos = sampleProductos()
-            }
             val firstPage = allProductos.take(pageSize)
             _listState.value = _listState.value.copy(
                 productos = firstPage,
@@ -121,17 +118,20 @@ class ProductosViewModel(
         _searchInput.value = query
     }
 
-    fun loadProductoForEdit(id: String) {
-        val producto = allProductos.find { it.id == id } ?: return
-        _formState.value = ProductoFormState(
-            id = producto.id,
-            nombre = producto.nombre,
-            precioUnitario = producto.precioUnitario.toString(),
-            unidadMedida = producto.unidadMedida,
-            tasaIva = producto.tasaIva,
-            categoria = producto.categoria,
-            isEditing = true
-        )
+    fun loadForEdit(id: String) {
+        viewModelScope.launch {
+            val productos = getProductos()
+            val found = productos.find { it.id == id } ?: return@launch
+            _formState.value = ProductoFormState(
+                id = found.id,
+                nombre = found.nombre,
+                precioUnitario = found.precioUnitario.toString(),
+                unidadMedida = found.unidadMedida,
+                tasaIva = found.tasaIva,
+                categoria = found.categoria ?: "",
+                isEditing = true
+            )
+        }
     }
 
     fun resetForm() {
@@ -181,14 +181,3 @@ class ProductosViewModel(
         }
     }
 }
-
-private fun sampleProductos(): List<ProductoUi> = listOf(
-    ProductoUi("1", "Mandioca", 5_000, "kg", 5, "Verduras"),
-    ProductoUi("2", "Cebolla", 4_000, "kg", 5, "Verduras"),
-    ProductoUi("3", "Banana", 15_000, "docena", 5, "Frutas"),
-    ProductoUi("4", "Tomate", 8_000, "kg", 5, "Verduras"),
-    ProductoUi("5", "Arroz", 6_500, "kg", 10, "Granos"),
-    ProductoUi("6", "Aceite", 18_000, "litro", 10, "Comestibles"),
-    ProductoUi("7", "Fideos", 4_500, "unidad", 10, "Comestibles"),
-    ProductoUi("8", "Yerba Mate", 25_000, "kg", 10, "Bebidas")
-)
