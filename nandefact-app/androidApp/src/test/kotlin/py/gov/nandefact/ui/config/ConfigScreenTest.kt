@@ -4,15 +4,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import py.gov.nandefact.TestNandefactApp
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [33])
+@Config(sdk = [33], application = TestNandefactApp::class)
 class ConfigScreenTest {
 
     @get:Rule
@@ -40,12 +42,12 @@ class ConfigScreenTest {
     @Test
     fun `shows dark mode toggle`() {
         setContent()
-        composeRule.onNodeWithText("Modo oscuro").assertIsDisplayed()
+        composeRule.onNodeWithText("Modo oscuro").performScrollTo().assertIsDisplayed()
     }
 
     @Test
     fun `shows cerrar sesion button`() {
         setContent()
-        composeRule.onNodeWithText("Cerrar sesión").assertIsDisplayed()
+        composeRule.onNodeWithText("Cerrar sesión").performScrollTo().assertIsDisplayed()
     }
 }

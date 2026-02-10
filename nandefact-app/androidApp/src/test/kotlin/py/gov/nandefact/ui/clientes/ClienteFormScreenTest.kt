@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,13 +21,14 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import py.gov.nandefact.TestData
+import py.gov.nandefact.TestNandefactApp
 import py.gov.nandefact.fakes.FakeAuthPort
 import py.gov.nandefact.fakes.FakeClientePort
 import py.gov.nandefact.shared.domain.usecase.GetClientesUseCase
 import py.gov.nandefact.shared.domain.usecase.SaveClienteUseCase
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [33])
+@Config(sdk = [33], application = TestNandefactApp::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class ClienteFormScreenTest {
 
@@ -69,7 +71,7 @@ class ClienteFormScreenTest {
 
         composeRule.onNodeWithText("Nombre *").assertIsDisplayed()
         composeRule.onNodeWithText("Tipo de documento").assertIsDisplayed()
-        composeRule.onNodeWithText("Enviar WhatsApp automático").assertIsDisplayed()
+        composeRule.onNodeWithText("Enviar WhatsApp automático").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -85,7 +87,7 @@ class ClienteFormScreenTest {
         }
         composeRule.waitForIdle()
 
-        composeRule.onNodeWithText("Guardar").assertIsDisplayed()
+        composeRule.onNodeWithText("Guardar").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -105,6 +107,6 @@ class ClienteFormScreenTest {
         }
         composeRule.waitForIdle()
 
-        composeRule.onNodeWithText("Actualizar").assertIsDisplayed()
+        composeRule.onNodeWithText("Actualizar").performScrollTo().assertIsDisplayed()
     }
 }

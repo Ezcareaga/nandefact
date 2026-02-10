@@ -17,11 +17,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import py.gov.nandefact.TestNandefactApp
 import py.gov.nandefact.fakes.FakeAuthPort
 import py.gov.nandefact.shared.domain.usecase.LoginUseCase
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [33])
+@Config(sdk = [33], application = TestNandefactApp::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginScreenTest {
 

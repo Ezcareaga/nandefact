@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,13 +21,14 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import py.gov.nandefact.TestData
+import py.gov.nandefact.TestNandefactApp
 import py.gov.nandefact.fakes.FakeAuthPort
 import py.gov.nandefact.fakes.FakeProductoPort
 import py.gov.nandefact.shared.domain.usecase.GetProductosUseCase
 import py.gov.nandefact.shared.domain.usecase.SaveProductoUseCase
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [33])
+@Config(sdk = [33], application = TestNandefactApp::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProductoFormScreenTest {
 
@@ -69,9 +71,9 @@ class ProductoFormScreenTest {
 
         composeRule.onNodeWithText("Nombre *").assertIsDisplayed()
         composeRule.onNodeWithText("Precio unitario (Gs) *").assertIsDisplayed()
-        composeRule.onNodeWithText("Unidad de medida").assertIsDisplayed()
-        composeRule.onNodeWithText("Tasa IVA").assertIsDisplayed()
-        composeRule.onNodeWithText("Categoría").assertIsDisplayed()
+        composeRule.onNodeWithText("Unidad de medida").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Tasa IVA").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Categoría").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -87,7 +89,7 @@ class ProductoFormScreenTest {
         }
         composeRule.waitForIdle()
 
-        composeRule.onNodeWithText("Guardar").assertIsDisplayed()
+        composeRule.onNodeWithText("Guardar").performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -107,6 +109,6 @@ class ProductoFormScreenTest {
         }
         composeRule.waitForIdle()
 
-        composeRule.onNodeWithText("Actualizar").assertIsDisplayed()
+        composeRule.onNodeWithText("Actualizar").performScrollTo().assertIsDisplayed()
     }
 }
