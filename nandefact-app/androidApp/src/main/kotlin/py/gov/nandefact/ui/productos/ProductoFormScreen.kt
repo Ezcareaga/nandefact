@@ -25,6 +25,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,9 +42,14 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ProductoFormScreen(
     paddingValues: PaddingValues,
+    onSaveSuccess: () -> Unit = {},
     viewModel: ProductosViewModel = koinViewModel()
 ) {
     val state by viewModel.formState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.saveSuccess.collect { onSaveSuccess() }
+    }
     var unidadExpanded by remember { mutableStateOf(false) }
     val unidades = listOf("unidad", "kg", "litro", "docena")
 

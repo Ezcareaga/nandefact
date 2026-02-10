@@ -83,8 +83,8 @@ val appModule = module {
     // Ports (interfaces de domain) → implementaciones en data/
     single<AuthPort> { AuthRepository(get(), get(), BuildConfig.DEMO_MODE) }
     single<FacturaPort> { FacturaRepository(get(), get()) }
-    single<ProductoPort> { ProductoRepository(get(), get()) }
-    single<ClientePort> { ClienteRepository(get(), get()) }
+    single<ProductoPort> { ProductoRepository(get(), get(), BuildConfig.DEMO_MODE) }
+    single<ClientePort> { ClienteRepository(get(), get(), BuildConfig.DEMO_MODE) }
     single<SyncPort> { SyncManager(get(), get()) }
     single<NetworkMonitor> { AndroidNetworkMonitor(androidContext()) }
 

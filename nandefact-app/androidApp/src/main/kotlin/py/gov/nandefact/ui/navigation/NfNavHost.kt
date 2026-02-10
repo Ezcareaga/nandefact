@@ -145,7 +145,10 @@ fun NfNavHost() {
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
-                    ProductoFormScreen(paddingValues = paddingValues)
+                    ProductoFormScreen(
+                        paddingValues = paddingValues,
+                        onSaveSuccess = { navController.popBackStack() }
+                    )
                 }
             }
 
@@ -189,7 +192,10 @@ fun NfNavHost() {
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
-                    ClienteFormScreen(paddingValues = paddingValues)
+                    ClienteFormScreen(
+                        paddingValues = paddingValues,
+                        onSaveSuccess = { navController.popBackStack() }
+                    )
                 }
             }
 

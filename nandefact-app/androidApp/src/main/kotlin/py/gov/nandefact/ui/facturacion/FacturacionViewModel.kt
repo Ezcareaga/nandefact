@@ -81,14 +81,10 @@ data class FacturacionUiState(
         get() = totalGravada5 - (totalGravada5 * 100 / 105)
 
     val productosFiltrados: List<ProductoItem>
-        get() {
-            val filtered = if (searchQuery.isBlank()) productos
-                else productos.filter {
-                    it.nombre.contains(searchQuery, ignoreCase = true)
-                }
-            // Productos con cantidad > 0 flotan al inicio
-            return filtered.sortedByDescending { it.cantidad }
-        }
+        get() = if (searchQuery.isBlank()) productos
+            else productos.filter {
+                it.nombre.contains(searchQuery, ignoreCase = true)
+            }
 
     val canAdvanceStep1: Boolean
         get() = productosSeleccionados.isNotEmpty()

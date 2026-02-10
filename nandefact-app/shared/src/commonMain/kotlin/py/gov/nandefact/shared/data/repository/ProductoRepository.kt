@@ -5,10 +5,12 @@ import py.gov.nandefact.shared.data.remote.dto.ProductoDto
 import py.gov.nandefact.shared.db.NandefactDatabase
 import py.gov.nandefact.shared.domain.Producto
 import py.gov.nandefact.shared.domain.ports.ProductoPort
+import py.gov.nandefact.shared.domain.util.generateUUID
 
 class ProductoRepository(
     private val api: ProductoApi,
-    private val database: NandefactDatabase
+    private val database: NandefactDatabase,
+    private val demoMode: Boolean = false
 ) : ProductoPort {
     private val queries = database.productoQueries
 
@@ -25,8 +27,11 @@ class ProductoRepository(
         return queries.selectById(id).executeAsOneOrNull()?.toDomain()
     }
 
-    /** Guarda producto via API (create o update) */
+    /** Guarda producto via API (create o update), o local en demo mode */
     override suspend fun save(producto: Producto): Result<Unit> {
+        if (demoMode) {
+            return saveLocal(producto)
+        }
         val dto = ProductoDto(
             id = producto.id,
             comercioId = producto.comercioId,
@@ -54,6 +59,24 @@ class ProductoRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    private fun saveLocal(producto: Producto): Result<Unit> {
+        val id = producto.id.ifBlank { generateUUID() }
+        queries.upsert(
+            id = id,
+            comercioId = producto.comercioId,
+            nombre = producto.nombre,
+            codigo = producto.codigo,
+            precioUnitario = producto.precioUnitario,
+            unidadMedida = producto.unidadMedida,
+            tasaIva = producto.tasaIva.toLong(),
+            categoria = producto.categoria,
+            activo = if (producto.activo) 1L else 0L,
+            createdAt = producto.createdAt,
+            updatedAt = producto.updatedAt
+        )
+        return Result.success(Unit)
     }
 
     /** Sincroniza desde API y actualiza cache local */

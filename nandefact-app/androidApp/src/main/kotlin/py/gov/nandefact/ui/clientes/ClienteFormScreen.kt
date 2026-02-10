@@ -22,6 +22,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,9 +35,14 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ClienteFormScreen(
     paddingValues: PaddingValues,
+    onSaveSuccess: () -> Unit = {},
     viewModel: ClientesViewModel = koinViewModel()
 ) {
     val state by viewModel.formState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.saveSuccess.collect { onSaveSuccess() }
+    }
 
     val textFieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = MaterialTheme.colorScheme.primary,

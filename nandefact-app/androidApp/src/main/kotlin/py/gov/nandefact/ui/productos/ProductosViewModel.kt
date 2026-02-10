@@ -3,8 +3,11 @@ package py.gov.nandefact.ui.productos
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -58,6 +61,9 @@ class ProductosViewModel(
 
     private val _formState = MutableStateFlow(ProductoFormState())
     val formState: StateFlow<ProductoFormState> = _formState.asStateFlow()
+
+    private val _saveSuccess = MutableSharedFlow<Unit>()
+    val saveSuccess: SharedFlow<Unit> = _saveSuccess.asSharedFlow()
 
     private var allProductos: List<ProductoUi> = emptyList()
     private val pageSize = 20
@@ -170,6 +176,7 @@ class ProductosViewModel(
             _formState.value = _formState.value.copy(isSaving = false)
             if (result.isSuccess) {
                 loadProductos()
+                _saveSuccess.emit(Unit)
             }
         }
     }

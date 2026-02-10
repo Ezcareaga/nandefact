@@ -3,8 +3,11 @@ package py.gov.nandefact.ui.clientes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -59,6 +62,9 @@ class ClientesViewModel(
 
     private val _formState = MutableStateFlow(ClienteFormState())
     val formState: StateFlow<ClienteFormState> = _formState.asStateFlow()
+
+    private val _saveSuccess = MutableSharedFlow<Unit>()
+    val saveSuccess: SharedFlow<Unit> = _saveSuccess.asSharedFlow()
 
     private var allClientes: List<ClienteUi> = emptyList()
     private val pageSize = 20
@@ -159,6 +165,7 @@ class ClientesViewModel(
             _formState.value = _formState.value.copy(isSaving = false)
             if (result.isSuccess) {
                 loadClientes()
+                _saveSuccess.emit(Unit)
             }
         }
     }

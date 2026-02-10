@@ -12,6 +12,10 @@ class AuthRepository(
     override fun isLoggedIn(): Boolean = sessionManager.getAccessToken() != null
 
     override suspend fun login(telefono: String, pin: String): Result<Unit> {
+        // En demo mode, skip network call — login instantáneo
+        if (demoMode) {
+            return loginAsDemo()
+        }
         return try {
             val response = authApi.login(telefono, pin)
             if (response.success && response.data != null) {
@@ -31,11 +35,7 @@ class AuthRepository(
                 Result.failure(Exception(response.error?.message ?: "Error de autenticación"))
             }
         } catch (e: Exception) {
-            if (demoMode) {
-                loginAsDemo()
-            } else {
-                Result.failure(e)
-            }
+            Result.failure(e)
         }
     }
 

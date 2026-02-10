@@ -5,10 +5,12 @@ import py.gov.nandefact.shared.data.remote.dto.ClienteDto
 import py.gov.nandefact.shared.db.NandefactDatabase
 import py.gov.nandefact.shared.domain.Cliente
 import py.gov.nandefact.shared.domain.ports.ClientePort
+import py.gov.nandefact.shared.domain.util.generateUUID
 
 class ClienteRepository(
     private val api: ClienteApi,
-    private val database: NandefactDatabase
+    private val database: NandefactDatabase,
+    private val demoMode: Boolean = false
 ) : ClientePort {
     private val queries = database.clienteQueries
 
@@ -24,8 +26,11 @@ class ClienteRepository(
         return queries.selectById(id).executeAsOneOrNull()?.toDomain()
     }
 
-    /** Guarda cliente via API (create o update) */
+    /** Guarda cliente via API (create o update), o local en demo mode */
     override suspend fun save(cliente: Cliente): Result<Unit> {
+        if (demoMode) {
+            return saveLocal(cliente)
+        }
         val dto = ClienteDto(
             id = cliente.id,
             comercioId = cliente.comercioId,
@@ -49,6 +54,23 @@ class ClienteRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    private fun saveLocal(cliente: Cliente): Result<Unit> {
+        val id = cliente.id.ifBlank { generateUUID() }
+        queries.upsert(
+            id = id,
+            comercioId = cliente.comercioId,
+            nombre = cliente.nombre,
+            rucCi = cliente.rucCi,
+            tipoDocumento = cliente.tipoDocumento,
+            telefono = cliente.telefono,
+            email = cliente.email,
+            enviarWhatsApp = if (cliente.enviarWhatsApp) 1L else 0L,
+            frecuente = if (cliente.frecuente) 1L else 0L,
+            createdAt = cliente.createdAt
+        )
+        return Result.success(Unit)
     }
 
     suspend fun refresh(comercioId: String): Result<List<Cliente>> {
