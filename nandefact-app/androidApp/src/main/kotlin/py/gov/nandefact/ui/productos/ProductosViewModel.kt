@@ -79,6 +79,8 @@ class ProductosViewModel(
         }
     }
 
+    fun refresh() { loadProductos() }
+
     private fun loadProductos() {
         viewModelScope.launch {
             val productos = getProductos()

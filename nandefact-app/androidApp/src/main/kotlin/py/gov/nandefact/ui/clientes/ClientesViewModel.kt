@@ -80,6 +80,8 @@ class ClientesViewModel(
         }
     }
 
+    fun refresh() { loadClientes() }
+
     private fun loadClientes() {
         viewModelScope.launch {
             val clientes = getClientes()
