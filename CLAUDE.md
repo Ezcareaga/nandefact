@@ -879,6 +879,9 @@ const xmlCancel = await xmlgen.generateXMLEventoCancelacion(id, params, data);
 - Contingencia (tipo emisión 2) solo cuando SIFEN está caído confirmado
 - Reintentos con backoff exponencial para errores de red
 
+### UI/UX Rules
+Ver sección dedicada ## UI/UX RULES más abajo.
+
 ### Reglas para API REST (Phase 7+)
 - Cada endpoint debe tener validación Zod del input ANTES de llamar al use case
 - Errores de dominio → mapear a HTTP status codes: DomainError→400, *NoEncontrado→404, *Inmutable→409, ApplicationError→422
@@ -980,3 +983,69 @@ Después de completar cada fase de GSD (antes de merge a main):
 - NUNCA usar new Error() en domain/. Crear errores tipados específicos.
 - Validar TODAS las props en constructores de entidades.
 - State transitions explícitas: validar estado actual antes de cambiar.
+
+---
+
+## UI/UX RULES
+
+### DESIGN SYSTEM: Tajy Profundo
+Paleta adoptada. Colores exactos en Theme.kt. Dark mode default.
+
+### DO:
+- Usar Material 3 tokens (MaterialTheme.colorScheme.primary, etc.)
+- Status indicators: dots de color 8dp (verde=aprobado, naranja=pendiente, rojo=rechazado)
+- Cards: rounded corners 16dp, border 1dp con cardBorder, elevation 0
+- Botones principales: height 52dp, rounded 12dp, font bold
+- Inputs: height 50dp, rounded 12dp, border 1dp, icon left 20dp
+- Formatear guaraníes: "Gs X.XXX" con punto separador de miles (nunca coma)
+- Animaciones: fadeInUp para listas (stagger 50ms), scaleIn para cards
+- Texto: font weight bold para títulos, medium para body, mono para RUC/CDC
+- Spacing: padding horizontal 24dp en pantallas, 16dp entre cards
+- Bottom nav: solo 2 items (Home + Facturas), icons 24dp, label 10sp
+- Drawer: hamburger top-right en header, drawer lateral izquierdo
+- UiState sealed class por pantalla: Loading / Success(data) / Empty / Error(message, retry)
+- Offline-first: mostrar datos locales inmediatamente, sync badge si hay pendientes
+
+### DON'T:
+- NO usar colores hardcodeados — siempre via Theme tokens
+- NO usar bottom nav con más de 2 items (Home y Facturas)
+- NO duplicar secciones entre bottom nav y drawer
+- NO usar emojis en la UI (solo iconos Material/Lucide)
+- NO poner texto de estado junto al dot — el color comunica solo
+- NO usar negro puro (#000000) ni blanco puro (#FFFFFF) como fondos
+- NO reordenar listas al modificar items (posición fija, key estable)
+- NO hacer save que reemplace lista completa — siempre append/update
+- NO navegar a formulario vacío al tocar item existente — pasar ID
+- NO mostrar loading spinner en demo mode — datos instantáneos (<100ms)
+- NO usar ScrollView cuando hay lista dinámica — usar LazyColumn
+- NO poner más de 1 botón de acción primaria por pantalla
+- NO usar alerts/dialogs para confirmaciones simples — usar inline feedback
+- NO hacer network calls en demo mode — retornar datos mock instantáneos
+
+### NAVIGATION STRUCTURE
+Bottom nav (siempre visible en pantallas principales):
+- Home — Dashboard
+- Facturas — Historial
+
+Drawer lateral (hamburger top-right):
+- Dark/Light mode toggle
+- Config SIFEN
+- Usuarios/Equipo (solo dueño)
+- Cerrar sesión
+
+Flujos modales (sin bottom nav ni drawer):
+- Login
+- Wizard Facturación (3 pasos)
+
+### WIZARD FACTURACIÓN (3 pasos)
+Paso 1: Seleccionar productos (search + lista + qty controls)
+Paso 2: Datos cliente (tabs RUC/CI/Sin Datos + frecuentes + inline create)
+Paso 3: Confirmar (resumen + desglose IVA + TOTAL + CONFIRMAR)
+Éxito: check animado + CDC + botones (WhatsApp, Nueva Factura, Volver)
+
+### PANTALLA ÉXITO POST-FACTURA
+3 botones en orden:
+1. "Enviar por WhatsApp" (outline, ícono WA)
+2. "Nueva Factura" (primary)
+3. "Volver al Inicio" (ghost)
+Badge: "Pendiente de envío SIFEN" (warning) hasta sync
