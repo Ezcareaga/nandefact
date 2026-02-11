@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import py.gov.nandefact.ui.util.OnNearEnd
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -23,7 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import py.gov.nandefact.ui.common.UiState
 import py.gov.nandefact.ui.components.NfCard
+import py.gov.nandefact.ui.components.NfEmptyState
+import py.gov.nandefact.ui.components.NfErrorState
+import py.gov.nandefact.ui.components.NfLoadingShimmer
 import py.gov.nandefact.ui.components.NfQuantitySelector
 import py.gov.nandefact.ui.components.NfSearchBar
 import py.gov.nandefact.ui.components.formatPYG
@@ -46,60 +52,78 @@ fun Step1ProductosScreen(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
-        // Lista de productos con paginación
-        val listState = rememberLazyListState()
+        when (val productsState = state.productsState) {
+            is UiState.Loading -> NfLoadingShimmer(
+                modifier = Modifier.weight(1f)
+            )
+            is UiState.Error -> NfErrorState(
+                message = productsState.message,
+                onRetry = productsState.retry,
+                modifier = Modifier.weight(1f)
+            )
+            is UiState.Empty -> NfEmptyState(
+                icon = Icons.Filled.Inventory2,
+                title = "Sin productos",
+                subtitle = "Agrega productos desde el menu principal",
+                modifier = Modifier.weight(1f)
+            )
+            is UiState.Success -> {
+                // Lista de productos con paginacion
+                val listState = rememberLazyListState()
 
-        listState.OnNearEnd {
-            if (state.hasMore) onLoadMore()
-        }
+                listState.OnNearEnd {
+                    if (state.hasMore) onLoadMore()
+                }
 
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(state.productosFiltrados, key = { it.id }) { producto ->
-                NfCard(
-                    onClick = { onProductTap(producto.id) },
-                    borderColor = if (producto.cantidad > 0)
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                    else
-                        MaterialTheme.colorScheme.outline
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "${producto.nombre} (${producto.unidadMedida})",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
+                    items(state.productosFiltrados, key = { it.id }) { producto ->
+                        NfCard(
+                            onClick = { onProductTap(producto.id) },
+                            borderColor = if (producto.cantidad > 0)
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                            else
+                                MaterialTheme.colorScheme.outline
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "${producto.nombre} (${producto.unidadMedida})",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                                Text(
+                                    text = formatPYG(producto.precioUnitario),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                NfQuantitySelector(
+                                    quantity = producto.cantidad,
+                                    onQuantityChange = { onQuantityChange(producto.id, it) }
+                                )
+                            }
                         }
-                        Text(
-                            text = formatPYG(producto.precioUnitario),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontWeight = FontWeight.SemiBold
-                        )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        NfQuantitySelector(
-                            quantity = producto.cantidad,
-                            onQuantityChange = { onQuantityChange(producto.id, it) }
-                        )
-                    }
+                    item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
             }
-            item { Spacer(modifier = Modifier.height(80.dp)) }
         }
 
         // Bottom bar sticky
@@ -127,7 +151,7 @@ fun Step1ProductosScreen(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("Siguiente →")
+                    Text("Siguiente \u2192")
                 }
             }
         }
