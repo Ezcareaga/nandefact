@@ -30,8 +30,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
+import py.gov.nandefact.ui.common.UiState
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfEmptyState
+import py.gov.nandefact.ui.components.NfErrorState
+import py.gov.nandefact.ui.components.NfLoadingShimmer
 import py.gov.nandefact.ui.components.NfSearchBar
 import py.gov.nandefact.ui.components.formatPYG
 import py.gov.nandefact.ui.util.OnNearEnd
@@ -83,47 +86,64 @@ fun ProductosListScreen(
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            if (state.productosFiltrados.isEmpty()) {
-                NfEmptyState(
+            when (val content = state.content) {
+                is UiState.Loading -> NfLoadingShimmer()
+                is UiState.Error -> NfErrorState(
+                    message = content.message,
+                    onRetry = content.retry
+                )
+                is UiState.Empty -> NfEmptyState(
                     icon = Icons.Filled.Inventory2,
                     title = "Sin productos",
-                    subtitle = "Agrega tu primer producto con el botón +"
+                    subtitle = "Agrega tu primer producto con el boton +",
+                    actionLabel = "Agregar producto",
+                    onAction = onCreateClick
                 )
-            } else {
-                LazyColumn(
-                    state = listState,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(state.productosFiltrados, key = { it.id }) { producto ->
-                        NfCard(onClick = { onProductoClick(producto.id) }) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = producto.nombre,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "${formatPYG(producto.precioUnitario)}/${producto.unidadMedida} — IVA ${producto.tasaIva}%",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    if (producto.categoria.isNotBlank()) {
-                                        Text(
-                                            text = producto.categoria,
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.outline
-                                        )
+                is UiState.Success -> {
+                    val filtrados = state.productosFiltrados
+                    if (filtrados.isEmpty() && state.searchQuery.isNotBlank()) {
+                        NfEmptyState(
+                            icon = Icons.Filled.Inventory2,
+                            title = "Sin resultados",
+                            subtitle = "No se encontraron productos para \"${state.searchQuery}\""
+                        )
+                    } else {
+                        LazyColumn(
+                            state = listState,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(filtrados, key = { it.id }) { producto ->
+                                NfCard(onClick = { onProductoClick(producto.id) }) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = producto.nombre,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                color = MaterialTheme.colorScheme.onBackground
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = "${formatPYG(producto.precioUnitario)}/${producto.unidadMedida} — IVA ${producto.tasaIva}%",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            if (producto.categoria.isNotBlank()) {
+                                                Text(
+                                                    text = producto.categoria,
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = MaterialTheme.colorScheme.outline
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
+                            item { Spacer(modifier = Modifier.height(80.dp)) }
                         }
                     }
-                    item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
             }
         }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import py.gov.nandefact.shared.domain.usecase.GetProductosUseCase
 import py.gov.nandefact.shared.domain.usecase.ProductoInput
 import py.gov.nandefact.shared.domain.usecase.SaveProductoUseCase
+import py.gov.nandefact.ui.common.UiState
 
 data class ProductoUi(
     val id: String,
@@ -26,19 +27,21 @@ data class ProductoUi(
 )
 
 data class ProductosUiState(
-    val productos: List<ProductoUi> = emptyList(),
+    val content: UiState<List<ProductoUi>> = UiState.Loading,
     val searchQuery: String = "",
-    val isLoading: Boolean = true,
-    // Paginación
+    // Paginacion
     val page: Int = 1,
     val hasMore: Boolean = false
 ) {
     val productosFiltrados: List<ProductoUi>
-        get() = if (searchQuery.isBlank()) productos
+        get() {
+            val productos = (content as? UiState.Success)?.data ?: return emptyList()
+            return if (searchQuery.isBlank()) productos
             else productos.filter {
                 it.nombre.contains(searchQuery, ignoreCase = true) ||
                 it.categoria.contains(searchQuery, ignoreCase = true)
             }
+        }
 }
 
 data class ProductoFormState(
@@ -83,34 +86,44 @@ class ProductosViewModel(
 
     private fun loadProductos() {
         viewModelScope.launch {
-            val productos = getProductos()
-            allProductos = productos.map { p ->
-                ProductoUi(
-                    id = p.id,
-                    nombre = p.nombre,
-                    precioUnitario = p.precioUnitario,
-                    unidadMedida = p.unidadMedida,
-                    tasaIva = p.tasaIva,
-                    categoria = p.categoria ?: ""
+            try {
+                val productos = getProductos()
+                allProductos = productos.map { p ->
+                    ProductoUi(
+                        id = p.id,
+                        nombre = p.nombre,
+                        precioUnitario = p.precioUnitario,
+                        unidadMedida = p.unidadMedida,
+                        tasaIva = p.tasaIva,
+                        categoria = p.categoria ?: ""
+                    )
+                }
+                val firstPage = allProductos.take(pageSize)
+                _listState.value = _listState.value.copy(
+                    content = if (allProductos.isEmpty()) UiState.Empty
+                              else UiState.Success(firstPage),
+                    page = 1,
+                    hasMore = allProductos.size > pageSize
+                )
+            } catch (e: Exception) {
+                _listState.value = _listState.value.copy(
+                    content = UiState.Error(
+                        message = e.message ?: "Error al cargar productos",
+                        retry = ::loadProductos
+                    )
                 )
             }
-            val firstPage = allProductos.take(pageSize)
-            _listState.value = _listState.value.copy(
-                productos = firstPage,
-                isLoading = false,
-                page = 1,
-                hasMore = allProductos.size > pageSize
-            )
         }
     }
 
     fun loadMore() {
         val state = _listState.value
         if (!state.hasMore) return
+        val currentList = (state.content as? UiState.Success)?.data ?: return
         val nextPage = state.page + 1
         val endIndex = nextPage * pageSize
         _listState.value = state.copy(
-            productos = allProductos.take(endIndex),
+            content = UiState.Success(allProductos.take(endIndex)),
             page = nextPage,
             hasMore = endIndex < allProductos.size
         )
