@@ -15,11 +15,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -144,32 +144,35 @@ private fun HomeContent(
                 onClick = onNavigateClientes,
                 modifier = Modifier.weight(1f)
             )
+            HomeGridCard(
+                icon = Icons.Filled.History,
+                label = "Historial",
+                onClick = onNavigateHistorial,
+                modifier = Modifier.weight(1f)
+            )
+        }
 
-            // Card Pendientes — estilo especial
+        // Banner pendientes (si hay)
+        if (data.pendingCount > 0) {
+            Spacer(modifier = Modifier.height(12.dp))
             NfCard(
-                modifier = Modifier.weight(1f),
                 borderColor = NfTheme.colors.warning,
                 backgroundColor = NfTheme.colors.warningContainer,
                 onClick = onNavigatePendientes
             ) {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     NfStatusDot(status = StatusColor.WARNING)
                     Text(
-                        text = "(${data.pendingCount})",
-                        style = MaterialTheme.typography.titleMedium,
+                        text = "${data.pendingCount} pendientes de envio",
+                        style = MaterialTheme.typography.bodyMedium,
                         color = NfTheme.colors.warning,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Pendientes",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
             }
         }
 
@@ -196,20 +199,9 @@ private fun HomeContent(
                     )
                 }
             }
-
-            TextButton(
-                onClick = onNavigateHistorial,
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text(
-                    text = "Ver historial completo \u2192",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
         }
 
-        Spacer(modifier = Modifier.height(80.dp)) // Espacio para pill
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
