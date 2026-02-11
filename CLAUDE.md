@@ -1049,3 +1049,42 @@ Paso 3: Confirmar (resumen + desglose IVA + TOTAL + CONFIRMAR)
 2. "Nueva Factura" (primary)
 3. "Volver al Inicio" (ghost)
 Badge: "Pendiente de envío SIFEN" (warning) hasta sync
+
+---
+
+## ESTADO ACTUAL DEL PROYECTO (última sesión: 2026-02-11)
+
+### Completado hasta ahora (en orden cronológico):
+1. **Modo demo + network security** — Login instantáneo sin backend, datos mock
+2. **Bugs críticos testing manual** — State productos, save CRUD, demo instant login
+3. **CRUD append + edit navigation + wizard client save** — Correcciones de listas y navegación
+4. **Reactive refresh** — Lista de productos/clientes se actualiza reactivamente post-save
+5. **Tests automatizados UI** — 71+ tests para login, home, wizard, CRUD, historial, reportes, config, pendientes
+6. **Sealed UiState pattern** — Loading/Success/Empty/Error en todas las pantallas
+7. **Review findings** — Unused vars, UiState.Error equality, tildes UI
+8. **Tajy Profundo design system** — Paleta de colores, dark mode default, tokens Material 3
+9. **Reestructuración navegación** — 2-tab bottom nav (Home + Facturas) + drawer lateral
+
+### PRÓXIMA TAREA PENDIENTE: Wizard UX Improvements
+**Plan completo listo.** Implementar mejoras UX del wizard de facturación:
+
+**Archivos a modificar (6):**
+- `ui/components/NfProgressBar.kt` — Círculos numerados + labels ("Productos", "Cliente", "Confirmar")
+- `ui/facturacion/FacturacionViewModel.kt` — Client search wired, tab state (CI/RUC/SIN_DATOS), dedup logic
+- `ui/facturacion/FacturacionWizardScreen.kt` — 3 pasos visibles, wire nuevos params
+- `ui/facturacion/Step2ClienteScreen.kt` — Tabs segmentados + inline form + consumidor final
+- `di/AppModule.kt` — FacturacionViewModel 4to param (GetClientesUseCase)
+- `test/facturacion/FacturacionViewModelTest.kt` — Nuevos tests + constructor update
+
+**Cambios clave:**
+1. **NfProgressBar**: Stepper con círculos numerados (completed=check icon, active=primary, future=outline) + labels debajo
+2. **Step2ClienteScreen**: `SingleChoiceSegmentedButtonRow` con tabs CI/RUC/Sin Datos. Búsqueda inline. Si no hay resultados → formulario inline con documento pre-llenado. Sin Datos → card "Consumidor Final"
+3. **FacturacionViewModel**: `clienteTab`, `clientesResults`, `showInlineForm` en state. Debounce search → `GetClientesUseCase`. `onClienteTabChange()`. Dedup con UUID pre-generado en `saveClienteIfNeeded()`
+4. **Restricciones**: NO cambios de tema/colores, NO cambios de navegación, NO cambios de interfaz de repositorio
+
+**Verificación:**
+```bash
+ANDROID_HOME=/home/ez/Android/Sdk ./gradlew :androidApp:assembleDebug
+ANDROID_HOME=/home/ez/Android/Sdk ./gradlew :androidApp:testDebugUnitTest
+```
+71+ tests deben pasar. Commit: `feat: wizard UX improvements - stepper labels, inline client creation`
