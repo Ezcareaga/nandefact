@@ -26,8 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
+import py.gov.nandefact.ui.common.UiState
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfEmptyState
+import py.gov.nandefact.ui.components.NfErrorState
+import py.gov.nandefact.ui.components.NfLoadingShimmer
 import py.gov.nandefact.ui.components.NfSearchBar
 import py.gov.nandefact.ui.components.NfStatusDot
 import py.gov.nandefact.ui.components.StatusColor
@@ -86,65 +89,80 @@ fun HistorialScreen(
             }
         }
 
-        if (state.facturasFiltradas.isEmpty()) {
-            NfEmptyState(
+        when (val content = state.content) {
+            is UiState.Loading -> NfLoadingShimmer()
+            is UiState.Error -> NfErrorState(
+                message = content.message,
+                onRetry = content.retry
+            )
+            is UiState.Empty -> NfEmptyState(
                 icon = Icons.Filled.Receipt,
                 title = "Sin facturas",
-                subtitle = "Las facturas generadas aparecerán aquí"
+                subtitle = "Las facturas generadas apareceran aqui"
             )
-        } else {
-            LazyColumn(
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(state.facturasFiltradas, key = { it.id }) { factura ->
-                    NfCard(onClick = { onFacturaClick(factura.id) }) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
+            is UiState.Success -> {
+                val filtradas = state.facturasFiltradas
+                if (filtradas.isEmpty()) {
+                    NfEmptyState(
+                        icon = Icons.Filled.Receipt,
+                        title = "Sin resultados",
+                        subtitle = "No se encontraron facturas"
+                    )
+                } else {
+                    LazyColumn(
+                        state = listState,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(filtradas, key = { it.id }) { factura ->
+                            NfCard(onClick = { onFacturaClick(factura.id) }) {
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = "#${factura.numero}",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
-                                    NfStatusDot(
-                                        status = when (factura.estadoSifen) {
-                                            "aprobado" -> StatusColor.SUCCESS
-                                            "rechazado" -> StatusColor.ERROR
-                                            else -> StatusColor.WARNING
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Text(
+                                                text = "#${factura.numero}",
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                color = MaterialTheme.colorScheme.onBackground
+                                            )
+                                            NfStatusDot(
+                                                status = when (factura.estadoSifen) {
+                                                    "aprobado" -> StatusColor.SUCCESS
+                                                    "rechazado" -> StatusColor.ERROR
+                                                    else -> StatusColor.WARNING
+                                                }
+                                            )
                                         }
-                                    )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = factura.clienteNombre,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        Text(
+                                            text = formatPYG(factura.total),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.onBackground
+                                        )
+                                        Text(
+                                            text = factura.hora,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                 }
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = factura.clienteNombre,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(
-                                    text = formatPYG(factura.total),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                                Text(
-                                    text = factura.hora,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
                             }
                         }
+                        item { Spacer(modifier = Modifier.height(80.dp)) }
                     }
                 }
-                item { Spacer(modifier = Modifier.height(80.dp)) }
             }
         }
     }

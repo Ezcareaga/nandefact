@@ -18,6 +18,7 @@ import py.gov.nandefact.fakes.FakeAuthPort
 import py.gov.nandefact.fakes.FakeProductoPort
 import py.gov.nandefact.shared.domain.usecase.GetProductosUseCase
 import py.gov.nandefact.shared.domain.usecase.SaveProductoUseCase
+import py.gov.nandefact.ui.common.UiState
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProductosViewModelTest {
@@ -46,13 +47,19 @@ class ProductosViewModelTest {
         )
     }
 
+    private fun assertContentSuccess(vm: ProductosViewModel): List<ProductoUi> {
+        val content = vm.listState.value.content
+        assertTrue("Expected UiState.Success but was $content", content is UiState.Success)
+        return (content as UiState.Success).data
+    }
+
     @Test
     fun `init loads productos`() = runTest {
         vm = createVm()
         advanceUntilIdle()
 
-        assertEquals(5, vm.listState.value.productos.size)
-        assertFalse(vm.listState.value.isLoading)
+        val productos = assertContentSuccess(vm)
+        assertEquals(5, productos.size)
     }
 
     @Test
@@ -79,7 +86,7 @@ class ProductosViewModelTest {
         vm = createVm()
         advanceUntilIdle()
 
-        val countBefore = vm.listState.value.productos.size
+        val countBefore = assertContentSuccess(vm).size
 
         vm.onNombreChange("Nuevo Producto")
         vm.onPrecioChange("8000")
@@ -87,7 +94,7 @@ class ProductosViewModelTest {
         advanceUntilIdle()
 
         // La lista se recarga del port que ahora tiene +1
-        assertEquals(countBefore + 1, vm.listState.value.productos.size)
+        assertEquals(countBefore + 1, assertContentSuccess(vm).size)
     }
 
     @Test
@@ -144,6 +151,6 @@ class ProductosViewModelTest {
         vm.refresh()
         advanceUntilIdle()
 
-        assertEquals(6, vm.listState.value.productos.size)
+        assertEquals(6, assertContentSuccess(vm).size)
     }
 }

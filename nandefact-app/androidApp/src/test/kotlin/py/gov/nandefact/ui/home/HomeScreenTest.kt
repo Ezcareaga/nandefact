@@ -66,7 +66,7 @@ class HomeScreenTest {
         composeRule.waitForIdle()
 
         // El saludo contiene el nombre del usuario
-        composeRule.onNodeWithText("Hola, María Demo \uD83D\uDC4B").assertIsDisplayed()
+        composeRule.onNodeWithText("Hola, Mar\u00eda Demo \uD83D\uDC4B").assertIsDisplayed()
     }
 
     @Test

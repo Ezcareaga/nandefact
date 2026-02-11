@@ -15,6 +15,7 @@ import py.gov.nandefact.shared.domain.usecase.FacturaInput
 import py.gov.nandefact.shared.domain.usecase.GetProductosUseCase
 import py.gov.nandefact.shared.domain.usecase.ItemInput
 import py.gov.nandefact.shared.domain.usecase.SaveClienteUseCase
+import py.gov.nandefact.ui.common.UiState
 import py.gov.nandefact.ui.components.PaymentCondition
 
 // Producto en el wizard
@@ -40,7 +41,7 @@ data class ClienteSelection(
 
 data class FacturacionUiState(
     val currentStep: Int = 0, // 0-3
-    val productos: List<ProductoItem> = emptyList(),
+    val productsState: UiState<List<ProductoItem>> = UiState.Loading,
     val searchQuery: String = "",
     val cliente: ClienteSelection = ClienteSelection(),
     val clienteSearchQuery: String = "",
@@ -49,11 +50,14 @@ data class FacturacionUiState(
     val isGenerated: Boolean = false,
     val facturaNumero: String = "",
     val whatsAppAutoSent: Boolean = false,
-    val isLoadingProducts: Boolean = true,
-    // Paginación
+    // Paginacion
     val page: Int = 1,
     val hasMore: Boolean = false
 ) {
+    // Propiedad de compatibilidad: extrae la lista de productos del UiState
+    val productos: List<ProductoItem>
+        get() = (productsState as? UiState.Success)?.data ?: emptyList()
+
     val productosSeleccionados: List<ProductoItem>
         get() = productos.filter { it.cantidad > 0 }
 
@@ -123,37 +127,47 @@ class FacturacionViewModel(
 
     private fun loadProductos() {
         viewModelScope.launch {
-            val productos = getProductos()
-            allProductos = productos.map { p ->
-                ProductoItem(
-                    id = p.id,
-                    nombre = p.nombre,
-                    unidadMedida = p.unidadMedida,
-                    precioUnitario = p.precioUnitario,
-                    tasaIva = p.tasaIva
+            try {
+                val productos = getProductos()
+                allProductos = productos.map { p ->
+                    ProductoItem(
+                        id = p.id,
+                        nombre = p.nombre,
+                        unidadMedida = p.unidadMedida,
+                        precioUnitario = p.precioUnitario,
+                        tasaIva = p.tasaIva
+                    )
+                }
+                val firstPage = allProductos.take(pageSize)
+                _uiState.value = _uiState.value.copy(
+                    productsState = if (allProductos.isEmpty()) UiState.Empty
+                                    else UiState.Success(firstPage),
+                    page = 1,
+                    hasMore = allProductos.size > pageSize
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    productsState = UiState.Error(
+                        message = e.message ?: "Error al cargar productos",
+                        retry = ::loadProductos
+                    )
                 )
             }
-            val firstPage = allProductos.take(pageSize)
-            _uiState.value = _uiState.value.copy(
-                productos = firstPage,
-                isLoadingProducts = false,
-                page = 1,
-                hasMore = allProductos.size > pageSize
-            )
         }
     }
 
     fun loadMoreProducts() {
         val state = _uiState.value
         if (!state.hasMore) return
+        val currentList = (state.productsState as? UiState.Success)?.data ?: return
         val nextPage = state.page + 1
         val endIndex = nextPage * pageSize
         val items = allProductos.take(endIndex)
         // Preservar cantidades seleccionadas
-        val currentQuantities = state.productos.associate { it.id to it.cantidad }
+        val currentQuantities = currentList.associate { it.id to it.cantidad }
         val merged = items.map { it.copy(cantidad = currentQuantities[it.id] ?: 0) }
         _uiState.value = state.copy(
-            productos = merged,
+            productsState = UiState.Success(merged),
             page = nextPage,
             hasMore = endIndex < allProductos.size
         )
@@ -164,18 +178,20 @@ class FacturacionViewModel(
     }
 
     fun onProductQuantityChange(productoId: String, newQty: Int) {
-        val updated = _uiState.value.productos.map {
+        val currentList = (uiState.value.productsState as? UiState.Success)?.data ?: return
+        val updated = currentList.map {
             if (it.id == productoId) it.copy(cantidad = maxOf(0, newQty)) else it
         }
-        _uiState.value = _uiState.value.copy(productos = updated)
+        _uiState.value = _uiState.value.copy(productsState = UiState.Success(updated))
     }
 
     fun onProductTap(productoId: String) {
         // Shortcut: toque simple = +1
-        val updated = _uiState.value.productos.map {
+        val currentList = (uiState.value.productsState as? UiState.Success)?.data ?: return
+        val updated = currentList.map {
             if (it.id == productoId) it.copy(cantidad = it.cantidad + 1) else it
         }
-        _uiState.value = _uiState.value.copy(productos = updated)
+        _uiState.value = _uiState.value.copy(productsState = UiState.Success(updated))
     }
 
     fun nextStep() {
@@ -203,7 +219,7 @@ class FacturacionViewModel(
                 )
             )
             if (result.isSuccess) {
-                // Cliente guardado — se mostrará en la lista de clientes
+                // Cliente guardado — se mostrara en la lista de clientes
             }
         }
     }

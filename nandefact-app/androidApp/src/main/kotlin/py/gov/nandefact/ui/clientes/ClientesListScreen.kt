@@ -30,8 +30,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
+import py.gov.nandefact.ui.common.UiState
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfEmptyState
+import py.gov.nandefact.ui.components.NfErrorState
+import py.gov.nandefact.ui.components.NfLoadingShimmer
 import py.gov.nandefact.ui.components.NfSearchBar
 import py.gov.nandefact.ui.util.OnNearEnd
 
@@ -82,45 +85,62 @@ fun ClientesListScreen(
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            if (state.clientesFiltrados.isEmpty()) {
-                NfEmptyState(
+            when (val content = state.content) {
+                is UiState.Loading -> NfLoadingShimmer()
+                is UiState.Error -> NfErrorState(
+                    message = content.message,
+                    onRetry = content.retry
+                )
+                is UiState.Empty -> NfEmptyState(
                     icon = Icons.Filled.Person,
                     title = "Sin clientes",
-                    subtitle = "Los clientes se guardan al facturar"
+                    subtitle = "Los clientes se guardan al facturar",
+                    actionLabel = "Agregar cliente",
+                    onAction = onCreateClick
                 )
-            } else {
-                LazyColumn(
-                    state = listState,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(state.clientesFiltrados, key = { it.id }) { cliente ->
-                        NfCard(onClick = { onClienteClick(cliente.id) }) {
-                            Text(
-                                text = cliente.nombre,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "${cliente.tipoDocumento}: ${cliente.rucCi}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                if (cliente.telefono.isNotBlank()) {
+                is UiState.Success -> {
+                    val filtrados = state.clientesFiltrados
+                    if (filtrados.isEmpty() && state.searchQuery.isNotBlank()) {
+                        NfEmptyState(
+                            icon = Icons.Filled.Person,
+                            title = "Sin resultados",
+                            subtitle = "No se encontraron clientes para \"${state.searchQuery}\""
+                        )
+                    } else {
+                        LazyColumn(
+                            state = listState,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(filtrados, key = { it.id }) { cliente ->
+                                NfCard(onClick = { onClienteClick(cliente.id) }) {
                                     Text(
-                                        text = cliente.telefono,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        text = cliente.nombre,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onBackground
                                     )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = "${cliente.tipoDocumento}: ${cliente.rucCi}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        if (cliente.telefono.isNotBlank()) {
+                                            Text(
+                                                text = cliente.telefono,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
                                 }
                             }
+                            item { Spacer(modifier = Modifier.height(80.dp)) }
                         }
                     }
-                    item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
             }
         }

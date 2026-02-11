@@ -1,6 +1,5 @@
 package py.gov.nandefact.ui.home
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,7 +18,6 @@ import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,9 +29,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
-import py.gov.nandefact.ui.components.NfAmountDisplay
+import py.gov.nandefact.ui.common.UiState
 import py.gov.nandefact.ui.components.NfCard
+import py.gov.nandefact.ui.components.NfErrorState
 import py.gov.nandefact.ui.components.NfHeroCard
+import py.gov.nandefact.ui.components.NfLoadingShimmer
 import py.gov.nandefact.ui.components.NfStatusDot
 import py.gov.nandefact.ui.components.StatusColor
 import py.gov.nandefact.ui.components.formatPYG
@@ -50,8 +50,42 @@ fun HomeScreen(
     onNavigateHistorial: () -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
+    when (val state = uiState) {
+        is UiState.Loading -> NfLoadingShimmer(
+            modifier = Modifier.padding(paddingValues)
+        )
+        is UiState.Error -> NfErrorState(
+            message = state.message,
+            onRetry = state.retry,
+            modifier = Modifier.padding(paddingValues)
+        )
+        is UiState.Empty -> {} // Home siempre tiene contenido
+        is UiState.Success -> HomeContent(
+            data = state.data,
+            paddingValues = paddingValues,
+            onNavigateFacturacion = onNavigateFacturacion,
+            onNavigateReportes = onNavigateReportes,
+            onNavigateProductos = onNavigateProductos,
+            onNavigateClientes = onNavigateClientes,
+            onNavigatePendientes = onNavigatePendientes,
+            onNavigateHistorial = onNavigateHistorial
+        )
+    }
+}
+
+@Composable
+private fun HomeContent(
+    data: HomeData,
+    paddingValues: PaddingValues,
+    onNavigateFacturacion: () -> Unit,
+    onNavigateReportes: () -> Unit,
+    onNavigateProductos: () -> Unit,
+    onNavigateClientes: () -> Unit,
+    onNavigatePendientes: () -> Unit,
+    onNavigateHistorial: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,7 +97,7 @@ fun HomeScreen(
 
         // Saludo personalizado
         Text(
-            text = "Hola, ${state.userName} \uD83D\uDC4B",
+            text = "Hola, ${data.userName} \uD83D\uDC4B",
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold
@@ -79,7 +113,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Grid 2×2
+        // Grid 2x2
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -124,7 +158,7 @@ fun HomeScreen(
                 ) {
                     NfStatusDot(status = StatusColor.WARNING)
                     Text(
-                        text = "(${state.pendingCount})",
+                        text = "(${data.pendingCount})",
                         style = MaterialTheme.typography.titleMedium,
                         color = NfExtendedColors.warning,
                         fontWeight = FontWeight.Bold
@@ -141,8 +175,8 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Última venta
-        if (state.lastSaleAmount != null) {
+        // Ultima venta
+        if (data.lastSaleAmount != null) {
             NfCard {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -150,13 +184,13 @@ fun HomeScreen(
                 ) {
                     NfStatusDot(status = StatusColor.SUCCESS)
                     Text(
-                        text = " Última: ${state.lastSaleAmount?.let { formatPYG(it) } ?: ""}",
+                        text = " Ultima: ${data.lastSaleAmount.let { formatPYG(it) }}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = "Hace ${state.lastSaleMinutesAgo} min",
+                        text = "Hace ${data.lastSaleMinutesAgo} min",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -168,7 +202,7 @@ fun HomeScreen(
                 modifier = Modifier.align(Alignment.End)
             ) {
                 Text(
-                    text = "Ver historial completo →",
+                    text = "Ver historial completo \u2192",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )

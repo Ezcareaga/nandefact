@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import py.gov.nandefact.shared.domain.usecase.GetFacturasUseCase
+import py.gov.nandefact.ui.common.UiState
 
 data class FacturaListItem(
     val id: String,
@@ -23,24 +24,23 @@ data class FacturaListItem(
 enum class HistorialFilter { HOY, SEMANA, MES, TODO }
 
 data class HistorialUiState(
-    val facturas: List<FacturaListItem> = emptyList(),
+    val content: UiState<List<FacturaListItem>> = UiState.Loading,
     val searchQuery: String = "",
     val filter: HistorialFilter = HistorialFilter.HOY,
-    val isLoading: Boolean = true,
-    // Paginación
+    // Paginacion
     val page: Int = 1,
     val hasMore: Boolean = false
 ) {
     val facturasFiltradas: List<FacturaListItem>
         get() {
-            var list = facturas
+            val facturas = (content as? UiState.Success)?.data ?: return emptyList()
             if (searchQuery.isNotBlank()) {
-                list = list.filter {
+                return facturas.filter {
                     it.numero.contains(searchQuery, ignoreCase = true) ||
                     it.clienteNombre.contains(searchQuery, ignoreCase = true)
                 }
             }
-            return list
+            return facturas
         }
 }
 
@@ -66,37 +66,46 @@ class HistorialViewModel(
 
     private fun loadFacturas() {
         viewModelScope.launch {
-            val facturas = getFacturas()
-            allFacturas = facturas.map { f ->
-                FacturaListItem(
-                    id = f.id,
-                    numero = f.numero ?: "",
-                    clienteNombre = f.clienteNombre ?: "Sin nombre",
-                    total = f.totalBruto,
-                    hora = f.createdAt.takeLast(8).take(5), // HH:mm
-                    estadoSifen = f.estadoSifen
+            try {
+                val facturas = getFacturas()
+                allFacturas = facturas.map { f ->
+                    FacturaListItem(
+                        id = f.id,
+                        numero = f.numero ?: "",
+                        clienteNombre = f.clienteNombre ?: "Sin nombre",
+                        total = f.totalBruto,
+                        hora = f.createdAt.takeLast(8).take(5), // HH:mm
+                        estadoSifen = f.estadoSifen
+                    )
+                }
+                if (allFacturas.isEmpty()) {
+                    allFacturas = sampleFacturas()
+                }
+                val firstPage = allFacturas.take(pageSize)
+                _uiState.value = _uiState.value.copy(
+                    content = UiState.Success(firstPage),
+                    page = 1,
+                    hasMore = allFacturas.size > pageSize
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    content = UiState.Error(
+                        message = e.message ?: "Error al cargar facturas",
+                        retry = ::loadFacturas
+                    )
                 )
             }
-            if (allFacturas.isEmpty()) {
-                allFacturas = sampleFacturas()
-            }
-            val firstPage = allFacturas.take(pageSize)
-            _uiState.value = _uiState.value.copy(
-                facturas = firstPage,
-                isLoading = false,
-                page = 1,
-                hasMore = allFacturas.size > pageSize
-            )
         }
     }
 
     fun loadMore() {
         val state = _uiState.value
         if (!state.hasMore) return
+        val currentList = (state.content as? UiState.Success)?.data ?: return
         val nextPage = state.page + 1
         val endIndex = nextPage * pageSize
         _uiState.value = state.copy(
-            facturas = allFacturas.take(endIndex),
+            content = UiState.Success(allFacturas.take(endIndex)),
             page = nextPage,
             hasMore = endIndex < allFacturas.size
         )
@@ -113,9 +122,9 @@ class HistorialViewModel(
 }
 
 private fun sampleFacturas(): List<FacturaListItem> = listOf(
-    FacturaListItem("1", "001-001-0000140", "Juan Pérez", 45_000, "14:30", "aprobado"),
+    FacturaListItem("1", "001-001-0000140", "Juan P\u00e9rez", 45_000, "14:30", "aprobado"),
     FacturaListItem("2", "001-001-0000139", "Sin documento", 12_000, "13:15", "pendiente"),
-    FacturaListItem("3", "001-001-0000138", "María González", 85_000, "11:45", "aprobado"),
-    FacturaListItem("4", "001-001-0000137", "Carlos López", 32_000, "10:20", "rechazado"),
-    FacturaListItem("5", "001-001-0000136", "Ana Martínez", 156_000, "09:00", "aprobado")
+    FacturaListItem("3", "001-001-0000138", "Mar\u00eda Gonz\u00e1lez", 85_000, "11:45", "aprobado"),
+    FacturaListItem("4", "001-001-0000137", "Carlos L\u00f3pez", 32_000, "10:20", "rechazado"),
+    FacturaListItem("5", "001-001-0000136", "Ana Mart\u00ednez", 156_000, "09:00", "aprobado")
 )

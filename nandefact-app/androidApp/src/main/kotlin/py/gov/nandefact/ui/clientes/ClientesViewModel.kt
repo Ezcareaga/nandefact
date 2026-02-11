@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import py.gov.nandefact.shared.domain.usecase.ClienteInput
 import py.gov.nandefact.shared.domain.usecase.GetClientesUseCase
 import py.gov.nandefact.shared.domain.usecase.SaveClienteUseCase
+import py.gov.nandefact.ui.common.UiState
 
 data class ClienteUi(
     val id: String,
@@ -26,19 +27,21 @@ data class ClienteUi(
 )
 
 data class ClientesUiState(
-    val clientes: List<ClienteUi> = emptyList(),
+    val content: UiState<List<ClienteUi>> = UiState.Loading,
     val searchQuery: String = "",
-    val isLoading: Boolean = true,
-    // Paginación
+    // Paginacion
     val page: Int = 1,
     val hasMore: Boolean = false
 ) {
     val clientesFiltrados: List<ClienteUi>
-        get() = if (searchQuery.isBlank()) clientes
+        get() {
+            val clientes = (content as? UiState.Success)?.data ?: return emptyList()
+            return if (searchQuery.isBlank()) clientes
             else clientes.filter {
                 it.nombre.contains(searchQuery, ignoreCase = true) ||
                 it.rucCi.contains(searchQuery, ignoreCase = true)
             }
+        }
 }
 
 data class ClienteFormState(
@@ -84,34 +87,44 @@ class ClientesViewModel(
 
     private fun loadClientes() {
         viewModelScope.launch {
-            val clientes = getClientes()
-            allClientes = clientes.map { c ->
-                ClienteUi(
-                    id = c.id,
-                    nombre = c.nombre,
-                    tipoDocumento = c.tipoDocumento,
-                    rucCi = c.rucCi ?: "",
-                    telefono = c.telefono ?: "",
-                    enviarWhatsApp = c.enviarWhatsApp
+            try {
+                val clientes = getClientes()
+                allClientes = clientes.map { c ->
+                    ClienteUi(
+                        id = c.id,
+                        nombre = c.nombre,
+                        tipoDocumento = c.tipoDocumento,
+                        rucCi = c.rucCi ?: "",
+                        telefono = c.telefono ?: "",
+                        enviarWhatsApp = c.enviarWhatsApp
+                    )
+                }
+                val firstPage = allClientes.take(pageSize)
+                _listState.value = _listState.value.copy(
+                    content = if (allClientes.isEmpty()) UiState.Empty
+                              else UiState.Success(firstPage),
+                    page = 1,
+                    hasMore = allClientes.size > pageSize
+                )
+            } catch (e: Exception) {
+                _listState.value = _listState.value.copy(
+                    content = UiState.Error(
+                        message = e.message ?: "Error al cargar clientes",
+                        retry = ::loadClientes
+                    )
                 )
             }
-            val firstPage = allClientes.take(pageSize)
-            _listState.value = _listState.value.copy(
-                clientes = firstPage,
-                isLoading = false,
-                page = 1,
-                hasMore = allClientes.size > pageSize
-            )
         }
     }
 
     fun loadMore() {
         val state = _listState.value
         if (!state.hasMore) return
+        val currentList = (state.content as? UiState.Success)?.data ?: return
         val nextPage = state.page + 1
         val endIndex = nextPage * pageSize
         _listState.value = state.copy(
-            clientes = allClientes.take(endIndex),
+            content = UiState.Success(allClientes.take(endIndex)),
             page = nextPage,
             hasMore = endIndex < allClientes.size
         )
