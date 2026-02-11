@@ -1,13 +1,17 @@
 package py.gov.nandefact.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.koin.compose.koinInject
+import py.gov.nandefact.shared.domain.ports.NetworkMonitor
 import py.gov.nandefact.ui.clientes.ClienteFormScreen
 import py.gov.nandefact.ui.clientes.ClientesListScreen
 import py.gov.nandefact.ui.config.ConfigScreen
@@ -20,9 +24,6 @@ import py.gov.nandefact.ui.pendientes.PendientesScreen
 import py.gov.nandefact.ui.productos.ProductoFormScreen
 import py.gov.nandefact.ui.productos.ProductosListScreen
 import py.gov.nandefact.ui.reportes.ReportesScreen
-import androidx.compose.runtime.collectAsState
-import org.koin.compose.koinInject
-import py.gov.nandefact.shared.domain.ports.NetworkMonitor
 import py.gov.nandefact.ui.theme.NandefactTheme
 
 @Composable
@@ -30,19 +31,28 @@ fun NfNavHost() {
     val navController = rememberNavController()
     var isDarkTheme by rememberSaveable { mutableStateOf(true) }
     val networkMonitor = koinInject<NetworkMonitor>()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     // TODO: Verificar token existente para decidir startDestination
     val startDestination = Routes.Login.route
 
-    // Helper para crear scaffold con parámetros comunes
+    // Bottom tab: Home
     val navigateHome: () -> Unit = {
         navController.navigate(Routes.Home.route) {
             popUpTo(Routes.Home.route) { inclusive = true }
+            launchSingleTop = true
         }
     }
-    val navigateHistorial: () -> Unit = {
-        navController.navigate(Routes.Historial.route)
+
+    // Bottom tab: Facturas (= Historial)
+    val navigateFacturas: () -> Unit = {
+        navController.navigate(Routes.Historial.route) {
+            popUpTo(Routes.Home.route) { inclusive = false }
+            launchSingleTop = true
+        }
     }
+
     val logout: () -> Unit = {
         navController.navigate(Routes.Login.route) {
             popUpTo(0) { inclusive = true }
@@ -65,19 +75,24 @@ fun NfNavHost() {
                 )
             }
 
-            // Home
+            // Home — con bottom bar + drawer
             composable(Routes.Home.route) {
                 NfScaffold(
                     title = "Comercial El Triunfo",
                     isHome = true,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = {},
                     onNavigateBack = null,
-                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
-                    isOnlineFlow = networkMonitor.isOnline
+                    isOnlineFlow = networkMonitor.isOnline,
+                    showBottomBar = true,
+                    currentRoute = currentRoute,
+                    onNavigateHome = {},
+                    onNavigateFacturas = navigateFacturas,
+                    onNavigateClientes = { navController.navigate(Routes.Clientes.route) },
+                    onNavigateProductos = { navController.navigate(Routes.Productos.route) },
+                    onNavigateReportes = { navController.navigate(Routes.Reportes.route) },
+                    onNavigateConfig = { navController.navigate(Routes.Config.route) }
                 ) { paddingValues ->
                     HomeScreen(
                         paddingValues = paddingValues,
@@ -86,12 +101,12 @@ fun NfNavHost() {
                         onNavigateProductos = { navController.navigate(Routes.Productos.route) },
                         onNavigateClientes = { navController.navigate(Routes.Clientes.route) },
                         onNavigatePendientes = { navController.navigate(Routes.Pendientes.route) },
-                        onNavigateHistorial = navigateHistorial
+                        onNavigateHistorial = navigateFacturas
                     )
                 }
             }
 
-            // Facturación — full screen modal, sin scaffold
+            // Facturacion — full screen modal, sin scaffold
             composable(Routes.Facturacion.route) {
                 val isOnline by networkMonitor.isOnline.collectAsState()
                 FacturacionWizardScreen(
@@ -105,19 +120,20 @@ fun NfNavHost() {
                 )
             }
 
-            // Productos lista
+            // Productos lista — con bottom bar
             composable(Routes.Productos.route) {
                 NfScaffold(
                     title = "Productos",
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
-                    isOnlineFlow = networkMonitor.isOnline
+                    isOnlineFlow = networkMonitor.isOnline,
+                    showBottomBar = true,
+                    currentRoute = currentRoute,
+                    onNavigateHome = navigateHome,
+                    onNavigateFacturas = navigateFacturas
                 ) { paddingValues ->
                     ProductosListScreen(
                         paddingValues = paddingValues,
@@ -131,7 +147,7 @@ fun NfNavHost() {
                 }
             }
 
-            // Producto form (crear/editar)
+            // Producto form — sin bottom bar
             composable(Routes.ProductoForm.route) { backStackEntry ->
                 val productoId = backStackEntry.arguments?.getString("productoId")
                 NfScaffold(
@@ -139,10 +155,7 @@ fun NfNavHost() {
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -154,19 +167,20 @@ fun NfNavHost() {
                 }
             }
 
-            // Clientes lista
+            // Clientes lista — con bottom bar
             composable(Routes.Clientes.route) {
                 NfScaffold(
                     title = "Clientes",
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
-                    isOnlineFlow = networkMonitor.isOnline
+                    isOnlineFlow = networkMonitor.isOnline,
+                    showBottomBar = true,
+                    currentRoute = currentRoute,
+                    onNavigateHome = navigateHome,
+                    onNavigateFacturas = navigateFacturas
                 ) { paddingValues ->
                     ClientesListScreen(
                         paddingValues = paddingValues,
@@ -180,7 +194,7 @@ fun NfNavHost() {
                 }
             }
 
-            // Cliente form (crear/editar)
+            // Cliente form — sin bottom bar
             composable(Routes.ClienteForm.route) { backStackEntry ->
                 val clienteId = backStackEntry.arguments?.getString("clienteId")
                 NfScaffold(
@@ -188,10 +202,7 @@ fun NfNavHost() {
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -203,19 +214,20 @@ fun NfNavHost() {
                 }
             }
 
-            // Historial
+            // Historial — con bottom bar
             composable(Routes.Historial.route) {
                 NfScaffold(
                     title = "Facturas",
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
-                    isOnlineFlow = networkMonitor.isOnline
+                    isOnlineFlow = networkMonitor.isOnline,
+                    showBottomBar = true,
+                    currentRoute = currentRoute,
+                    onNavigateHome = navigateHome,
+                    onNavigateFacturas = {}
                 ) { paddingValues ->
                     HistorialScreen(
                         paddingValues = paddingValues,
@@ -226,7 +238,7 @@ fun NfNavHost() {
                 }
             }
 
-            // Factura detalle
+            // Factura detalle — sin bottom bar
             composable(Routes.FacturaDetalle.route) { backStackEntry ->
                 val facturaId = backStackEntry.arguments?.getString("facturaId") ?: ""
                 NfScaffold(
@@ -234,10 +246,7 @@ fun NfNavHost() {
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -248,17 +257,14 @@ fun NfNavHost() {
                 }
             }
 
-            // Pendientes
+            // Pendientes — sin bottom bar
             composable(Routes.Pendientes.route) {
                 NfScaffold(
                     title = "Pendientes",
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
@@ -266,35 +272,33 @@ fun NfNavHost() {
                 }
             }
 
-            // Reportes
+            // Reportes — con bottom bar
             composable(Routes.Reportes.route) {
                 NfScaffold(
                     title = "Reportes",
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateConfig = { navController.navigate(Routes.Config.route) },
-                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
-                    isOnlineFlow = networkMonitor.isOnline
+                    isOnlineFlow = networkMonitor.isOnline,
+                    showBottomBar = true,
+                    currentRoute = currentRoute,
+                    onNavigateHome = navigateHome,
+                    onNavigateFacturas = navigateFacturas
                 ) { paddingValues ->
                     ReportesScreen(paddingValues = paddingValues)
                 }
             }
 
-            // Config
+            // Config — sin bottom bar
             composable(Routes.Config.route) {
                 NfScaffold(
-                    title = "Configuración",
+                    title = "Configuracion",
                     isHome = false,
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = { isDarkTheme = !isDarkTheme },
-                    onNavigateHome = navigateHome,
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateConfig = {},
-                    onNavigateHistorial = navigateHistorial,
                     onLogout = logout,
                     isOnlineFlow = networkMonitor.isOnline
                 ) { paddingValues ->
