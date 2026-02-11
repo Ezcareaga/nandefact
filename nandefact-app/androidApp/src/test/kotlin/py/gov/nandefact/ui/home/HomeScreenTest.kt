@@ -80,7 +80,7 @@ class HomeScreenTest {
     }
 
     @Test
-    fun `shows grid cards for Reportes, Productos, Clientes, Pendientes`() = runTest {
+    fun `shows grid cards for Reportes, Productos, Clientes, Historial`() = runTest {
         val vm = HomeViewModel(GetHomeDataUseCase(FakeAuthPort(), FakeFacturaPort()))
         advanceUntilIdle()
         setContent(vm)
@@ -89,6 +89,6 @@ class HomeScreenTest {
         composeRule.onNodeWithText("Reportes").assertIsDisplayed()
         composeRule.onNodeWithText("Productos").assertIsDisplayed()
         composeRule.onNodeWithText("Clientes").assertIsDisplayed()
-        composeRule.onNodeWithText("Pendientes").assertIsDisplayed()
+        composeRule.onNodeWithText("Historial").assertIsDisplayed()
     }
 }
