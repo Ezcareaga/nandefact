@@ -37,7 +37,7 @@ import py.gov.nandefact.ui.components.NfLoadingSpinner
 import py.gov.nandefact.ui.components.NfStatusDot
 import py.gov.nandefact.ui.components.StatusColor
 import py.gov.nandefact.ui.components.formatPYG
-import py.gov.nandefact.ui.theme.NfExtendedColors
+import py.gov.nandefact.ui.theme.NfTheme
 
 @Composable
 fun HomeScreen(
@@ -148,8 +148,8 @@ private fun HomeContent(
             // Card Pendientes — estilo especial
             NfCard(
                 modifier = Modifier.weight(1f),
-                borderColor = NfExtendedColors.warning,
-                backgroundColor = NfExtendedColors.warningContainer,
+                borderColor = NfTheme.colors.warning,
+                backgroundColor = NfTheme.colors.warningContainer,
                 onClick = onNavigatePendientes
             ) {
                 Row(
@@ -160,7 +160,7 @@ private fun HomeContent(
                     Text(
                         text = "(${data.pendingCount})",
                         style = MaterialTheme.typography.titleMedium,
-                        color = NfExtendedColors.warning,
+                        color = NfTheme.colors.warning,
                         fontWeight = FontWeight.Bold
                     )
                 }

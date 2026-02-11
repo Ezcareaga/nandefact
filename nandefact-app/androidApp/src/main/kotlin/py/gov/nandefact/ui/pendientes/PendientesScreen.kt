@@ -35,7 +35,7 @@ import py.gov.nandefact.ui.components.NfEmptyState
 import py.gov.nandefact.ui.components.NfStatusDot
 import py.gov.nandefact.ui.components.StatusColor
 import py.gov.nandefact.ui.components.formatPYG
-import py.gov.nandefact.ui.theme.NfExtendedColors
+import py.gov.nandefact.ui.theme.NfTheme
 
 @Composable
 fun PendientesScreen(
@@ -62,7 +62,7 @@ fun PendientesScreen(
             Text(
                 text = "${state.pendientes.size} facturas esperando conexión",
                 style = MaterialTheme.typography.titleMedium,
-                color = NfExtendedColors.warning,
+                color = NfTheme.colors.warning,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 12.dp)
             )

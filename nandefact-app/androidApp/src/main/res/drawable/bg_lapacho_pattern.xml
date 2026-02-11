@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Pétalo lapacho superior izquierdo -->
+    <path
+        android:pathData="M30,20 Q40,5 50,20 Q45,35 30,30 Q20,28 30,20"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Pétalo lapacho superior derecho -->
+    <path
+        android:pathData="M150,15 Q162,8 170,22 Q165,36 152,30 Q142,25 150,15"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Pétalo lapacho centro -->
+    <path
+        android:pathData="M95,85 Q108,72 118,88 Q112,102 98,98 Q86,95 95,85"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Pétalo lapacho inferior izquierdo -->
+    <path
+        android:pathData="M25,145 Q38,132 48,148 Q42,162 28,155 Q18,150 25,145"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Pétalo lapacho inferior derecho -->
+    <path
+        android:pathData="M160,155 Q172,142 180,158 Q175,172 162,165 Q152,160 160,155"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Pétalo suelto centro-izquierdo -->
+    <path
+        android:pathData="M55,110 Q65,100 72,112 Q68,122 58,118 Q50,115 55,110"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Pétalo suelto derecho -->
+    <path
+        android:pathData="M140,70 Q150,60 158,72 Q154,84 142,78 Q135,74 140,70"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Pétalo pequeño superior centro -->
+    <path
+        android:pathData="M80,40 Q88,32 94,42 Q90,50 82,48 Q76,45 80,40"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Pétalo pequeño inferior centro -->
+    <path
+        android:pathData="M110,175 Q118,167 124,178 Q120,186 112,183 Q106,180 110,175"
+        android:fillColor="#FFFFFF" />
+
+</vector>
