@@ -15,6 +15,7 @@ import py.gov.nandefact.TestData
 import py.gov.nandefact.fakes.FakeAuthPort
 import py.gov.nandefact.fakes.FakeFacturaPort
 import py.gov.nandefact.shared.domain.usecase.GetHomeDataUseCase
+import py.gov.nandefact.ui.common.UiState
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
@@ -35,13 +36,20 @@ class HomeViewModelTest {
         Dispatchers.resetMain()
     }
 
+    private fun assertSuccess(vm: HomeViewModel): HomeData {
+        val state = vm.uiState.value
+        assertTrue("Expected UiState.Success but was $state", state is UiState.Success)
+        return (state as UiState.Success).data
+    }
+
     @Test
     fun `init loads home data with user name`() = runTest {
         val vm = HomeViewModel(GetHomeDataUseCase(authPort, facturaPort))
         advanceUntilIdle()
 
-        assertEquals("María Demo", vm.uiState.value.userName)
-        assertEquals("Puesto Demo", vm.uiState.value.comercioName)
+        val data = assertSuccess(vm)
+        assertEquals("Mar\u00eda Demo", data.userName)
+        assertEquals("Puesto Demo", data.comercioName)
     }
 
     @Test
@@ -50,7 +58,8 @@ class HomeViewModelTest {
         val vm = HomeViewModel(GetHomeDataUseCase(authPort, facturaPort))
         advanceUntilIdle()
 
-        assertEquals(3, vm.uiState.value.pendingCount)
+        val data = assertSuccess(vm)
+        assertEquals(3, data.pendingCount)
     }
 
     @Test
@@ -64,20 +73,21 @@ class HomeViewModelTest {
         val vm = HomeViewModel(GetHomeDataUseCase(authPort, facturaPort))
         advanceUntilIdle()
 
-        assertEquals(75_000L, vm.uiState.value.lastSaleAmount)
+        val data = assertSuccess(vm)
+        assertEquals(75_000L, data.lastSaleAmount)
     }
 
     @Test
     fun `loadHomeData refreshes state`() = runTest {
         val vm = HomeViewModel(GetHomeDataUseCase(authPort, facturaPort))
         advanceUntilIdle()
-        assertEquals(0, vm.uiState.value.pendingCount)
+        assertEquals(0, assertSuccess(vm).pendingCount)
 
         facturaPort.facturas.add(TestData.factura())
         vm.loadHomeData()
         advanceUntilIdle()
 
-        assertEquals(1, vm.uiState.value.pendingCount)
+        assertEquals(1, assertSuccess(vm).pendingCount)
     }
 
     @Test
@@ -86,7 +96,8 @@ class HomeViewModelTest {
         val vm = HomeViewModel(GetHomeDataUseCase(authPort, facturaPort))
         advanceUntilIdle()
 
-        assertEquals(0, vm.uiState.value.pendingCount)
-        assertNull(vm.uiState.value.lastSaleAmount)
+        val data = assertSuccess(vm)
+        assertEquals(0, data.pendingCount)
+        assertNull(data.lastSaleAmount)
     }
 }

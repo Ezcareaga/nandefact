@@ -19,6 +19,7 @@ import py.gov.nandefact.fakes.FakeProductoPort
 import py.gov.nandefact.shared.domain.usecase.CrearFacturaLocalUseCase
 import py.gov.nandefact.shared.domain.usecase.GetProductosUseCase
 import py.gov.nandefact.shared.domain.usecase.SaveClienteUseCase
+import py.gov.nandefact.ui.common.UiState
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FacturacionViewModelTest {
@@ -58,7 +59,7 @@ class FacturacionViewModelTest {
         advanceUntilIdle()
 
         assertEquals(5, vm.uiState.value.productos.size)
-        assertFalse(vm.uiState.value.isLoadingProducts)
+        assertTrue(vm.uiState.value.productsState is UiState.Success)
     }
 
     @Test
@@ -180,7 +181,7 @@ class FacturacionViewModelTest {
 
         assertTrue(vm.uiState.value.isGenerated)
         assertFalse(vm.uiState.value.isGenerating)
-        assertEquals(3, vm.uiState.value.currentStep) // paso confirmación
+        assertEquals(3, vm.uiState.value.currentStep) // paso confirmacion
         assertTrue(vm.uiState.value.facturaNumero.isNotBlank())
         assertEquals(1, facturaPort.facturas.size)
     }

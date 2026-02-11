@@ -18,6 +18,7 @@ import py.gov.nandefact.fakes.FakeAuthPort
 import py.gov.nandefact.fakes.FakeClientePort
 import py.gov.nandefact.shared.domain.usecase.GetClientesUseCase
 import py.gov.nandefact.shared.domain.usecase.SaveClienteUseCase
+import py.gov.nandefact.ui.common.UiState
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ClientesViewModelTest {
@@ -46,13 +47,19 @@ class ClientesViewModelTest {
         )
     }
 
+    private fun assertContentSuccess(vm: ClientesViewModel): List<ClienteUi> {
+        val content = vm.listState.value.content
+        assertTrue("Expected UiState.Success but was $content", content is UiState.Success)
+        return (content as UiState.Success).data
+    }
+
     @Test
     fun `init loads clientes`() = runTest {
         vm = createVm()
         advanceUntilIdle()
 
-        assertEquals(3, vm.listState.value.clientes.size)
-        assertFalse(vm.listState.value.isLoading)
+        val clientes = assertContentSuccess(vm)
+        assertEquals(3, clientes.size)
     }
 
     @Test
@@ -63,7 +70,7 @@ class ClientesViewModelTest {
         var emitted = false
         val job = launch { vm.saveSuccess.first(); emitted = true }
 
-        vm.onNombreChange("Ana García")
+        vm.onNombreChange("Ana Garcia")
         vm.onTipoDocChange("CI")
         vm.onRucCiChange("1234567")
         vm.onSave()
@@ -124,13 +131,13 @@ class ClientesViewModelTest {
         vm = createVm()
         advanceUntilIdle()
 
-        val countBefore = vm.listState.value.clientes.size
+        val countBefore = assertContentSuccess(vm).size
 
         vm.onNombreChange("Nuevo Cliente")
         vm.onTipoDocChange("CI")
         vm.onSave()
         advanceUntilIdle()
 
-        assertEquals(countBefore + 1, vm.listState.value.clientes.size)
+        assertEquals(countBefore + 1, assertContentSuccess(vm).size)
     }
 }
