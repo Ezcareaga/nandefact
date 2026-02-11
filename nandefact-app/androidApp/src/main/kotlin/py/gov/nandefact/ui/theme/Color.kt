@@ -2,23 +2,36 @@ package py.gov.nandefact.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Paleta ÑandeFact — dark mode (default)
-val NfPrimary = Color(0xFF7B9CFF)
-val NfPrimaryVariant = Color(0xFF4D69FF)
-val NfBackground = Color(0xFF0D1017)
-val NfSurface = Color(0xFF161A23)
-val NfSurfaceVariant = Color(0xFF1E2330)
-val NfOnBackground = Color(0xFFE8EAED)
-val NfOnSurfaceVariant = Color(0xFF9AA0AC)
-val NfSuccess = Color(0xFF2D6A4F)
-val NfWarning = Color(0xFFC47A20)
-val NfWarningContainer = Color(0xFF2A1F0E)
-val NfError = Color(0xFFB84040)
-val NfOutline = Color(0xFF2A2E38)
+// Paleta Tajy Profundo — Dark mode (default)
+val DarkBackground = Color(0xFF061E29)
+val DarkSurface = Color(0xFF0F2F3D)
+val DarkNavBackground = Color(0xFF04151D)
+val DarkPrimary = Color(0xFF5F9598)
+val DarkOnPrimary = Color(0xFF061E29)
+val DarkTextPrimary = Color(0xFFFFFFFF)
+val DarkTextSecondary = Color(0xFF8EAAB8)
+val DarkCardBorder = Color(0x265F9598)       // primary@15%
+val DarkInputBg = Color(0xCC061E29)          // background@80%
+val DarkSuccess = Color(0xFF10B981)
+val DarkWarning = Color(0xFFF0D060)
+val DarkError = Color(0xFFFF6B6B)
+val DarkDivider = Color(0x1A5F9598)          // primary@10%
+val DarkIconContainer = Color(0x265F9598)    // primary@15%
+val DarkWarningContainer = Color(0x26F0D060) // warning@15%
 
-// Light mode (stub — post-MVP)
-val NfLightBackground = Color(0xFFF5F6FA)
-val NfLightSurface = Color(0xFFFFFFFF)
-val NfLightOnBackground = Color(0xFF1A1C20)
-val NfLightOnSurfaceVariant = Color(0xFF5A5E68)
-val NfLightOutline = Color(0xFFD0D3DA)
+// Paleta Tajy Profundo — Light mode
+val LightBackground = Color(0xFFF0F4F8)
+val LightSurface = Color(0xFFFFFFFF)
+val LightNavBackground = Color(0xFFFFFFFF)
+val LightPrimary = Color(0xFF1D546D)
+val LightOnPrimary = Color(0xFFFFFFFF)
+val LightTextPrimary = Color(0xFF0F172A)
+val LightTextSecondary = Color(0xFF475569)
+val LightCardBorder = Color(0xFFCBD5E1)
+val LightInputBg = Color(0xFFF1F5F9)
+val LightSuccess = Color(0xFF059669)
+val LightWarning = Color(0xFFB45309)
+val LightError = Color(0xFFDC2626)
+val LightDivider = Color(0xFFE2E8F0)
+val LightIconContainer = Color(0xFFF1F5F9)
+val LightWarningContainer = Color(0x26B45309) // warning@15%
