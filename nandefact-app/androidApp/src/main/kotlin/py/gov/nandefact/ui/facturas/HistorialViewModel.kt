@@ -101,7 +101,7 @@ class HistorialViewModel(
     fun loadMore() {
         val state = _uiState.value
         if (!state.hasMore) return
-        val currentList = (state.content as? UiState.Success)?.data ?: return
+        (state.content as? UiState.Success) ?: return
         val nextPage = state.page + 1
         val endIndex = nextPage * pageSize
         _uiState.value = state.copy(

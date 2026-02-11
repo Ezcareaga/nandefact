@@ -34,7 +34,7 @@ import py.gov.nandefact.ui.common.UiState
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfEmptyState
 import py.gov.nandefact.ui.components.NfErrorState
-import py.gov.nandefact.ui.components.NfLoadingShimmer
+import py.gov.nandefact.ui.components.NfLoadingSpinner
 import py.gov.nandefact.ui.components.NfSearchBar
 import py.gov.nandefact.ui.components.formatPYG
 import py.gov.nandefact.ui.util.OnNearEnd
@@ -87,7 +87,7 @@ fun ProductosListScreen(
             )
 
             when (val content = state.content) {
-                is UiState.Loading -> NfLoadingShimmer()
+                is UiState.Loading -> NfLoadingSpinner()
                 is UiState.Error -> NfErrorState(
                     message = content.message,
                     onRetry = content.retry
@@ -95,7 +95,7 @@ fun ProductosListScreen(
                 is UiState.Empty -> NfEmptyState(
                     icon = Icons.Filled.Inventory2,
                     title = "Sin productos",
-                    subtitle = "Agrega tu primer producto con el boton +",
+                    subtitle = "Agrega tu primer producto con el bot\u00f3n +",
                     actionLabel = "Agregar producto",
                     onAction = onCreateClick
                 )

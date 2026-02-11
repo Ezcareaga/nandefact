@@ -33,7 +33,7 @@ import py.gov.nandefact.ui.common.UiState
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfErrorState
 import py.gov.nandefact.ui.components.NfHeroCard
-import py.gov.nandefact.ui.components.NfLoadingShimmer
+import py.gov.nandefact.ui.components.NfLoadingSpinner
 import py.gov.nandefact.ui.components.NfStatusDot
 import py.gov.nandefact.ui.components.StatusColor
 import py.gov.nandefact.ui.components.formatPYG
@@ -53,7 +53,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     when (val state = uiState) {
-        is UiState.Loading -> NfLoadingShimmer(
+        is UiState.Loading -> NfLoadingSpinner(
             modifier = Modifier.padding(paddingValues)
         )
         is UiState.Error -> NfErrorState(
@@ -184,7 +184,7 @@ private fun HomeContent(
                 ) {
                     NfStatusDot(status = StatusColor.SUCCESS)
                     Text(
-                        text = " Ultima: ${data.lastSaleAmount.let { formatPYG(it) }}",
+                        text = " \u00DAltima: ${data.lastSaleAmount.let { formatPYG(it) }}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.weight(1f)

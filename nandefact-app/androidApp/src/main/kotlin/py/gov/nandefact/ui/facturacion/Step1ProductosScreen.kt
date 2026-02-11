@@ -29,7 +29,7 @@ import py.gov.nandefact.ui.common.UiState
 import py.gov.nandefact.ui.components.NfCard
 import py.gov.nandefact.ui.components.NfEmptyState
 import py.gov.nandefact.ui.components.NfErrorState
-import py.gov.nandefact.ui.components.NfLoadingShimmer
+import py.gov.nandefact.ui.components.NfLoadingSpinner
 import py.gov.nandefact.ui.components.NfQuantitySelector
 import py.gov.nandefact.ui.components.NfSearchBar
 import py.gov.nandefact.ui.components.formatPYG
@@ -53,7 +53,7 @@ fun Step1ProductosScreen(
         )
 
         when (val productsState = state.productsState) {
-            is UiState.Loading -> NfLoadingShimmer(
+            is UiState.Loading -> NfLoadingSpinner(
                 modifier = Modifier.weight(1f)
             )
             is UiState.Error -> NfErrorState(
@@ -64,7 +64,7 @@ fun Step1ProductosScreen(
             is UiState.Empty -> NfEmptyState(
                 icon = Icons.Filled.Inventory2,
                 title = "Sin productos",
-                subtitle = "Agrega productos desde el menu principal",
+                subtitle = "Agrega productos desde el men\u00fa principal",
                 modifier = Modifier.weight(1f)
             )
             is UiState.Success -> {
