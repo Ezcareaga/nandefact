@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import py.gov.nandefact.ui.components.NfBackground
+import py.gov.nandefact.ui.theme.NfTheme
 import py.gov.nandefact.ui.components.NfHomePill
 import py.gov.nandefact.ui.components.NfOfflineBanner
 
@@ -126,17 +128,19 @@ fun NfScaffold(
             },
             containerColor = MaterialTheme.colorScheme.background
         ) { paddingValues ->
-            Box(modifier = Modifier.fillMaxSize()) {
-                content(paddingValues)
+            NfBackground {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    content(paddingValues)
 
-                // Pill Home — oculta en Home
-                if (!isHome) {
-                    NfHomePill(
-                        onClick = onNavigateHome,
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(paddingValues)
-                    )
+                    // Pill Home — oculta en Home
+                    if (!isHome) {
+                        NfHomePill(
+                            onClick = onNavigateHome,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(paddingValues)
+                        )
+                    }
                 }
             }
         }

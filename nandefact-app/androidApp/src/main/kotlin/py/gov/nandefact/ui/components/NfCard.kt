@@ -12,11 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import py.gov.nandefact.ui.theme.NfTheme
 
 @Composable
 fun NfCard(
     modifier: Modifier = Modifier,
-    borderColor: Color = MaterialTheme.colorScheme.outline,
+    borderColor: Color = NfTheme.colors.cardBorder,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     borderWidth: Dp = 1.dp,
     onClick: (() -> Unit)? = null,

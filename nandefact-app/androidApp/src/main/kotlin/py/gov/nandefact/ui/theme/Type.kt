@@ -2,8 +2,11 @@ package py.gov.nandefact.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+
+val NfMonoFamily = FontFamily.Monospace
 
 // Tipografía optimizada para targets táctiles grandes (Doña María, bajo el sol)
 val NandefactTypography = Typography(
@@ -18,7 +21,7 @@ val NandefactTypography = Typography(
         lineHeight = 32.sp
     ),
     headlineSmall = TextStyle(
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
         lineHeight = 28.sp
     ),
@@ -53,7 +56,7 @@ val NandefactTypography = Typography(
         lineHeight = 16.sp
     ),
     labelLarge = TextStyle(
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
         lineHeight = 20.sp
     ),

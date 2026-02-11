@@ -12,6 +12,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import py.gov.nandefact.ui.theme.NfTheme
 
 @Composable
 fun NfSearchBar(
@@ -52,9 +53,9 @@ fun NfSearchBar(
         shape = MaterialTheme.shapes.medium,
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedBorderColor = NfTheme.colors.cardBorder,
+            focusedContainerColor = NfTheme.colors.inputBg,
+            unfocusedContainerColor = NfTheme.colors.inputBg,
             cursorColor = MaterialTheme.colorScheme.primary
         )
     )
