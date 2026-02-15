@@ -45,7 +45,7 @@ class ReportesScreenTest {
     }
 
     @Test
-    fun `displays period filter chips`() = runTest {
+    fun `displays period filter chips without Todo`() = runTest {
         val vm = ReportesViewModel(GetReportesUseCase(FakeFacturaPort(), FakeAuthPort()))
         advanceUntilIdle()
         composeRule.setContent {
@@ -59,11 +59,11 @@ class ReportesScreenTest {
         composeRule.onNodeWithText("Hoy").assertIsDisplayed()
         composeRule.onNodeWithText("Semana").assertIsDisplayed()
         composeRule.onNodeWithText("Mes").assertIsDisplayed()
-        composeRule.onNodeWithText("Todo").assertIsDisplayed()
+        composeRule.onNodeWithText("Todo").assertDoesNotExist()
     }
 
     @Test
-    fun `shows ventas and IVA cards`() = runTest {
+    fun `shows all 5 section titles`() = runTest {
         val vm = ReportesViewModel(GetReportesUseCase(FakeFacturaPort(), FakeAuthPort()))
         advanceUntilIdle()
         composeRule.setContent {
@@ -74,9 +74,12 @@ class ReportesScreenTest {
         }
         composeRule.waitForIdle()
 
-        composeRule.onNodeWithText("Ventas").assertIsDisplayed()
-        composeRule.onNodeWithText("Desglose IVA").assertIsDisplayed()
+        composeRule.onNodeWithText("Vista General").assertIsDisplayed()
         composeRule.onNodeWithText("IVA 10%").assertIsDisplayed()
         composeRule.onNodeWithText("IVA 5%").assertIsDisplayed()
+        composeRule.onNodeWithText("Productos").assertIsDisplayed()
+        composeRule.onNodeWithText("Clientes Frecuentes").assertIsDisplayed()
+        composeRule.onNodeWithText("Horario Pico").assertIsDisplayed()
+        composeRule.onNodeWithText("Resumen para tu contador").assertIsDisplayed()
     }
 }
