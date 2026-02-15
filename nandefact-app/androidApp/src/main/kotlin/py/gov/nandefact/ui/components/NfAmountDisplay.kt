@@ -16,6 +16,23 @@ fun formatPYG(amount: Long): String {
     return "Gs ${formatter.format(amount)}"
 }
 
+// Formato compacto: "Gs 1.2M", "Gs 850K", "Gs 500"
+fun formatCompactPYG(amount: Long): String {
+    val abs = kotlin.math.abs(amount)
+    val sign = if (amount < 0) "-" else ""
+    return when {
+        abs >= 1_000_000 -> {
+            val millions = abs / 100_000 // un decimal
+            val whole = millions / 10
+            val decimal = millions % 10
+            if (decimal == 0L) "${sign}Gs ${whole}M"
+            else "${sign}Gs ${whole}.${decimal}M"
+        }
+        abs >= 1_000 -> "${sign}Gs ${abs / 1_000}K"
+        else -> formatPYG(amount)
+    }
+}
+
 @Composable
 fun NfAmountDisplay(
     amount: Long,
