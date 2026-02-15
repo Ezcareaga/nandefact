@@ -17,6 +17,7 @@ import py.gov.nandefact.fakes.FakeClientePort
 import py.gov.nandefact.fakes.FakeFacturaPort
 import py.gov.nandefact.fakes.FakeProductoPort
 import py.gov.nandefact.shared.domain.usecase.CrearFacturaLocalUseCase
+import py.gov.nandefact.shared.domain.usecase.GetClientesUseCase
 import py.gov.nandefact.shared.domain.usecase.GetProductosUseCase
 import py.gov.nandefact.shared.domain.usecase.SaveClienteUseCase
 import py.gov.nandefact.ui.common.UiState
@@ -49,7 +50,8 @@ class FacturacionViewModelTest {
         return FacturacionViewModel(
             getProductos = GetProductosUseCase(productoPort, authPort),
             crearFacturaLocal = CrearFacturaLocalUseCase(facturaPort, authPort),
-            saveCliente = SaveClienteUseCase(clientePort, authPort)
+            saveCliente = SaveClienteUseCase(clientePort, authPort),
+            getClientes = GetClientesUseCase(clientePort, authPort)
         )
     }
 
@@ -163,7 +165,7 @@ class FacturacionViewModelTest {
         vm.onSelectInnominado()
         val cliente = vm.uiState.value.cliente
         assertTrue(cliente.isInnominado)
-        assertEquals("Sin Nombre", cliente.nombre)
+        assertEquals("Consumidor Final", cliente.nombre)
         assertEquals("innominado", cliente.tipoDocumento)
     }
 
@@ -210,5 +212,115 @@ class FacturacionViewModelTest {
 
         assertEquals(0, vm.uiState.value.currentStep)
         assertTrue(vm.uiState.value.productosSeleccionados.isEmpty())
+    }
+
+    // === Nuevos tests: Wizard UX Improvements ===
+
+    @Test
+    fun `onClienteTabChange to SIN_DATOS sets consumidor final`() = runTest {
+        vm = createVm()
+        advanceUntilIdle()
+
+        vm.onClienteTabChange(ClienteTab.SIN_DATOS)
+
+        val state = vm.uiState.value
+        assertEquals(ClienteTab.SIN_DATOS, state.clienteTab)
+        assertTrue(state.cliente.isInnominado)
+        assertEquals("Consumidor Final", state.cliente.nombre)
+        assertEquals("innominado", state.cliente.tipoDocumento)
+        assertFalse(state.cliente.guardarCliente)
+    }
+
+    @Test
+    fun `onClienteTabChange to CI clears innominado`() = runTest {
+        vm = createVm()
+        advanceUntilIdle()
+
+        // Primero seleccionar SIN_DATOS
+        vm.onClienteTabChange(ClienteTab.SIN_DATOS)
+        assertTrue(vm.uiState.value.cliente.isInnominado)
+
+        // Cambiar a CI
+        vm.onClienteTabChange(ClienteTab.CI)
+        advanceUntilIdle()
+
+        val state = vm.uiState.value
+        assertEquals(ClienteTab.CI, state.clienteTab)
+        assertFalse(state.cliente.isInnominado)
+        assertEquals("CI", state.cliente.tipoDocumento)
+    }
+
+    @Test
+    fun `client search returns results and hides inline form`() = runTest {
+        // Precargar clientes en el fake
+        clientePort.clientes.addAll(TestData.clientes(3).map {
+            it.copy(comercioId = "comercio-001")
+        })
+        vm = createVm()
+        advanceUntilIdle()
+
+        // Buscar por nombre que existe
+        vm.onClienteSearchChange("Cliente 1")
+        advanceUntilIdle()
+
+        val state = vm.uiState.value
+        assertTrue(state.clientesResults.isNotEmpty())
+        assertFalse(state.showInlineForm)
+    }
+
+    @Test
+    fun `client search with no match shows inline form`() = runTest {
+        vm = createVm()
+        advanceUntilIdle()
+
+        // Buscar algo que no existe
+        vm.onClienteSearchChange("NoExiste12345")
+        advanceUntilIdle()
+
+        val state = vm.uiState.value
+        assertTrue(state.clientesResults.isEmpty())
+        assertTrue(state.showInlineForm)
+    }
+
+    @Test
+    fun `saveClienteIfNeeded skips when client already has id`() = runTest {
+        vm = createVm()
+        advanceUntilIdle()
+
+        // Simular selección de cliente existente (tiene id)
+        val existingCliente = TestData.cliente()
+        vm.onSelectClienteFromList(existingCliente)
+
+        // Avanzar al paso 1 (cliente) y luego al paso 2 (confirmar)
+        vm.nextStep() // 0 -> 1
+        vm.nextStep() // 1 -> 2 (aquí se llama saveClienteIfNeeded)
+        advanceUntilIdle()
+
+        // No debería haber guardado — el cliente ya tiene id
+        assertFalse(clientePort.saveCalled)
+    }
+
+    @Test
+    fun `saveClienteIfNeeded saves new client and assigns id`() = runTest {
+        vm = createVm()
+        advanceUntilIdle()
+
+        // Configurar un cliente nuevo (sin id)
+        vm.onClienteNombreChange("María López")
+        vm.onClienteRucCiChange("1234567")
+        vm.onClienteTipoDocChange("CI")
+
+        // Verificar que no tiene id
+        assertNull(vm.uiState.value.cliente.id)
+
+        // Avanzar desde paso 1 al 2 (llama saveClienteIfNeeded)
+        vm.nextStep() // 0 -> 1
+        vm.nextStep() // 1 -> 2
+        advanceUntilIdle()
+
+        // Debería haber guardado
+        assertTrue(clientePort.saveCalled)
+        // Cliente debería tener id asignado
+        assertNotNull(vm.uiState.value.cliente.id)
     }
 }
