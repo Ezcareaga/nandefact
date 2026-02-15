@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
@@ -77,6 +78,7 @@ fun ReportesScreen(
             is UiState.Empty -> NfLoadingSpinner()
             is UiState.Success -> {
                 LazyColumn(
+                    modifier = Modifier.testTag("reportes_list"),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     item { VistaGeneralSection(content.data) }
