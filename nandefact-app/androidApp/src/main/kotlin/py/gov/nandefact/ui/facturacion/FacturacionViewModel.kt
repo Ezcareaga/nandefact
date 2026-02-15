@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import py.gov.nandefact.shared.domain.Cliente
 import py.gov.nandefact.shared.domain.usecase.ClienteInput
 import py.gov.nandefact.shared.domain.usecase.CrearFacturaLocalUseCase
 import py.gov.nandefact.shared.domain.usecase.FacturaInput
+import py.gov.nandefact.shared.domain.usecase.GetClientesUseCase
 import py.gov.nandefact.shared.domain.usecase.GetProductosUseCase
 import py.gov.nandefact.shared.domain.usecase.ItemInput
 import py.gov.nandefact.shared.domain.usecase.SaveClienteUseCase
@@ -39,8 +41,10 @@ data class ClienteSelection(
     val isInnominado: Boolean = false
 )
 
+enum class ClienteTab { CI, RUC, SIN_DATOS }
+
 data class FacturacionUiState(
-    val currentStep: Int = 0, // 0-3
+    val currentStep: Int = 0, // 0-2 (3 pasos) + 3 = confirmación post-genera
     val productsState: UiState<List<ProductoItem>> = UiState.Loading,
     val searchQuery: String = "",
     val cliente: ClienteSelection = ClienteSelection(),
@@ -52,7 +56,11 @@ data class FacturacionUiState(
     val whatsAppAutoSent: Boolean = false,
     // Paginacion
     val page: Int = 1,
-    val hasMore: Boolean = false
+    val hasMore: Boolean = false,
+    // Wizard Step 2: clientes
+    val clienteTab: ClienteTab = ClienteTab.CI,
+    val clientesResults: List<Cliente> = emptyList(),
+    val showInlineForm: Boolean = false
 ) {
     // Propiedad de compatibilidad: extrae la lista de productos del UiState
     val productos: List<ProductoItem>
@@ -99,7 +107,8 @@ data class FacturacionUiState(
 class FacturacionViewModel(
     private val getProductos: GetProductosUseCase,
     private val crearFacturaLocal: CrearFacturaLocalUseCase,
-    private val saveCliente: SaveClienteUseCase
+    private val saveCliente: SaveClienteUseCase,
+    private val getClientes: GetClientesUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(FacturacionUiState())
     val uiState: StateFlow<FacturacionUiState> = _uiState.asStateFlow()
@@ -111,6 +120,7 @@ class FacturacionViewModel(
 
     init {
         loadProductos()
+        loadInitialClientes()
         @OptIn(FlowPreview::class)
         viewModelScope.launch {
             _searchInput.debounce(300).distinctUntilChanged().collect { query ->
@@ -121,7 +131,27 @@ class FacturacionViewModel(
         viewModelScope.launch {
             _clienteSearchInput.debounce(300).distinctUntilChanged().collect { query ->
                 _uiState.value = _uiState.value.copy(clienteSearchQuery = query)
+                if (query.isNotBlank()) {
+                    val results = getClientes(query)
+                    _uiState.value = _uiState.value.copy(
+                        clientesResults = results,
+                        showInlineForm = results.isEmpty()
+                    )
+                } else {
+                    val results = getClientes()
+                    _uiState.value = _uiState.value.copy(
+                        clientesResults = results,
+                        showInlineForm = false
+                    )
+                }
             }
+        }
+    }
+
+    private fun loadInitialClientes() {
+        viewModelScope.launch {
+            val results = getClientes()
+            _uiState.value = _uiState.value.copy(clientesResults = results)
         }
     }
 
@@ -208,10 +238,13 @@ class FacturacionViewModel(
         val cliente = _uiState.value.cliente
         if (!cliente.guardarCliente || cliente.isInnominado) return
         if (cliente.nombre.isBlank()) return
+        if (cliente.id != null) return // Ya guardado o seleccionado — no duplicar
 
+        val newId = java.util.UUID.randomUUID().toString()
         viewModelScope.launch {
             val result = saveCliente(
                 ClienteInput(
+                    id = newId,
                     nombre = cliente.nombre,
                     tipoDocumento = cliente.tipoDocumento,
                     rucCi = cliente.rucCi.ifBlank { null },
@@ -219,7 +252,9 @@ class FacturacionViewModel(
                 )
             )
             if (result.isSuccess) {
-                // Cliente guardado — se mostrara en la lista de clientes
+                _uiState.value = _uiState.value.copy(
+                    cliente = _uiState.value.cliente.copy(id = newId)
+                )
             }
         }
     }
@@ -235,9 +270,73 @@ class FacturacionViewModel(
         _clienteSearchInput.value = query
     }
 
+    fun onClienteTabChange(tab: ClienteTab) {
+        when (tab) {
+            ClienteTab.SIN_DATOS -> {
+                _uiState.value = _uiState.value.copy(
+                    clienteTab = tab,
+                    cliente = ClienteSelection(
+                        isInnominado = true,
+                        nombre = "Consumidor Final",
+                        tipoDocumento = "innominado",
+                        guardarCliente = false
+                    ),
+                    clienteSearchQuery = "",
+                    showInlineForm = false
+                )
+                _clienteSearchInput.value = ""
+            }
+            ClienteTab.CI, ClienteTab.RUC -> {
+                val tipoDoc = if (tab == ClienteTab.CI) "CI" else "RUC"
+                _uiState.value = _uiState.value.copy(
+                    clienteTab = tab,
+                    cliente = ClienteSelection(tipoDocumento = tipoDoc),
+                    showInlineForm = false
+                )
+                // Recargar clientes
+                viewModelScope.launch {
+                    val results = getClientes()
+                    _uiState.value = _uiState.value.copy(clientesResults = results)
+                }
+            }
+        }
+    }
+
     fun onSelectInnominado() {
         _uiState.value = _uiState.value.copy(
-            cliente = ClienteSelection(isInnominado = true, nombre = "Sin Nombre", tipoDocumento = "innominado")
+            clienteTab = ClienteTab.SIN_DATOS,
+            cliente = ClienteSelection(
+                isInnominado = true,
+                nombre = "Consumidor Final",
+                tipoDocumento = "innominado",
+                guardarCliente = false
+            )
+        )
+    }
+
+    fun onSelectClienteFromList(cliente: Cliente) {
+        _uiState.value = _uiState.value.copy(
+            cliente = ClienteSelection(
+                id = cliente.id,
+                nombre = cliente.nombre,
+                rucCi = cliente.rucCi ?: "",
+                tipoDocumento = cliente.tipoDocumento,
+                telefono = cliente.telefono ?: "",
+                guardarCliente = false, // Ya existe
+                isInnominado = false
+            )
+        )
+    }
+
+    fun onClearClienteSelection() {
+        val currentTab = _uiState.value.clienteTab
+        val tipoDoc = when (currentTab) {
+            ClienteTab.CI -> "CI"
+            ClienteTab.RUC -> "RUC"
+            ClienteTab.SIN_DATOS -> "innominado"
+        }
+        _uiState.value = _uiState.value.copy(
+            cliente = ClienteSelection(tipoDocumento = tipoDoc)
         )
     }
 
@@ -315,5 +414,6 @@ class FacturacionViewModel(
     fun resetWizard() {
         _uiState.value = FacturacionUiState()
         loadProductos()
+        loadInitialClientes()
     }
 }

@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
+import py.gov.nandefact.ui.components.ClienteSelectorItem
 import py.gov.nandefact.ui.components.NfOfflineBanner
 import py.gov.nandefact.ui.components.NfProgressBar
 
@@ -56,7 +57,7 @@ fun FacturacionWizardScreen(
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
-                                text = "Paso ${state.currentStep + 1}/4",
+                                text = "Paso ${state.currentStep + 1}/3",
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -98,11 +99,12 @@ fun FacturacionWizardScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Progress bar
+            // Progress bar con labels
             if (!state.isGenerated) {
                 NfProgressBar(
                     currentStep = state.currentStep,
-                    totalSteps = 4,
+                    totalSteps = 3,
+                    labels = listOf("Productos", "Cliente", "Confirmar"),
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -121,6 +123,19 @@ fun FacturacionWizardScreen(
                 1 -> Step2ClienteScreen(
                     state = state,
                     onClienteSearchChange = viewModel::onClienteSearchChange,
+                    clientesDisponibles = state.clientesResults.map { c ->
+                        ClienteSelectorItem(
+                            id = c.id,
+                            nombre = c.nombre,
+                            rucCi = c.rucCi,
+                            tipoDocumento = c.tipoDocumento
+                        )
+                    },
+                    clienteTab = state.clienteTab,
+                    showInlineForm = state.showInlineForm,
+                    onClienteTabChange = viewModel::onClienteTabChange,
+                    onSelectClienteFromList = viewModel::onSelectClienteFromList,
+                    onClearClienteSelection = viewModel::onClearClienteSelection,
                     onSelectInnominado = viewModel::onSelectInnominado,
                     onTipoDocChange = viewModel::onClienteTipoDocChange,
                     onRucCiChange = viewModel::onClienteRucCiChange,
